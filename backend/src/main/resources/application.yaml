@@ -1,0 +1,3 @@
+spring:
+  application:
+    name: Donor Search backend
