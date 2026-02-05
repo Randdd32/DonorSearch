@@ -153,11 +153,15 @@ async function* scrape(endpoint: PartType, page: Page): AsyncGenerator<Part[]> {
 				(p) => p.innerText.replaceAll('\n', ' ')
 			)
 			
-            const relativeUrl = await productEl.$eval(
-                '.td__name > a', 
-                (a) => a.getAttribute('href')
-            )
-            serialized['part_url'] = `https://pcpartpicker.com${relativeUrl}`
+			const relativeUrl = await productEl.$eval(
+					'.td__name > a', 
+					(a) => a.getAttribute('href')
+			)
+			if (relativeUrl) {
+				serialized['part_url'] = `https://pcpartpicker.com${relativeUrl}`
+			} else {
+				serialized['part_url'] = null
+			}
 
 			const priceText = await productEl.$eval(
 				'.td__price',
