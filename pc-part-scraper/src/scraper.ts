@@ -56,6 +56,7 @@ async function scrapeInParallel(endpoints: PartType[]) {
 		puppeteer,
 		puppeteerOptions: {
 			headless: 'new',
+			args: ['--no-sandbox', '--disable-setuid-sandbox']
 		},
 	})
 
