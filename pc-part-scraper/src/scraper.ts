@@ -125,7 +125,7 @@ async function* scrape(endpoint: PartType, page: Page): AsyncGenerator<Part[]> {
 	await page.goto(`${BASE_URL}/${endpoint}`)
 
 	const paginationEl = await page.waitForSelector('.pagination', {
-		timeout: 5000,
+		timeout: 60000
 	})
 
 	// NOTE: We are banging paginationEl because Page.waitForSelector()
