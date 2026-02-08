@@ -1,6 +1,6 @@
 import re
 
-def clean_unit(value, unit_str=""):
+def clean_unit(value, unit_str=''):
     """Убирает единицы измерения и возвращает число (int или float)."""
     if not value or not isinstance(value, str):
         return None
@@ -26,7 +26,7 @@ def clean_bool(value):
         value = value[0]
     return True if str(value).lower() == 'yes' else False
 
-def list_to_str(value_list, separator="|"):
+def list_to_str(value_list, separator='|'):
     """Превращает список JSON в строку."""
     if not value_list:
         return None
@@ -76,17 +76,25 @@ def parse_dynamic_counts(specs, suffix_key, exclude_keys=None):
             clean_key = re.sub(r'[^a-z0-9]', '_', clean_key)
             clean_key = re.sub(r'_+', '_', clean_key).strip('_')
             
-            col_name = f"{clean_key}_{suffix_key.lower().replace(' ', '_')}"
+            col_name = f'{clean_key}_{suffix_key.lower().replace(' ', '_')}'
             result[col_name] = count
     return result
 
+def get_base_info(specs):
+    """
+    Извлекает общие поля для любой детали.
+    """
+    return {
+        'manufacturer': get_first_val(specs, 'Manufacturer'),
+        'part_number': list_to_str(specs.get('Part #'))
+    }
+
 def parse_case(specs):
-    data = {} 
-    data['part_number'] = get_first_val(specs, 'Part #')
-    data['manufacturer'] = get_first_val(specs, 'Manufacturer')
+    data = get_base_info(specs) 
     
     drive_bays = specs.get('Drive Bays', [])
     data['ext_525_bays'] = extract_count_from_list(drive_bays, 'External 5.25')
+    data['ext_35_bays'] = extract_count_from_list(drive_bays, 'External 3.5')
     data['int_25_bays'] = extract_count_from_list(drive_bays, 'Internal 2.5')
     
     data['expansion_slots'] = clean_unit(get_first_val(specs, 'Expansion Slots'))
@@ -103,13 +111,11 @@ def parse_case(specs):
     data['front_panel_usb'] = list_to_str(specs.get('Front Panel USB', []))
     data['radiator_support'] = list_to_str(specs.get('Radiator Support', []))
     data['fan_support'] = list_to_str(specs.get('Fan Support', []))
-    
+
     return data
 
 def parse_cpu(specs):
-    data = {}
-    data['part_number'] = get_first_val(specs, 'Part #')
-    data['manufacturer'] = get_first_val(specs, 'Manufacturer')
+    data = get_base_info(specs) 
 
     data['socket'] = get_first_val(specs, 'Socket')
     data['max_memory'] = clean_unit(get_first_val(specs, 'Maximum Supported Memory'), 'GB')
@@ -118,27 +124,15 @@ def parse_cpu(specs):
     return data
 
 def parse_cpu_cooler(specs):
-    data = {}
-    data['part_number'] = get_first_val(specs, 'Part #')
-    data['manufacturer'] = get_first_val(specs, 'Manufacturer')
+    data = get_base_info(specs)
     
-    height_raw = get_first_val(specs, 'Height')
-    data['height'] = clean_unit(height_raw, 'mm')
-    
+    data['height'] = clean_unit(get_first_val(specs, 'Height'), 'mm')
     data['supported_sockets'] = list_to_str(specs.get('CPU Socket', []))
-    
-    water_raw = get_first_val(specs, 'Water Cooled')
-    if water_raw and 'mm' in str(water_raw):
-        data['water_cooled_size'] = clean_unit(water_raw, 'mm')
-    else:
-        data['water_cooled_size'] = 0
         
     return data
 
 def parse_motherboard(specs):
-    data = {}
-    data['part_number'] = get_first_val(specs, 'Part #')
-    data['manufacturer'] = get_first_val(specs, 'Manufacturer')
+    data = get_base_info(specs) 
     
     data['memory_type'] = get_first_val(specs, 'Memory Type')
     
@@ -169,15 +163,13 @@ def parse_motherboard(specs):
             count = int(match.group(1)) if match else 0
             
             clean_key = key.replace('Headers', '').strip().replace(' ', '_').replace('.', '_').lower()
-            usb_headers[f"header_{clean_key}"] = count
+            usb_headers[f'header_{clean_key}'] = count
     data.update(usb_headers)
     
     return data
 
 def parse_memory(specs):
-    data = {}
-    data['part_number'] = get_first_val(specs, 'Part #')
-    data['manufacturer'] = get_first_val(specs, 'Manufacturer')
+    data = get_base_info(specs) 
 
     data['form_factor'] = get_first_val(specs, 'Form Factor')
     
@@ -192,9 +184,7 @@ def parse_memory(specs):
     return data
 
 def parse_storage(specs):
-    data = {}
-    data['part_number'] = get_first_val(specs, 'Part #')
-    data['manufacturer'] = get_first_val(specs, 'Manufacturer')
+    data = get_base_info(specs) 
     
     raw_rpm = get_first_val(specs, 'RPM')
     if raw_rpm == 'SSD':
@@ -210,9 +200,7 @@ def parse_storage(specs):
     return data
 
 def parse_video_card(specs):
-    data = {}
-    data['part_number'] = get_first_val(specs, 'Part #')
-    data['manufacturer'] = get_first_val(specs, 'Manufacturer')
+    data = get_base_info(specs) 
     
     data['length'] = clean_unit(get_first_val(specs, 'Length'), 'mm')
     data['tdp'] = clean_unit(get_first_val(specs, 'TDP'), 'W')
@@ -243,9 +231,7 @@ def parse_video_card(specs):
     return data
 
 def parse_power_supply(specs):
-    data = {}
-    data['part_number'] = get_first_val(specs, 'Part #')
-    data['manufacturer'] = get_first_val(specs, 'Manufacturer')
+    data = get_base_info(specs)
 
     data['length'] = clean_unit(get_first_val(specs, 'Length'), 'mm')
     
@@ -255,9 +241,7 @@ def parse_power_supply(specs):
     return data
 
 def parse_case_fan(specs):
-    data = {}
-    data['part_number'] = get_first_val(specs, 'Part #')
-    data['manufacturer'] = get_first_val(specs, 'Manufacturer')
+    data = get_base_info(specs)
 
     data['size'] = clean_unit(get_first_val(specs, 'Size'), 'mm')
     data['connectors'] = get_first_val(specs, 'Connector')
@@ -265,9 +249,7 @@ def parse_case_fan(specs):
     return data
 
 def parse_monitor(specs):
-    data = {}
-    data['part_number'] = get_first_val(specs, 'Part #')
-    data['manufacturer'] = get_first_val(specs, 'Manufacturer')
+    data = get_base_info(specs)
     
     inputs_list = specs.get('Inputs', [])
     
@@ -299,18 +281,14 @@ def parse_monitor(specs):
     return data
 
 def parse_expansion_card(specs):
-    data = {}
-    data['part_number'] = get_first_val(specs, 'Part #')
-    data['manufacturer'] = get_first_val(specs, 'Manufacturer')
+    data = get_base_info(specs)
 
     data['interface'] = get_first_val(specs, 'Interface')
 
     return data
 
 def parse_optical_drive(specs):
-    data = {}
-    data['part_number'] = get_first_val(specs, 'Part #')
-    data['manufacturer'] = get_first_val(specs, 'Manufacturer')
+    data = get_base_info(specs)
 
     data['form_factor'] = get_first_val(specs, 'Form Factor')
     data['interface'] = get_first_val(specs, 'Interface')
