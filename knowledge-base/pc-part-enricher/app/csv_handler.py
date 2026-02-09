@@ -26,9 +26,9 @@ def save_csv(data_rows, output_path):
 
 def _fill_missing_counts(df):
     zero_fill_patterns = [
-        'power_', 'output_', 'input_', 'header_', 
-        'sata_', 'pci_', 'ext_', 'int_', 
-        '_connectors', '_slots', '_bays', '_ports'
+        'power_', 'input_', 'header_', 
+        'sata_', 'pci_', 'ext_', 'int_', '_outputs',
+        '_connectors',
     ]
     
     cols_to_fill = [
