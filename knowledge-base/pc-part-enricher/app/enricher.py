@@ -30,18 +30,18 @@ class PartEnricher:
         await asyncio.sleep(random.uniform(3, 6))
         
         try:
-            print(f"Scraping: {url}")
+            print(f'Scraping: {url}')
             
             product = await self.scraper.aio_fetch_product(url)
             specs = product.specs
             
             parse_func = self.parser_map.get(part_type)
             if not parse_func:
-                print(f"No parser defined for {part_type}")
+                print(f'No parser defined for {part_type}')
                 return base_row
                 
             return parse_func(specs, base_row)
             
         except Exception as e:
-            print(f"Error scraping {url}: {e}")
+            print(f'Error scraping {url}: {e}')
             return base_row
