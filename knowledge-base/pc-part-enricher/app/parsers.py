@@ -106,7 +106,21 @@ def parse_case(specs, base_row):
     data['ext_35_bays'] = extract_count_from_list(drive_bays, 'External 3.5')
     data['int_25_bays'] = extract_count_from_list(drive_bays, 'Internal 2.5')
     
-    data['expansion_slots'] = clean_unit(get_first_val(specs, 'Expansion Slots'), 'x Full-Height')
+    slots_list = specs.get('Expansion Slots', [])
+    data['expansion_slots_full_height'] = 0             
+    data['expansion_slots_half_height'] = 0
+    data['expansion_slots_riser'] = 0 
+    
+    for item in slots_list:
+        match = re.search(r'^(\d+)', item)
+        count = int(match.group(1)) if match else 0
+        
+        if 'via Riser' in item:
+            data['expansion_slots_riser'] = count
+        elif 'Half-Height' in item:
+            data['expansion_slots_half_height'] = count
+        elif 'Full-Height' in item:
+            data['expansion_slots_full_height'] = count
 
     dims_raw = get_first_val(specs, 'Dimensions')
     if dims_raw:
