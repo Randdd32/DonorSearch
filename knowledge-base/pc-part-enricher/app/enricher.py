@@ -1,6 +1,6 @@
 import asyncio
 import random
-from pypartpicker2 import Scraper
+from pypartpicker import Scraper
 from . import parsers
 
 class PartEnricher:
