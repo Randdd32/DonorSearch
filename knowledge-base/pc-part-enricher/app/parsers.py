@@ -5,7 +5,7 @@ def clean_unit(value, unit_str=''):
     if not value or not isinstance(value, str):
         return None
     
-    clean = re.sub(rf'\s*{unit_str}$', '', value, flags=re.IGNORECASE).strip()
+    clean = re.sub(rf"\s*{unit_str}$", '', value, flags=re.IGNORECASE).strip()
    
     if ' - ' in clean:
         parts = clean.split(' - ')
@@ -76,7 +76,7 @@ def parse_dynamic_counts(specs, suffix_key, exclude_keys=None):
             clean_key = re.sub(r'[^a-z0-9]', '_', clean_key)
             clean_key = re.sub(r'_+', '_', clean_key).strip('_')
             
-            col_name = f'{clean_key}_{suffix_key.lower().replace(' ', '_')}'
+            col_name = f"{clean_key}_{suffix_key.lower().replace(' ', '_')}"
             result[col_name] = count
     return result
 
@@ -218,7 +218,7 @@ def parse_motherboard(specs, base_row):
             count = int(match.group(1)) if match else 0
             
             clean_key = key.replace('Headers', '').strip().replace(' ', '_').replace('.', '_').lower()
-            usb_headers[f'header_{clean_key}'] = count
+            usb_headers[f"header_{clean_key}"] = count
     data.update(usb_headers)
     
     remove_keys(data, ['part_url', 'price', 'color'])
@@ -250,7 +250,7 @@ def parse_memory(specs, base_row):
     if speed_raw and ',' in str(speed_raw):
         parts = str(speed_raw).split(',')
         try:
-            data['memory_type'] = f'DDR{parts[0]}'
+            data['memory_type'] = f"DDR{parts[0]}"
             data['frequency'] = int(parts[1])
         except: pass
 
@@ -367,7 +367,7 @@ def parse_monitor(specs, base_row):
         total = 0
         for item in inputs_list:
             if keyword in item:
-                if exact and re.search(rf'(Mini-|Micro-){keyword}', item):
+                if exact and re.search(rf"(Mini-|Micro-){keyword}", item):
                     continue
                 
                 match = re.search(r'^(\d+)', item)

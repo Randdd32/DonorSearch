@@ -14,13 +14,13 @@ async def main():
     
     args = parser.parse_args()
     
-    input_path = os.path.join(args.input, f'{args.part_type}.csv')
-    output_path = os.path.join(args.output, f'{args.part_type}_enriched.csv')
+    input_path = os.path.join(args.input, f"{args.part_type}.csv")
+    output_path = os.path.join(args.output, f"{args.part_type}_enriched.csv")
 
     try:
         df = load_csv(input_path)
     except Exception as e:
-        print(f'Error loading input: {e}')
+        print(f"Error loading input: {e}")
         return
 
     enricher = PartEnricher()
@@ -29,7 +29,7 @@ async def main():
     target_df = df if args.limit == 0 else df.head(args.limit)
     total = len(target_df)
 
-    print(f'Starting enrichment for {args.part_type}. Count: {total}')
+    print(f"Starting enrichment for {args.part_type}. Count: {total}")
 
     for index, row in target_df.iterrows():
         url = row['part_url']
