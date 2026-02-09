@@ -24,7 +24,7 @@ def clean_bool(value):
         return None
     if isinstance(value, list):
         value = value[0]
-    return True if str(value).lower() == 'yes' else False
+    return str(value).lower() == 'yes'
 
 def list_to_str(value_list, separator='|'):
     """Превращает список JSON в строку."""
@@ -86,18 +86,38 @@ def get_base_info(specs):
     """
     return {
         'manufacturer': get_first_val(specs, 'Manufacturer'),
-        'part_number': list_to_str(specs.get('Part #'))
+        'part_number': list_to_str(specs.get('Part #', []))
     }
 
-def parse_case(specs):
-    data = get_base_info(specs) 
+def remove_keys(data, keys):
+    """
+    Удаляет указанные ключи из словаря.
+    """
+    for k in keys:
+        if k in data:
+            del data[k]
+
+def parse_case(specs, base_row):
+    data = base_row.copy()
+    data.update(get_base_info(specs))
     
     drive_bays = specs.get('Drive Bays', [])
     data['ext_525_bays'] = extract_count_from_list(drive_bays, 'External 5.25')
     data['ext_35_bays'] = extract_count_from_list(drive_bays, 'External 3.5')
     data['int_25_bays'] = extract_count_from_list(drive_bays, 'Internal 2.5')
     
-    data['expansion_slots'] = clean_unit(get_first_val(specs, 'Expansion Slots'))
+    data['expansion_slots'] = clean_unit(get_first_val(specs, 'Expansion Slots'), 'x Full-Height')
+
+    dims_raw = get_first_val(specs, 'Dimensions')
+    if dims_raw:
+        parts = dims_raw.replace(' mm', '').split(' x ')
+        if len(parts) >= 3:
+            try:
+                data['length'] = float(parts[0])
+                data['width'] = float(parts[1])
+                data['height'] = float(parts[2])
+            except ValueError:
+                pass
     
     gpu_len_raw = specs.get('Maximum Video Card Length')
     if gpu_len_raw:
@@ -112,36 +132,57 @@ def parse_case(specs):
     data['radiator_support'] = list_to_str(specs.get('Radiator Support', []))
     data['fan_support'] = list_to_str(specs.get('Fan Support', []))
 
+    remove_keys(data, ['part_url', 'price', 'color', 'psu', 'side_panel', 'external_volume'])
     return data
 
-def parse_cpu(specs):
-    data = get_base_info(specs) 
+def parse_cpu(specs, base_row):
+    data = base_row.copy()
+    data.update(get_base_info(specs)) 
 
     data['socket'] = get_first_val(specs, 'Socket')
     data['max_memory'] = clean_unit(get_first_val(specs, 'Maximum Supported Memory'), 'GB')
     data['ecc_support'] = clean_bool(get_first_val(specs, 'ECC Support'))
 
+    remove_keys(data, ['part_url', 'price', 'core_count', 'core_clock', 'boost_clock', 'microarchitecture'])
     return data
 
-def parse_cpu_cooler(specs):
-    data = get_base_info(specs)
+def parse_cpu_cooler(specs, base_row):
+    data = base_row.copy()
+    data.update(get_base_info(specs))
     
     data['height'] = clean_unit(get_first_val(specs, 'Height'), 'mm')
     data['supported_sockets'] = list_to_str(specs.get('CPU Socket', []))
-        
+
+    rad_size = base_row.get('size')
+    if rad_size:
+        data['water_cooled_size'] = rad_size
+        data['is_water_cooled'] = True
+    else:
+        data['water_cooled_size'] = None
+        data['is_water_cooled'] = False
+
+    remove_keys(data, ['part_url', 'price', 'rpm', 'noise_level', 'color', 'size'])    
     return data
 
-def parse_motherboard(specs):
-    data = get_base_info(specs) 
+def parse_motherboard(specs, base_row):
+    data = base_row.copy()
+    data.update(get_base_info(specs)) 
     
     data['memory_type'] = get_first_val(specs, 'Memory Type')
     
     mem_speed_raw = specs.get('Memory Speed', [])
-    speeds = [clean_unit(x) for x in mem_speed_raw]
-    speeds = [x for x in speeds if x is not None]
+    speeds = []
+    for s in mem_speed_raw:
+        if '-' in s:
+            try:
+                val = int(s.split('-')[-1])
+                speeds.append(val)
+            except ValueError:
+                pass
     data['memory_speed_max'] = max(speeds) if speeds else None
     
-    data['m2_slots'] = len(specs.get('M.2 Slots', []))
+    data['m2_slots'] = list_to_str(specs.get('M.2 Slots', []))
+
     data['sata_6_ports'] = clean_unit(get_first_val(specs, 'SATA 6.0 Gb/s Ports'))
     data['sata_3_ports'] = clean_unit(get_first_val(specs, 'SATA 3.0 Gb/s Ports'))
     
@@ -166,10 +207,12 @@ def parse_motherboard(specs):
             usb_headers[f'header_{clean_key}'] = count
     data.update(usb_headers)
     
+    remove_keys(data, ['part_url', 'price', 'color'])
     return data
 
-def parse_memory(specs):
-    data = get_base_info(specs) 
+def parse_memory(specs, base_row):
+    data = base_row.copy()
+    data.update(get_base_info(specs))
 
     data['form_factor'] = get_first_val(specs, 'Form Factor')
     
@@ -180,29 +223,71 @@ def parse_memory(specs):
     else:
         data['is_ecc'] = None
         data['is_registered'] = None
+
+    modules_raw = base_row.get('modules')
+    if modules_raw and ',' in str(modules_raw):
+         parts = str(modules_raw).split(',')
+         try:
+            data['modules_count'] = int(parts[0])
+            data['modules_size'] = int(parts[1])
+         except: pass
+
+    speed_raw = base_row.get('speed')
+    if speed_raw and ',' in str(speed_raw):
+        parts = str(speed_raw).split(',')
+        try:
+            data['memory_type'] = f'DDR{parts[0]}'
+            data['frequency'] = int(parts[1])
+        except: pass
+
+    remove_keys(data, ['part_url', 'price', 'speed', 'modules', 'price_per_gb', 'color', 'first_word_latency', 'cas_latency'])
+    return data
+
+def parse_storage(specs, base_row):
+    data = base_row.copy()
+    data.update(get_base_info(specs))
+
+    base_type = str(base_row.get('type'))
+    json_rpm = get_first_val(specs, 'RPM')
+
+    final_type = 'HDD'
+    final_rpm = None
+    final_form = 'External'
+
+    base_ff = base_row.get('form_factor')
+    is_internal = base_ff is not None and str(base_ff) != 'nan'
+
+    if is_internal:
+        final_form = base_ff
         
+        if 'SSD' in base_type:
+            final_type = 'SSD'
+            final_rpm = None
+        else:
+            final_type = 'HDD'
+            try:
+                final_rpm = int(float(base_type))
+            except: 
+                final_rpm = None
+    else:
+        if json_rpm == 'SSD':
+            final_type = 'SSD'
+            final_rpm = None
+        elif json_rpm and 'RPM' in json_rpm:
+             final_type = 'HDD'
+             final_rpm = clean_unit(json_rpm, 'RPM') 
+    
+    data['type'] = final_type
+    data['rpm'] = final_rpm
+    data['form_factor'] = final_form
+    
+    remove_keys(data, ['part_url', 'price', 'price_per_gb', 'cache', 'color'])
     return data
 
-def parse_storage(specs):
-    data = get_base_info(specs) 
+def parse_video_card(specs, base_row):
+    data = base_row.copy()
+    data.update(get_base_info(specs)) 
     
-    raw_rpm = get_first_val(specs, 'RPM')
-    if raw_rpm == 'SSD':
-        data['type'] = 'SSD'
-        data['rpm'] = None
-    elif raw_rpm:
-        data['type'] = 'HDD'
-        data['rpm'] = clean_unit(raw_rpm, 'RPM')
-    
-    data['form_factor'] = get_first_val(specs, 'Form Factor')
-    data['interface'] = get_first_val(specs, 'Interface')
-    
-    return data
-
-def parse_video_card(specs):
-    data = get_base_info(specs) 
-    
-    data['length'] = clean_unit(get_first_val(specs, 'Length'), 'mm')
     data['tdp'] = clean_unit(get_first_val(specs, 'TDP'), 'W')
     data['slot_width'] = clean_unit(get_first_val(specs, 'Total Slot Width'))
     data['case_expansion_width'] = clean_unit(get_first_val(specs, 'Case Expansion Slot Width'))
@@ -212,6 +297,7 @@ def parse_video_card(specs):
     power_str = get_first_val(specs, 'External Power')
     data['power_6pin_count'] = 0
     data['power_8pin_count'] = 0
+    data['power_12pin_count'] = 0
     data['power_12vhpwr_count'] = 0
     data['power_eps_count'] = 0
     
@@ -220,36 +306,46 @@ def parse_video_card(specs):
             data['power_6pin_count'] = int(match.group(1))
         if match := re.search(r'(\d+)\s*x\s*PCIe\s*8-pin', power_str):
             data['power_8pin_count'] = int(match.group(1))
-        if match := re.search(r'(\d+)\s*x\s*(?:PCIe\s*16-pin|12VHPWR|PCIe\s*12-pin)', power_str):
+        if match := re.search(r'(\d+)\s*x\s*PCIe\s*12-pin', power_str):
+             data['power_12pin_count'] = int(match.group(1))
+        if match := re.search(r'(\d+)\s*x\s*(?:PCIe\s*16-pin|12VHPWR)', power_str):
             data['power_12vhpwr_count'] = int(match.group(1))
         if match := re.search(r'(\d+)\s*x\s*EPS\s*8-pin', power_str):
             data['power_eps_count'] = int(match.group(1))
             
-    outputs = parse_dynamic_counts(specs, 'Outputs')
-    data.update(outputs)
+    data.update(parse_dynamic_counts(specs, 'Outputs'))
     
+    remove_keys(data, ['part_url', 'price', 'memory', 'core_clock', 'boost_clock', 'color'])
     return data
 
-def parse_power_supply(specs):
-    data = get_base_info(specs)
+def parse_power_supply(specs, base_row):
+    data = base_row.copy()
+    data.update(get_base_info(specs))
 
     data['length'] = clean_unit(get_first_val(specs, 'Length'), 'mm')
     
-    connectors = parse_dynamic_counts(specs, 'Connectors')
-    data.update(connectors)
+    data.update(parse_dynamic_counts(specs, 'Connectors'))
     
+    remove_keys(data, ['part_url', 'price', 'efficiency', 'modular', 'color'])
     return data
 
-def parse_case_fan(specs):
-    data = get_base_info(specs)
+def parse_case_fan(specs, base_row):
+    data = base_row.copy()
+    data.update(get_base_info(specs))
 
-    data['size'] = clean_unit(get_first_val(specs, 'Size'), 'mm')
-    data['connectors'] = get_first_val(specs, 'Connector')
+    conn_raw = get_first_val(specs, 'Connector')
+    if conn_raw:
+        parts = [x.strip() for x in conn_raw.split('+')]
+        data['connectors'] = "|".join(parts)
+    else:
+        data['connectors'] = None
 
+    remove_keys(data, ['part_url', 'price', 'color', 'rpm', 'airflow', 'noise_level', 'pwm'])
     return data
 
-def parse_monitor(specs):
-    data = get_base_info(specs)
+def parse_monitor(specs, base_row):
+    data = base_row.copy()
+    data.update(get_base_info(specs))
     
     inputs_list = specs.get('Inputs', [])
     
@@ -257,9 +353,8 @@ def parse_monitor(specs):
         total = 0
         for item in inputs_list:
             if keyword in item:
-                if exact:
-                    if re.search(rf'(Mini-|Micro-){keyword}', item):
-                        continue
+                if exact and re.search(rf'(Mini-|Micro-){keyword}', item):
+                    continue
                 
                 match = re.search(r'^(\d+)', item)
                 if match:
@@ -276,21 +371,33 @@ def parse_monitor(specs):
     data['input_dvi'] = count_inputs('DVI')
     data['input_vga'] = count_inputs('VGA') + count_inputs('D-Sub')
     data['input_usb_c'] = count_inputs('USB Type-C')
-    data['input_thunderbolt'] = count_inputs('Thunderbolt')
     
+    data['input_bnc'] = count_inputs('BNC')
+    data['input_component'] = count_inputs('Component')
+    data['input_s_video'] = count_inputs('S-Video')
+    data['input_virtual_link'] = count_inputs('VirtualLink')
+
+    remove_keys(data, ['part_url', 'price', 'screen_size', 'resolution', 'refresh_rate', 'response_time', 'panel_type', 'aspect_ratio'])
     return data
 
-def parse_expansion_card(specs):
-    data = get_base_info(specs)
+def parse_expansion_card(specs, base_row):
+    data = base_row.copy()
+    data.update(get_base_info(specs))
 
-    data['interface'] = get_first_val(specs, 'Interface')
-
+    keys_to_remove = [
+        'part_url', 'price', 'color', 
+        'channels', 'digital_audio', 'snr', 'sample_rate', 'chipset', # Sound
+        'protocol' # Wireless
+    ]
+    remove_keys(data, keys_to_remove)
     return data
 
-def parse_optical_drive(specs):
-    data = get_base_info(specs)
+def parse_optical_drive(specs, base_row):
+    data = base_row.copy()
+    data.update(get_base_info(specs))
 
     data['form_factor'] = get_first_val(specs, 'Form Factor')
     data['interface'] = get_first_val(specs, 'Interface')
     
+    remove_keys(data, ['part_url', 'price', 'bd', 'dvd', 'cd', 'bd_write', 'dvd_write', 'cd_write'])
     return data
