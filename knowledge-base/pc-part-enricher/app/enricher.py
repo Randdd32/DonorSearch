@@ -25,7 +25,7 @@ class PartEnricher:
             'optical-drive': parsers.parse_optical_drive
         }
 
-    async def enrich_part(self, part_type, url):
+    async def enrich_part(self, part_type, url, base_row):
         # slows down the program so as not to spam PCPartPicker and potentially get IP banned
         await asyncio.sleep(random.uniform(3, 6))
         
@@ -38,10 +38,10 @@ class PartEnricher:
             parse_func = self.parser_map.get(part_type)
             if not parse_func:
                 print(f"No parser defined for {part_type}")
-                return None
+                return base_row
                 
-            return parse_func(specs)
+            return parse_func(specs, base_row)
             
         except Exception as e:
             print(f"Error scraping {url}: {e}")
-            return None
+            return base_row

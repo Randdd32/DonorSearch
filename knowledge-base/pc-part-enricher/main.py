@@ -33,10 +33,10 @@ async def main():
 
     for index, row in target_df.iterrows():
         url = row['part_url']
-        combined = row.to_dict()
+        base_row_dict = row.to_dict()
 
         if pd.isna(url):
-            enriched_rows.append(combined)
+            enriched_rows.append(base_row_dict)
             continue
             
         enrich_type = args.part_type
@@ -45,12 +45,8 @@ async def main():
         elif args.part_type == 'expansion-card':
             enrich_type = 'wired-network-card'
             
-        new_data = await enricher.enrich_part(enrich_type, url)
-        
-        if new_data:
-            combined.update(new_data)
-        
-        enriched_rows.append(combined)
+        enriched_data = await enricher.enrich_part(enrich_type, url, base_row_dict)
+        enriched_rows.append(enriched_data)
 
     save_csv(enriched_rows, output_path)
 
