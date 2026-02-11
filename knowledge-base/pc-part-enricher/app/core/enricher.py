@@ -1,29 +1,13 @@
 import asyncio
 import random
 from pypartpicker import Scraper
-from . import parsers
+from app.utils.constants import PARSER_MAP
 
 class PartEnricher:
     def __init__(self):
         self.scraper = Scraper()
         
-        self.parser_map = {
-            'case': parsers.parse_case,
-            'cpu': parsers.parse_cpu,
-            'cpu-cooler': parsers.parse_cpu_cooler,
-            'motherboard': parsers.parse_motherboard,
-            'memory': parsers.parse_memory,
-            'internal-hard-drive': parsers.parse_storage,
-            'external-hard-drive': parsers.parse_storage,
-            'video-card': parsers.parse_video_card,
-            'power-supply': parsers.parse_power_supply,
-            'case-fan': parsers.parse_case_fan,
-            'monitor': parsers.parse_monitor,
-            'sound-card': parsers.parse_expansion_card,
-            'wired-network-card': parsers.parse_expansion_card,
-            'wireless-network-card': parsers.parse_expansion_card,
-            'optical-drive': parsers.parse_optical_drive
-        }
+        self.parser_map = PARSER_MAP
 
     async def enrich_part(self, part_type, url, base_row):
         # slows down the program so as not to spam PCPartPicker and potentially get IP banned

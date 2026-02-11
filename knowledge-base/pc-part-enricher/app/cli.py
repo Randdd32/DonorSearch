@@ -1,0 +1,25 @@
+import argparse
+from app.utils.constants import ALL_PART_TYPES
+
+def setup_arg_parser():
+    parser = argparse.ArgumentParser(description='Enrich PC parts data from PCPartPicker')
+    
+    parser.add_argument('part_types', nargs='*', 
+                        help='List of part types to process (e.g. cpu video-card). Ignored if --all is used.')
+    
+    parser.add_argument('--all', action='store_true', 
+                        help='Process ALL supported part types')
+    
+    parser.add_argument('--input', default='/data/input', help='Input CSV directory')
+    parser.add_argument('--output', default='/data/output', help='Output CSV directory')
+    parser.add_argument('--limit', type=int, default=0, help='Limit items per category (0=all, for testing)')
+    
+    return parser
+
+def validate_args(args):
+    if args.all:
+        return ALL_PART_TYPES
+    elif args.part_types:
+        return args.part_types
+    else:
+        return None
