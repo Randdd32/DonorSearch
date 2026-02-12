@@ -2,8 +2,15 @@ import re
 
 def clean_unit(value, unit_str=''):
     """Убирает единицы измерения и возвращает число (int или float)."""
-    if not value or not isinstance(value, str):
+    if value is None:
         return None
+    
+    s_val = str(value).strip().lower()
+    if s_val == 'nan' or s_val == '':
+        return None
+
+    if not isinstance(value, str):
+        return value
     
     clean = re.sub(rf"\s*{unit_str}$", '', value, flags=re.IGNORECASE).strip()
    
@@ -100,6 +107,9 @@ def remove_keys(data, keys):
 def parse_case(specs, base_row):
     data = base_row.copy()
     data.update(get_base_info(specs))
+
+    if 'internal_35_bays' in data:
+        data['int_35_bays'] = data['internal_35_bays']
     
     drive_bays = specs.get('Drive Bays', [])
     data['ext_525_bays'] = extract_count_from_list(drive_bays, 'External 5.25')
@@ -146,7 +156,7 @@ def parse_case(specs, base_row):
     data['radiator_support'] = list_to_str(specs.get('Radiator Support', []))
     data['fan_support'] = list_to_str(specs.get('Fan Support', []))
 
-    remove_keys(data, ['part_url', 'price', 'color', 'psu', 'side_panel', 'external_volume'])
+    remove_keys(data, ['part_url', 'price', 'color', 'psu', 'side_panel', 'external_volume', 'internal_35_bays'])
     return data
 
 def parse_cpu(specs, base_row):
@@ -168,7 +178,8 @@ def parse_cpu_cooler(specs, base_row):
     data['supported_sockets'] = list_to_str(specs.get('CPU Socket', []))
 
     rad_size = base_row.get('size')
-    if rad_size:
+    is_valid_rad = rad_size is not None and str(rad_size).lower() != 'nan' and str(rad_size).strip() != ''
+    if is_valid_rad:
         data['water_cooled_size'] = rad_size
         data['is_water_cooled'] = True
     else:
