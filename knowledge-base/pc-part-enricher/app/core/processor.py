@@ -22,8 +22,6 @@ async def process_part_type(part_type, enricher, input_dir, output_dir, limit=0)
 
     print(f"--- Processing: {part_type} (Count: {total}) ---")
 
-    enrich_type_key = part_type
-
     for index, row in target_df.iterrows():
         url = row.get('part_url')
         base_row_dict = row.to_dict()
@@ -33,7 +31,7 @@ async def process_part_type(part_type, enricher, input_dir, output_dir, limit=0)
             continue
             
         try:
-            enriched_data = await enricher.enrich_part(enrich_type_key, url, base_row_dict)
+            enriched_data = await enricher.enrich_part(part_type, url, base_row_dict)
             enriched_rows.append(enriched_data)
         except Exception as e:
             print(f"Error processing row {index} in {part_type}: {e}")
