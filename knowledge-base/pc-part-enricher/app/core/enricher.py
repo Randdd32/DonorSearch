@@ -19,9 +19,13 @@ class PartEnricher:
 
     async def _manual_fetch_specs(self, url):
         try:
+            await asyncio.sleep(random.uniform(5, 10))
+
             async with aiohttp.ClientSession(headers=self.headers) as session:
+                print('Starting manual fetch')
                 async with session.get(url) as response:
                     if response.status != 200:
+                        print(f"Failed to fetch page: {response.status}")
                         return None
                     html = await response.text()
             
@@ -29,6 +33,7 @@ class PartEnricher:
             
             specs_block = soup.find(class_="block xs-hide md-block specs")
             if not specs_block:
+                print('Couldn\'t find specs_block')
                 return {}
 
             specs = {}
@@ -46,7 +51,7 @@ class PartEnricher:
                         .split("\n")
                     )
                     specs[key] = value
-
+            print (f"Parsed specs: {specs}")
             return specs
 
         except Exception as e:
