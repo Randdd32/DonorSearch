@@ -15,17 +15,25 @@ async def main():
         print(f"Supported types: {', '.join(ALL_PART_TYPES)}")
         sys.exit(1)
     
-    enricher = PartEnricher()
+    enricher = PartEnricher(use_browser=args.use_browser)
+    await enricher.start_browser()
+
     print(f"Queue: {', '.join(targets)}")
     
-    for part in targets:
-        await process_part_type(
-            part_type=part, 
-            enricher=enricher, 
-            input_dir=args.input, 
-            output_dir=args.output, 
-            limit=args.limit
-        )
+    try:
+        print(f"Queue: {', '.join(targets)}")
+        print(f"Mode: {'BROWSER (slow & safe)' if args.use_browser else 'FAST (risky)'}")
+        
+        for part in targets:
+            await process_part_type(
+                part_type=part, 
+                enricher=enricher, 
+                input_dir=args.input, 
+                output_dir=args.output, 
+                limit=args.limit
+            )
+    finally:
+        await enricher.stop_browser()
 
     print("\nAll tasks completed.")
 

@@ -3,3 +3,5 @@ pypartpicker2
 asyncio
 aiohttp
 beautifulsoup4
+fake-useragent
+playwright
