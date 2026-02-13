@@ -17,8 +17,6 @@ async def main():
     
     enricher = PartEnricher(use_browser=args.use_browser)
     await enricher.start_browser()
-
-    print(f"Queue: {', '.join(targets)}")
     
     try:
         print(f"Queue: {', '.join(targets)}")
