@@ -4,10 +4,21 @@ WORKDIR /app
 
 ENV PYTHONUNBUFFERED=1
 
+RUN apt-get update && apt-get install -y \
+  wget \
+  gnupg \
+  libgtk-3-0 \
+  libx11-xcb1 \
+  libdbus-glib-1-2 \
+  libxt6 \
+  libasound2 \
+  xvfb \
+  && rm -rf /var/lib/apt/lists/*
+
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-RUN playwright install chromium && playwright install-deps
+RUN python -m camoufox fetch
 
 COPY . .
 

@@ -15,7 +15,7 @@ def setup_arg_parser():
     parser.add_argument('--limit', type=int, default=0, help='Limit items per category (0=all, for testing)')
     
     parser.add_argument('--use-browser', action='store_true', 
-                        help='Use real browser (Playwright) instead of lightweight requests. Slower but bypasses bans.')
+                        help='Use real browser (Camoufox) instead of lightweight requests. Slower but bypasses bans.')
 
     return parser
 

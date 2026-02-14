@@ -19,3 +19,25 @@ PARSER_MAP = {
 }
 
 ALL_PART_TYPES = sorted(list(PARSER_MAP.keys()))
+
+LINUX_USER_AGENTS = [
+    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36",
+]
+
+TIMEOUT_PAGE_LOAD = 60000        
+TIMEOUT_SELECTOR = 5000          
+
+DELAY_MIN = 5.0
+DELAY_MAX = 10.0
+DELAY_FAST_MIN = 3.0
+DELAY_FAST_MAX = 6.0
+
+DELAY_ERROR_RETRY = 5.0          
+DELAY_COOLDOWN_SHORT = 60.0      
+DELAY_COOLDOWN_LONG = 300.0     
+
+CAPTCHA_MARKERS = ["captcha", "challenge", "verify you are human"]
