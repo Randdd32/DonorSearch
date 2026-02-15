@@ -17,6 +17,9 @@ def setup_arg_parser():
     parser.add_argument('--use-browser', action='store_true', 
                         help='Use real browser (Camoufox) instead of lightweight requests. Slower but bypasses bans.')
 
+    parser.add_argument('--docker-mode', action='store_true',
+                        help='Use "virtual" headless mode (requires Xvfb/Linux). Use this inside Docker.')
+
     return parser
 
 def validate_args(args):

@@ -10,10 +10,11 @@ from browserforge.fingerprints import Screen
 import app.utils.constants as constants
 
 class PartEnricher:
-    def __init__(self, use_browser=False):
+    def __init__(self, use_browser=False, docker_mode=False):
         self.scraper = Scraper()
         self.parser_map = constants.PARSER_MAP
         self.use_browser = use_browser
+        self.docker_mode = docker_mode
 
         self.cm = None      
         self.context = None
@@ -21,8 +22,11 @@ class PartEnricher:
     async def start_browser(self):
         if self.use_browser:
             print("Launching Camoufox (Firefox Stealth)...")
+
+            headless_mode = "virtual" if self.docker_mode else False
             
             self.cm = AsyncCamoufox(
+                headless=headless_mode,
                 os=["windows", "macos", "linux"],
                 humanize=True,
                 block_images=False,

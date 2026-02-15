@@ -24,4 +24,4 @@ COPY . .
 
 RUN mkdir -p /data/input /data/output
 
-ENTRYPOINT ["python", "main.py"]
+ENTRYPOINT ["python", "main.py",  "--docker-mode"]

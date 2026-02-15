@@ -15,7 +15,10 @@ async def main():
         print(f"Supported types: {', '.join(ALL_PART_TYPES)}")
         sys.exit(1)
     
-    enricher = PartEnricher(use_browser=args.use_browser)
+    enricher = PartEnricher(
+        use_browser=args.use_browser,
+        docker_mode=args.docker_mode
+    )
     await enricher.start_browser()
     
     try:
