@@ -20,6 +20,8 @@ PARSER_MAP = {
 
 ALL_PART_TYPES = sorted(list(PARSER_MAP.keys()))
 
+LOCALE = 'en-US'
+
 LINUX_USER_AGENTS = [
     "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
     "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",

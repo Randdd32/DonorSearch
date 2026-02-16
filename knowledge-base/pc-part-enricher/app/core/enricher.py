@@ -222,8 +222,8 @@ class PartEnricher:
                             html = await response.text()
                             return self._parse_html_to_specs(html)
                         elif response.status == 429:
-                            print(f"429 in fast mode. Waiting {constants.DELAY_COOLDOWN_SHORT}s...")
-                            await asyncio.sleep(constants.DELAY_COOLDOWN_SHORT)
+                            print(f"429 in fast mode. Waiting {constants.DELAY_COOLDOWN_LONG_MIN}s...")
+                            await asyncio.sleep(constants.DELAY_COOLDOWN_LONG_MIN)
                             continue
                         else:
                             print(f"Failed to fetch {url} with status {response.status}")
