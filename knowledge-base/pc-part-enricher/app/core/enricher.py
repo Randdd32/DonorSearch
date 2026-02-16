@@ -96,14 +96,16 @@ class PartEnricher:
         raise Exception("Failed to launch browser after multiple attempts")
     
     async def _rotate_proxy(self):
+        proxy_rotation_break = random.uniform(constants.DELAY_PROXY_ROTATION_MIN, constants.DELAY_PROXY_ROTATION_MAX)
+        print(f"Cooling down before proxy rotating {proxy_rotation_break}s...")
+        await asyncio.sleep(proxy_rotation_break)
+
         if not self.proxy_manager.proxies:
-            print(f"No proxies configured. Cooling down {constants.DELAY_PROXY_ROTATION}s...")
-            await asyncio.sleep(constants.DELAY_PROXY_ROTATION)
+            print(f"No proxies configured")
             return
 
         if len(self.proxy_manager.proxies) == 1:
-            print(f"Single proxy detected. Waiting {constants.DELAY_PROXY_ROTATION}s for IP rotation on provider side...")
-            await asyncio.sleep(constants.DELAY_PROXY_ROTATION)
+            print(f"Single proxy detected: {self.proxy_manager.proxies[0]}")
             await self.launch_browser(self.proxy_manager.proxies[0])
             return
 
