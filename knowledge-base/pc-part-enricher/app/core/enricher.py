@@ -3,29 +3,61 @@ import random
 import aiohttp
 from bs4 import BeautifulSoup
 from pypartpicker import Scraper
-
 from camoufox.async_api import AsyncCamoufox
 from browserforge.fingerprints import Screen
 
 import app.utils.constants as constants
+from app.utils.proxy_manager import ProxyManager
+from app.utils.human_behavior import HumanBehavior
 
 class PartEnricher:
     def __init__(self, use_browser=False, docker_mode=False):
         self.scraper = Scraper()
         self.parser_map = constants.PARSER_MAP
+
         self.use_browser = use_browser
         self.docker_mode = docker_mode
 
         self.cm = None      
         self.context = None
+        self.page = None
 
-    async def start_browser(self):
-        if self.use_browser:
-            print("Launching Camoufox (Firefox Stealth)...")
+        self.proxy_manager = ProxyManager()
+        self.current_proxy = None
 
+        self.human = HumanBehavior()
+
+        self.request_count = 0
+        self.max_requests_per_session = 150
+
+    async def launch_browser(self, proxy_str=None):
+        if not self.use_browser:
+            return
+
+        if proxy_str is None:
+            proxy_str = self.proxy_manager.get_random_proxy()
+
+        if self.cm:
+            try:
+                await self.cm.__aexit__(None, None, None)
+            except Exception:
+                pass
+
+        current_proxy_str = proxy_str
+        max_retries = 5
+        attempt = 0
+
+        while attempt < max_retries:
+            attempt += 1
+            
+            print(f"Launching Camoufox (Attempt {attempt}/{max_retries}, Proxy: {current_proxy_str if current_proxy_str else 'Direct'})...")
+            
             headless_mode = "virtual" if self.docker_mode else False
             
+            pw_proxy = self.proxy_manager.parse_playwright_proxy(current_proxy_str) if current_proxy_str else None
+
             self.cm = AsyncCamoufox(
+                proxy=pw_proxy,
                 headless=headless_mode,
                 os=["windows", "macos", "linux"],
                 humanize=True,
@@ -33,9 +65,52 @@ class PartEnricher:
                 geoip=True,
                 screen=Screen(max_width=1920, max_height=1080)
             )
-            
-            self.context = await self.cm.__aenter__()
-            print("Camoufox started successfully")
+
+            try:
+                self.context = await self.cm.__aenter__()
+                self.page = await self.context.new_page()
+                self.current_proxy = current_proxy_str
+                print("Camoufox started successfully")
+                return
+
+            except Exception as e:
+                print(f"Failed to launch browser with proxy {current_proxy_str}: {e}")
+                try:
+                    await self.cm.__aexit__(None, None, None)
+                except:
+                    pass
+                
+                if current_proxy_str:
+                    new_proxy = self.proxy_manager.get_random_proxy(exclude=current_proxy_str)
+                    
+                    if new_proxy and new_proxy != current_proxy_str:
+                        print("Switching to another proxy...")
+                        current_proxy_str = new_proxy
+                        continue
+                    else:
+                        print("No other proxies available to retry.")
+                        raise e
+                else:
+                    raise e
+
+        raise Exception("Failed to launch browser after multiple attempts")
+    
+    async def _rotate_proxy(self):
+        if not self.proxy_manager.proxies:
+            print(f"No proxies configured. Cooling down {constants.DELAY_PROXY_ROTATION}s...")
+            await asyncio.sleep(constants.DELAY_PROXY_ROTATION)
+            return
+
+        if len(self.proxy_manager.proxies) == 1:
+            print(f"Single proxy detected. Waiting {constants.DELAY_PROXY_ROTATION}s for IP rotation on provider side...")
+            await asyncio.sleep(constants.DELAY_PROXY_ROTATION)
+            await self.launch_browser(self.proxy_manager.proxies[0])
+            return
+
+        new_proxy = self.proxy_manager.get_random_proxy(exclude=self.current_proxy)
+        print(f"Rotating proxy: {self.current_proxy} -> {new_proxy}")
+        
+        await self.launch_browser(new_proxy)
 
     async def stop_browser(self):
         if self.cm:
@@ -73,56 +148,57 @@ class PartEnricher:
         return specs
 
     async def _fetch_with_camoufox(self, url, retries=3):
-        print('Starting browser fetch')
+        self.request_count += 1
+        if self.request_count >= self.max_requests_per_session:
+            print(f"Session limit reached ({self.request_count}). Restarting browser to clear cookies...")
+            self.request_count = 0
+            await self.launch_browser(self.current_proxy)
+
+        await self.human.wait_before_request()
+        print('Starting browser fetch') 
         
         for attempt in range(retries):
-            page = await self.context.new_page()
+            if self.page.is_closed():
+                self.page = await self.context.new_page()
             
-            try:
-                await asyncio.sleep(random.uniform(constants.DELAY_MIN, constants.DELAY_MAX))
-                
+            try:  
                 print(f"Browser navigating to: {url} (Attempt {attempt+1}/{retries})")
                 
                 try:
-                    response = await page.goto(url, wait_until='domcontentloaded', timeout=constants.TIMEOUT_PAGE_LOAD)
+                    response = await self.page.goto(url, wait_until='domcontentloaded', timeout=constants.TIMEOUT_PAGE_LOAD)
                 except Exception as nav_err:
-                    print(f"Navigation error: {nav_err}. Retrying...")
-                    await page.close()
-                    await asyncio.sleep(constants.DELAY_ERROR_RETRY) 
+                    print(f"Navigation error: {nav_err}. Rotating...")
+                    await self._rotate_proxy()
                     continue
 
                 if response.status == 429:
-                    print(f"Browser got 429. Cooling down {constants.DELAY_COOLDOWN_LONG}s...")
-                    await page.close()
-                    await asyncio.sleep(constants.DELAY_COOLDOWN_LONG)
+                    print(f"429 Detected on {self.current_proxy}. Rotating...")
+                    await self._rotate_proxy()
                     continue
                 
                 if response.status != 200:
                     print(f"Browser failed to fetch {url}: {response.status}")
-                    await page.close()
                     return None
 
                 try:
-                    await page.wait_for_selector('.block.xs-hide.md-block.specs', timeout=constants.TIMEOUT_SELECTOR)
+                    await self.page.wait_for_selector('.block.xs-hide.md-block.specs', timeout=constants.TIMEOUT_SELECTOR)
                 except:
                     pass 
 
-                content = await page.content()
-                await page.close()
+                content = await self.page.content()
 
                 result = self._parse_html_to_specs(content)
                 
                 if result == "CAPTCHA":
-                    print(f"CAPTCHA! Waiting ({constants.DELAY_COOLDOWN_LONG}s)...")
-                    await asyncio.sleep(constants.DELAY_COOLDOWN_LONG)
-                    continue  
+                    print(f"CAPTCHA on {self.current_proxy}! Rotating...")
+                    await self._rotate_proxy()
+                    continue   
                 
                 return result
 
             except Exception as e:
-                print(f"Browser error for {url}: {e}")
-                await page.close()
-                await asyncio.sleep(constants.DELAY_ERROR_RETRY)
+                print(f"Browser error for {url}: {e}. Rotating...")
+                await self._rotate_proxy()
         
         print(f"Failed to fetch {url} after {retries} attempts")
         return None
@@ -131,7 +207,7 @@ class PartEnricher:
         print('Starting fast fetch')
         
         headers = {
-            'User-Agent': random.choice(cfg.LINUX_USER_AGENTS),
+            'User-Agent': random.choice(constants.LINUX_USER_AGENTS),
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
             'Accept-Language': constants.LOCALE.lower() + ',en;q=0.5'
         }
@@ -173,15 +249,15 @@ class PartEnricher:
 
         if not specs:
             print(f"Failed to get specs for {url}")
-            return base_row
+            return None
 
         parse_func = self.parser_map.get(part_type)
         if not parse_func:
             print(f"No parser defined for {part_type}")
-            return base_row 
+            return None 
             
         try:
             return parse_func(specs, base_row)
         except Exception as e:
             print(f"Parse logic error: {e}")
-            return base_row
+            return None

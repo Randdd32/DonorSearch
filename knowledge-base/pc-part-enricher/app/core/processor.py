@@ -27,15 +27,18 @@ async def process_part_type(part_type, enricher, input_dir, output_dir, limit=0)
         base_row_dict = row.to_dict()
 
         if pd.isna(url):
-            enriched_rows.append(base_row_dict)
+            print(f"Skipping row {index} in {part_type}: url is missing")
             continue
             
         try:
             enriched_data = await enricher.enrich_part(part_type, url, base_row_dict)
-            enriched_rows.append(enriched_data)
+            if enriched_data:
+                enriched_rows.append(enriched_data)
+            else:
+                print(f"Skipping row {index} in {part_type}: enrichment failed")
+
         except Exception as e:
             print(f"Error processing row {index} in {part_type}: {e}")
-            enriched_rows.append(base_row_dict)
 
     save_csv(enriched_rows, output_path)
     return True

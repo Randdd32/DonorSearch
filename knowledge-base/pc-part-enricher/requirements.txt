@@ -4,4 +4,5 @@ asyncio
 aiohttp
 beautifulsoup4
 playwright
-camoufox[geoip]  
+camoufox[geoip]
+python-dotenv  

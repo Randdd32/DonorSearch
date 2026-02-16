@@ -19,7 +19,7 @@ async def main():
         use_browser=args.use_browser,
         docker_mode=args.docker_mode
     )
-    await enricher.start_browser()
+    await enricher.launch_browser()
     
     try:
         print(f"Queue: {', '.join(targets)}")
