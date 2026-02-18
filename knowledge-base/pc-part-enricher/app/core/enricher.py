@@ -154,7 +154,7 @@ class PartEnricher:
         if self.request_count >= self.max_requests_per_session:
             print(f"Session limit reached ({self.request_count}). Restarting browser to clear cookies...")
             self.request_count = 0
-            await self.launch_browser(self.current_proxy)
+            await self.launch_browser(self.proxy_manager.get_random_proxy(exclude=self.current_proxy))
 
         await self.human.wait_before_request()
         print('Starting browser fetch') 
@@ -179,8 +179,9 @@ class PartEnricher:
                     continue
                 
                 if response.status != 200:
-                    print(f"Browser failed to fetch {url}: {response.status}")
-                    return None
+                    print(f"Browser failed to fetch {url}: {response.status}. Rotating...")
+                    await self._rotate_proxy()
+                    continue
 
                 try:
                     await self.page.wait_for_selector('.block.xs-hide.md-block.specs', timeout=constants.TIMEOUT_SELECTOR)
