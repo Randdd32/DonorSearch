@@ -20,6 +20,9 @@ def setup_arg_parser():
     parser.add_argument('--docker-mode', action='store_true',
                         help='Use "virtual" headless mode (requires Xvfb/Linux). Use this inside Docker.')
 
+    parser.add_argument('--update', action='store_true',
+                        help='Run in incremental update mode (scrape only new items).')
+
     return parser
 
 def validate_args(args):
