@@ -42,7 +42,8 @@ async def main():
                     enricher=enricher, 
                     input_dir=args.input, 
                     output_dir=args.output, 
-                    limit=args.limit
+                    limit=args.limit,
+                    start_index=args.start_index
                 )
         finally:
             await enricher.stop_browser()

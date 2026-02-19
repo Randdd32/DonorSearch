@@ -12,7 +12,7 @@ def load_csv(file_path):
         
     return df
 
-def save_csv(data_rows, output_path):
+def save_csv(data_rows, output_path, append=False):
     if not data_rows:
         print('No data to save.')
         return
@@ -21,8 +21,13 @@ def save_csv(data_rows, output_path):
     df = _fill_missing_counts(df)
     
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
-    df.to_csv(output_path, index=False)
-    print(f"Saved to {output_path}")
+
+    if append and os.path.exists(output_path):
+        df.to_csv(output_path, mode='a', header=False, index=False)
+        print(f"Appended to {output_path}")
+    else:
+        df.to_csv(output_path, mode='w', header=True, index=False)
+        print(f"Saved to {output_path}")
 
 def _fill_missing_counts(df):
     zero_fill_patterns = [

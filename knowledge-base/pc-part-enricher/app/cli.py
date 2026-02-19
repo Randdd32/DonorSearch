@@ -23,6 +23,9 @@ def setup_arg_parser():
     parser.add_argument('--update', action='store_true',
                         help='Run in incremental update mode (scrape only new items).')
 
+    parser.add_argument('--start-index', type=int, default=0, 
+                        help='Row index to start processing from (useful for resuming interrupted full scrapes).')
+
     return parser
 
 def validate_args(args):
