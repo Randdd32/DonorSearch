@@ -28,7 +28,7 @@ class PartEnricher:
         self.human = HumanBehavior()
 
         self.request_count = 0
-        self.max_requests_per_session = 150
+        self.max_requests_per_session = 250
 
     async def launch_browser(self, proxy_str=None):
         if not self.use_browser:
