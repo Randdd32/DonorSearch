@@ -20,7 +20,7 @@ async def process_part_type(part_type, enricher, input_dir, output_dir, limit=0,
     total_rows = len(df)
     
     if start_index >= total_rows:
-        print(f"Start index {start_index} is larger than total rows {total_rows}. Skipping.")
+        print(f"Start index {start_index} is larger than total rows {total_rows}. Skipping '{part_type}'.")
         return True
 
     target_df = df.iloc[start_index:]
@@ -36,7 +36,7 @@ async def process_part_type(part_type, enricher, input_dir, output_dir, limit=0,
         base_row_dict = row.to_dict()
 
         if pd.isna(url):
-            print(f"Skipping row {index} in {part_type}: url is missing")
+            print(f"Skipping row {current_idx + 1} in {part_type}: url is missing")
             continue
             
         try:
@@ -47,10 +47,10 @@ async def process_part_type(part_type, enricher, input_dir, output_dir, limit=0,
             if enriched_data:
                 enriched_rows.append(enriched_data)
             else:
-                print(f"Skipping row {index} in {part_type}: enrichment failed")
+                print(f"Skipping row {current_idx + 1} in {part_type}: enrichment failed")
 
         except Exception as e:
-            print(f"Error processing row {index} in {part_type}: {e}")
+            print(f"Error processing row {current_idx + 1} in {part_type}: {e}")
 
     should_append = (start_index > 0)
     save_csv(enriched_rows, output_path, append=should_append)
