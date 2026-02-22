@@ -156,7 +156,7 @@ def parse_case(specs, base_row):
     data['radiator_support'] = list_to_str(specs.get('Radiator Support', []))
     data['fan_support'] = list_to_str(specs.get('Fan Support', []))
 
-    remove_keys(data, ['part_url', 'price', 'color', 'psu', 'side_panel', 'external_volume', 'internal_35_bays'])
+    remove_keys(data, ['price', 'external_volume', 'internal_35_bays'])
     return data
 
 def parse_cpu(specs, base_row):
@@ -167,7 +167,7 @@ def parse_cpu(specs, base_row):
     data['max_memory'] = clean_unit(get_first_val(specs, 'Maximum Supported Memory'), 'GB')
     data['ecc_support'] = clean_bool(get_first_val(specs, 'ECC Support'))
 
-    remove_keys(data, ['part_url', 'price', 'core_count', 'core_clock', 'boost_clock', 'microarchitecture'])
+    remove_keys(data, ['price'])
     return data
 
 def parse_cpu_cooler(specs, base_row):
@@ -186,7 +186,7 @@ def parse_cpu_cooler(specs, base_row):
         data['water_cooled_size'] = None
         data['is_water_cooled'] = False
 
-    remove_keys(data, ['part_url', 'price', 'rpm', 'noise_level', 'color', 'size'])    
+    remove_keys(data, ['price', 'noise_level'])    
     return data
 
 def parse_motherboard(specs, base_row):
@@ -232,7 +232,7 @@ def parse_motherboard(specs, base_row):
             usb_headers[f"header_{clean_key}"] = count
     data.update(usb_headers)
     
-    remove_keys(data, ['part_url', 'price', 'color'])
+    remove_keys(data, ['price'])
     return data
 
 def parse_memory(specs, base_row):
@@ -265,7 +265,7 @@ def parse_memory(specs, base_row):
             data['frequency'] = int(parts[1])
         except: pass
 
-    remove_keys(data, ['part_url', 'price', 'speed', 'modules', 'price_per_gb', 'color', 'first_word_latency', 'cas_latency'])
+    remove_keys(data, ['price', 'speed', 'modules', 'price_per_gb',  'first_word_latency'])
     return data
 
 def parse_storage(specs, base_row):
@@ -306,7 +306,7 @@ def parse_storage(specs, base_row):
     data['rpm'] = final_rpm
     data['form_factor'] = final_form
     
-    remove_keys(data, ['part_url', 'price', 'price_per_gb', 'cache', 'color'])
+    remove_keys(data, ['price', 'price_per_gb'])
     return data
 
 def parse_video_card(specs, base_row):
@@ -340,7 +340,7 @@ def parse_video_card(specs, base_row):
             
     data.update(parse_dynamic_counts(specs, 'Outputs'))
     
-    remove_keys(data, ['part_url', 'price', 'memory', 'core_clock', 'boost_clock', 'color'])
+    remove_keys(data, ['price'])
     return data
 
 def parse_power_supply(specs, base_row):
@@ -351,7 +351,7 @@ def parse_power_supply(specs, base_row):
     
     data.update(parse_dynamic_counts(specs, 'Connectors'))
     
-    remove_keys(data, ['part_url', 'price', 'efficiency', 'modular', 'color'])
+    remove_keys(data, ['price'])
     return data
 
 def parse_case_fan(specs, base_row):
@@ -365,7 +365,7 @@ def parse_case_fan(specs, base_row):
     else:
         data['connectors'] = None
 
-    remove_keys(data, ['part_url', 'price', 'color', 'rpm', 'airflow', 'noise_level', 'pwm'])
+    remove_keys(data, ['price', 'noise_level'])
     return data
 
 def parse_monitor(specs, base_row):
@@ -402,7 +402,7 @@ def parse_monitor(specs, base_row):
     data['input_s_video'] = count_inputs('S-Video')
     data['input_virtual_link'] = count_inputs('VirtualLink')
 
-    remove_keys(data, ['part_url', 'price', 'screen_size', 'resolution', 'refresh_rate', 'response_time', 'panel_type', 'aspect_ratio'])
+    remove_keys(data, ['price'])
     return data
 
 def parse_expansion_card(specs, base_row):
@@ -410,9 +410,8 @@ def parse_expansion_card(specs, base_row):
     data.update(get_base_info(specs))
 
     keys_to_remove = [
-        'part_url', 'price', 'color', 
-        'channels', 'digital_audio', 'snr', 'sample_rate', 'chipset', # Sound
-        'protocol' # Wireless
+        'price', 
+        'snr' # Sound
     ]
     remove_keys(data, keys_to_remove)
     return data
@@ -424,5 +423,5 @@ def parse_optical_drive(specs, base_row):
     data['form_factor'] = get_first_val(specs, 'Form Factor')
     data['interface'] = get_first_val(specs, 'Interface')
     
-    remove_keys(data, ['part_url', 'price', 'bd', 'dvd', 'cd', 'bd_write', 'dvd_write', 'cd_write'])
+    remove_keys(data, ['price', 'bd_write', 'dvd_write', 'cd_write'])
     return data
