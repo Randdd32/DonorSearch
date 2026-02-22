@@ -22,6 +22,6 @@ RUN python -m camoufox fetch
 
 COPY . .
 
-RUN mkdir -p /data/input /data/output /data/cache /data/master /data/delta
+RUN mkdir -p /data/input /data/output /data/master /data/delta
 
 ENTRYPOINT ["python", "main.py",  "--docker-mode"]

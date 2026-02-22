@@ -17,10 +17,11 @@ async def main():
         sys.exit(1)
 
     if args.update:
-        print("Running incremental update (Cache-based)")
+        print("Running incremental update mode")
         manager = UpdateManager(
             staging_dir=args.input, 
-            output_dir=args.output
+            output_dir=args.output,
+            master_dir=args.master
         )
         await manager.run_update(targets, args)
     else:
