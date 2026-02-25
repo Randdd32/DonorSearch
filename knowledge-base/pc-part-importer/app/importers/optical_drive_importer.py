@@ -1,8 +1,8 @@
 import pandas as pd
 from sqlalchemy.orm import Session
-from models.dictionaries import Manufacturer, StorageInterface, OpticalDriveFormFactor
-from models.optical_drive import OpticalDrive, OpticalDrivePartNumber
-from importers.base_importer import BaseImporter
+from app.models.dictionaries import Manufacturer, StorageInterface, OpticalDriveFormFactor
+from app.models.optical_drive import OpticalDrive, OpticalDrivePartNumber
+from app.importers.base_importer import BaseImporter
 
 class OpticalDriveImporter(BaseImporter):
     

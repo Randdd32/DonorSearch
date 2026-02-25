@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from models.base import Base
+from app.models.base import Base
 
 class BaseImporter:
     def __init__(self, session: Session):
