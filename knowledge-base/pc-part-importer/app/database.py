@@ -1,9 +1,7 @@
-import os
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 from app.models.base import Base
-
-DB_URL = os.getenv("DB_URL", "postgresql://postgres:postgres@localhost:5432/donor_search_db")
+from app.utils.constants import DB_URL
 
 engine = create_engine(DB_URL, echo=False)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

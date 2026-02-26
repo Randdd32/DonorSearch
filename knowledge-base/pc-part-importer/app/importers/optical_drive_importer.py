@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from app.models.dictionaries import Manufacturer, StorageInterface, OpticalDriveFormFactor
 from app.models.optical_drive import OpticalDrive, OpticalDrivePartNumber
 from app.importers.base_importer import BaseImporter
+from app.utils.parsing_utils import parse_separated_string
 
 class OpticalDriveImporter(BaseImporter):
     
@@ -16,8 +17,7 @@ class OpticalDriveImporter(BaseImporter):
             interface_id = self.get_or_create_dictionary(StorageInterface, row.get('interface'))
             form_factor_id = self.get_or_create_dictionary(OpticalDriveFormFactor, row.get('form_factor'))
 
-            part_numbers_raw = row.get('part_number')
-            part_numbers_list = str(part_numbers_raw).split('|') if part_numbers_raw else[]
+            part_numbers_list = parse_separated_string(row.get('part_number'))
 
             search_tokens =[
                 str(row.get('manufacturer', '')),
@@ -35,7 +35,7 @@ class OpticalDriveImporter(BaseImporter):
             search_name = " ".join(clean_tokens)
 
             drive = OpticalDrive(
-                name=row['name'],
+                name=row.get('name'),
                 search_name=search_name,
                 manufacturer_id=manufacturer_id,
                 form_factor_id=form_factor_id,
