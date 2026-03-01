@@ -15,7 +15,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class CompatibilityRuleService extends AbstractEntityService<CompatibilityRuleEntity> {
+public class CompatibilityRuleService extends AbstractValidatingService<CompatibilityRuleEntity> {
     private final CompatibilityRuleRepository repository;
 
     @Transactional(readOnly = true)

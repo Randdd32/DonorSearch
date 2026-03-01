@@ -3,10 +3,11 @@ package com.github.randdd32.donor_search_backend.web.controller;
 import com.github.randdd32.donor_search_backend.core.configuration.Constants;
 import com.github.randdd32.donor_search_backend.service.CompatibilityRuleService;
 import com.github.randdd32.donor_search_backend.web.dto.CompatibilityRuleDto;
+import com.github.randdd32.donor_search_backend.web.dto.pagination.PageDto;
 import com.github.randdd32.donor_search_backend.web.mapper.CompatibilityRuleMapper;
+import com.github.randdd32.donor_search_backend.web.mapper.pagination.PageDtoMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,11 +28,14 @@ public class CompatibilityRuleController {
     private final CompatibilityRuleMapper mapper;
 
     @GetMapping
-    public Page<CompatibilityRuleDto> getAll(
+    public PageDto<CompatibilityRuleDto> getAll(
             @RequestParam(required = false) String search,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = Constants.DEFAULT_PAGE_SIZE) int size) {
-        return service.getAll(search, page, size).map(mapper::toDto);
+        return PageDtoMapper.toDto(
+                service.getAll(search, page, size),
+                mapper::toDto
+        );
     }
 
     @GetMapping("/{id}")
