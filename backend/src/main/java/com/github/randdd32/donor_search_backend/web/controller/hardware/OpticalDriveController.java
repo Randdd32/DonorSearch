@@ -28,11 +28,12 @@ public class OpticalDriveController {
             @RequestParam(required = false) List<Long> manufacturerIds,
             @RequestParam(required = false) List<Long> formFactorIds,
             @RequestParam(required = false) List<Long> interfaceIds,
+            @RequestParam(required = false) List<String> sort,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = Constants.DEFAULT_PAGE_SIZE) int size) {
 
         return PageDtoMapper.toDto(
-                service.getAll(search, manufacturerIds, formFactorIds, interfaceIds, page, size),
+                service.getAll(search, manufacturerIds, formFactorIds, interfaceIds, sort, page, size),
                 mapper::toDto
         );
     }

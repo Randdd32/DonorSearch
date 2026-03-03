@@ -2,17 +2,23 @@ package com.github.randdd32.donor_search_backend.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.Instant;
 import java.util.Objects;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = "compatibility_rule")
 public class CompatibilityRuleEntity extends BaseEntity {
     @Column(name = "rule_code", nullable = false, unique = true, length = 100)
@@ -29,6 +35,14 @@ public class CompatibilityRuleEntity extends BaseEntity {
 
     @Column(columnDefinition = "text")
     private String description;
+
+    @CreatedDate
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Instant createdAt;
+
+    @LastModifiedDate
+    @Column(name = "updated_at")
+    private Instant updatedAt;
 
     @Override
     public boolean equals(Object o) {

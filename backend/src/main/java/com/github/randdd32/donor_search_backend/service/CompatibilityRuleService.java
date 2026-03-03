@@ -1,6 +1,7 @@
 package com.github.randdd32.donor_search_backend.service;
 
 import com.github.randdd32.donor_search_backend.core.error.NotFoundException;
+import com.github.randdd32.donor_search_backend.core.util.QueryUtils;
 import com.github.randdd32.donor_search_backend.model.CompatibilityRuleEntity;
 import com.github.randdd32.donor_search_backend.repository.CompatibilityRuleRepository;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -19,12 +22,28 @@ public class CompatibilityRuleService extends AbstractValidatingService<Compatib
     private final CompatibilityRuleRepository repository;
 
     @Transactional(readOnly = true)
-    public Page<CompatibilityRuleEntity> getAll(String searchToken, int page, int size) {
-        Pageable pageRequest = PageRequest.of(page, size, Sort.by("id"));
-        if (searchToken == null || searchToken.isBlank()) {
-            return repository.findAll(pageRequest);
-        }
-        return repository.findBySearchToken(searchToken, pageRequest);
+    public Page<CompatibilityRuleEntity> getAll(
+            String search,
+            Boolean isActive,
+            Instant createdAfter,
+            Instant createdBefore,
+            Instant updatedAfter,
+            Instant updatedBefore,
+            List<String> sort,
+            int page,
+            int size) {
+        Sort appliedSort = QueryUtils.createSort(sort, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Pageable pageRequest = PageRequest.of(page, size, appliedSort);
+
+        return repository.findByFilters(
+                QueryUtils.cleanSearchToken(search),
+                isActive,
+                createdAfter,
+                createdBefore,
+                updatedAfter,
+                updatedBefore,
+                pageRequest
+        );
     }
 
     @Transactional(readOnly = true)

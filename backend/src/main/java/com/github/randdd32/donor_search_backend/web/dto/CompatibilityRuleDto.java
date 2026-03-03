@@ -7,6 +7,8 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.Instant;
+
 @Getter
 @Setter
 public class CompatibilityRuleDto {
@@ -27,4 +29,10 @@ public class CompatibilityRuleDto {
     private Boolean isActive;
 
     private String description;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private Instant createdAt;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private Instant updatedAt;
 }

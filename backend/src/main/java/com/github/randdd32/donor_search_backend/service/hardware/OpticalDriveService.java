@@ -25,9 +25,11 @@ public class OpticalDriveService {
             List<Long> manufacturerIds,
             List<Long> formFactorIds,
             List<Long> interfaceIds,
+            List<String> sort,
             int page,
             int size) {
-        Pageable pageRequest = PageRequest.of(page, size, Sort.by("id"));
+        Sort appliedSort = QueryUtils.createSort(sort, Sort.by(Sort.Direction.ASC, "id"));
+        Pageable pageRequest = PageRequest.of(page, size, appliedSort);
 
         return repository.findByFilters(
                 QueryUtils.cleanSearchToken(search),
@@ -46,7 +48,10 @@ public class OpticalDriveService {
 
     @Transactional(readOnly = true)
     public OpticalDriveEntity findBestMatch(String rawNameFromInventory) {
-        String cleanToken = rawNameFromInventory.toLowerCase().trim();
+        String cleanToken = QueryUtils.cleanSearchToken(rawNameFromInventory);
+        if (cleanToken == null) {
+            throw new IllegalArgumentException("Search token cannot be null or empty");
+        }
         return repository.findMostSimilar(cleanToken)
                 .orElseThrow(() -> new IllegalArgumentException("No suitable optical drive found for: " + rawNameFromInventory));
     }
