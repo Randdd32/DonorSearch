@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping(Constants.API_URL + "/components/optical-drives")
 @RequiredArgsConstructor
@@ -23,10 +25,14 @@ public class OpticalDriveController {
     @GetMapping
     public PageDto<OpticalDriveDto> getAll(
             @RequestParam(required = false) String search,
+            @RequestParam(required = false) List<Long> manufacturerIds,
+            @RequestParam(required = false) List<Long> formFactorIds,
+            @RequestParam(required = false) List<Long> interfaceIds,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = Constants.DEFAULT_PAGE_SIZE) int size) {
+
         return PageDtoMapper.toDto(
-                service.getAll(search, page, size),
+                service.getAll(search, manufacturerIds, formFactorIds, interfaceIds, page, size),
                 mapper::toDto
         );
     }
