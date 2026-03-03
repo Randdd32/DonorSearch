@@ -8,6 +8,9 @@ import com.github.randdd32.donor_search_backend.web.mapper.CompatibilityRuleMapp
 import com.github.randdd32.donor_search_backend.web.mapper.pagination.PageDtoMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,7 +24,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Instant;
-import java.util.List;
 
 @RestController
 @RequestMapping(Constants.API_URL + "/compatibility-rules")
@@ -38,11 +40,10 @@ public class CompatibilityRuleController {
             @RequestParam(required = false) Instant createdBefore,
             @RequestParam(required = false) Instant updatedAfter,
             @RequestParam(required = false) Instant updatedBefore,
-            @RequestParam(required = false) List<String> sort,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = Constants.DEFAULT_PAGE_SIZE) int size) {
+            @PageableDefault(size = Constants.DEFAULT_PAGE_SIZE, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+
         return PageDtoMapper.toDto(
-                service.getAll(search, isActive, createdAfter, createdBefore, updatedAfter, updatedBefore, sort, page, size),
+                service.getAll(search, isActive, createdAfter, createdBefore, updatedAfter, updatedBefore, pageable),
                 mapper::toDto
         );
     }

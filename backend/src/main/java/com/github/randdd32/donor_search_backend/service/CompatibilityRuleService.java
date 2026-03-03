@@ -31,18 +31,13 @@ public class CompatibilityRuleService extends AbstractValidatingService<Compatib
             Instant createdBefore,
             Instant updatedAfter,
             Instant updatedBefore,
-            List<String> sort,
-            int page,
-            int size) {
-        Sort appliedSort = QueryUtils.createSort(sort, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Pageable pageRequest = PageRequest.of(page, size, appliedSort);
+            Pageable pageable) {
 
         Specification<CompatibilityRuleEntity> spec = CompatibilityRuleSpecification.withFilters(
                 QueryUtils.cleanSearchToken(search),
                 isActive, createdAfter, createdBefore, updatedAfter, updatedBefore
         );
-
-        return repository.findAll(spec, pageRequest);
+        return repository.findAll(spec, pageable);
     }
 
     @Transactional(readOnly = true)
