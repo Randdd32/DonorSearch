@@ -7,6 +7,9 @@ import com.github.randdd32.donor_search_backend.web.dto.pagination.PageDto;
 import com.github.randdd32.donor_search_backend.web.mapper.hardware.OpticalDriveMapper;
 import com.github.randdd32.donor_search_backend.web.mapper.pagination.PageDtoMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,12 +31,10 @@ public class OpticalDriveController {
             @RequestParam(required = false) List<Long> manufacturerIds,
             @RequestParam(required = false) List<Long> formFactorIds,
             @RequestParam(required = false) List<Long> interfaceIds,
-            @RequestParam(required = false) List<String> sort,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = Constants.DEFAULT_PAGE_SIZE) int size) {
+            @PageableDefault(size = Constants.DEFAULT_PAGE_SIZE, sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
 
         return PageDtoMapper.toDto(
-                service.getAll(search, manufacturerIds, formFactorIds, interfaceIds, sort, page, size),
+                service.getAll(search, manufacturerIds, formFactorIds, interfaceIds, pageable),
                 mapper::toDto
         );
     }

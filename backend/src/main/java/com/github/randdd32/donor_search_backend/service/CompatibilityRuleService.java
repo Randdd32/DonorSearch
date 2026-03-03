@@ -4,11 +4,13 @@ import com.github.randdd32.donor_search_backend.core.error.NotFoundException;
 import com.github.randdd32.donor_search_backend.core.util.QueryUtils;
 import com.github.randdd32.donor_search_backend.model.CompatibilityRuleEntity;
 import com.github.randdd32.donor_search_backend.repository.CompatibilityRuleRepository;
+import com.github.randdd32.donor_search_backend.repository.specification.CompatibilityRuleSpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,15 +37,12 @@ public class CompatibilityRuleService extends AbstractValidatingService<Compatib
         Sort appliedSort = QueryUtils.createSort(sort, Sort.by(Sort.Direction.DESC, "createdAt"));
         Pageable pageRequest = PageRequest.of(page, size, appliedSort);
 
-        return repository.findByFilters(
+        Specification<CompatibilityRuleEntity> spec = CompatibilityRuleSpecification.withFilters(
                 QueryUtils.cleanSearchToken(search),
-                isActive,
-                createdAfter,
-                createdBefore,
-                updatedAfter,
-                updatedBefore,
-                pageRequest
+                isActive, createdAfter, createdBefore, updatedAfter, updatedBefore
         );
+
+        return repository.findAll(spec, pageRequest);
     }
 
     @Transactional(readOnly = true)
