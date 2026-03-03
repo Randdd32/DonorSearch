@@ -24,7 +24,7 @@ public class OpticalDriveFormFactorService {
         if (cleanSearch == null) {
             return repository.findAll(pageRequest);
         }
-        return repository.findByName(cleanSearch, pageRequest);
+        return repository.findByNameContainingIgnoreCase(cleanSearch, pageRequest);
     }
 
     @Transactional(readOnly = true)
