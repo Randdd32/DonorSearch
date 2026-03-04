@@ -9,6 +9,9 @@ import com.github.randdd32.donor_search_backend.web.dto.pagination.PageDto;
 import com.github.randdd32.donor_search_backend.web.mapper.dictionary.DictionaryMapper;
 import com.github.randdd32.donor_search_backend.web.mapper.pagination.PageDtoMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,24 +30,21 @@ public class DictionaryController {
     @GetMapping("/manufacturers")
     public PageDto<NamedDictionaryDto> getManufacturers(
             @RequestParam(required = false) String search,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = Constants.DEFAULT_PAGE_SIZE) int size) {
-        return PageDtoMapper.toDto(manufacturerService.getAll(search, page, size), mapper::toDto);
+            @PageableDefault(size = Constants.DEFAULT_PAGE_SIZE, sort = "name", direction = Sort.Direction.ASC) Pageable pageable) {
+        return PageDtoMapper.toDto(manufacturerService.getAll(search, pageable), mapper::toDto);
     }
 
     @GetMapping("/storage-interfaces")
     public PageDto<NamedDictionaryDto> getStorageInterfaces(
             @RequestParam(required = false) String search,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = Constants.DEFAULT_PAGE_SIZE) int size) {
-        return PageDtoMapper.toDto(storageInterfaceService.getAll(search, page, size), mapper::toDto);
+            @PageableDefault(size = Constants.DEFAULT_PAGE_SIZE, sort = "name", direction = Sort.Direction.ASC) Pageable pageable) {
+        return PageDtoMapper.toDto(storageInterfaceService.getAll(search, pageable), mapper::toDto);
     }
 
     @GetMapping("/optical-drive-form-factors")
     public PageDto<NamedDictionaryDto> getOpticalDriveFormFactors(
             @RequestParam(required = false) String search,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = Constants.DEFAULT_PAGE_SIZE) int size) {
-        return PageDtoMapper.toDto(odFormFactorService.getAll(search, page, size), mapper::toDto);
+            @PageableDefault(size = Constants.DEFAULT_PAGE_SIZE, sort = "name", direction = Sort.Direction.ASC) Pageable pageable) {
+        return PageDtoMapper.toDto(odFormFactorService.getAll(search, pageable), mapper::toDto);
     }
 }
