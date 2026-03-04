@@ -1,10 +1,10 @@
 package com.github.randdd32.donor_search_backend.service.hardware;
 
-import com.github.randdd32.donor_search_backend.core.error.NotFoundException;
 import com.github.randdd32.donor_search_backend.core.util.QueryUtils;
 import com.github.randdd32.donor_search_backend.model.hardware.OpticalDriveEntity;
 import com.github.randdd32.donor_search_backend.repository.hardware.OpticalDriveRepository;
 import com.github.randdd32.donor_search_backend.repository.specification.OpticalDriveSpecification;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,8 +16,12 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class OpticalDriveService {
+public class OpticalDriveService extends AbstractHardwareService<OpticalDriveEntity, OpticalDriveRepository> {
+    @Getter
     private final OpticalDriveRepository repository;
+
+    @Getter
+    private final Class<OpticalDriveEntity> entityClass = OpticalDriveEntity.class;
 
     @Transactional(readOnly = true)
     public Page<OpticalDriveEntity> getAll(
@@ -34,21 +38,5 @@ public class OpticalDriveService {
                 QueryUtils.nullIfEmpty(interfaceIds)
         );
         return repository.findAll(spec, pageable);
-    }
-
-    @Transactional(readOnly = true)
-    public OpticalDriveEntity getById(Long id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new NotFoundException(OpticalDriveEntity.class, id));
-    }
-
-    @Transactional(readOnly = true)
-    public OpticalDriveEntity findBestMatch(String rawNameFromInventory) {
-        String cleanToken = QueryUtils.cleanSearchToken(rawNameFromInventory);
-        if (cleanToken == null) {
-            throw new IllegalArgumentException("Search token cannot be null or empty");
-        }
-        return repository.findMostSimilar(cleanToken)
-                .orElseThrow(() -> new NotFoundException("No suitable optical drive found for inventory string: " + rawNameFromInventory));
     }
 }

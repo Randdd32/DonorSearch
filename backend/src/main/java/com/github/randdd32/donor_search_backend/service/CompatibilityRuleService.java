@@ -1,36 +1,34 @@
 package com.github.randdd32.donor_search_backend.service;
 
-import com.github.randdd32.donor_search_backend.core.error.NotFoundException;
 import com.github.randdd32.donor_search_backend.core.util.QueryUtils;
 import com.github.randdd32.donor_search_backend.model.CompatibilityRuleEntity;
 import com.github.randdd32.donor_search_backend.repository.CompatibilityRuleRepository;
 import com.github.randdd32.donor_search_backend.repository.specification.CompatibilityRuleSpecification;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class CompatibilityRuleService extends AbstractValidatingService<CompatibilityRuleEntity> {
+public class CompatibilityRuleService extends AbstractCrudService<CompatibilityRuleEntity, CompatibilityRuleRepository> {
+    @Getter
     private final CompatibilityRuleRepository repository;
+
+    @Getter
+    private final Class<CompatibilityRuleEntity> entityClass = CompatibilityRuleEntity.class;
 
     @Transactional(readOnly = true)
     public Page<CompatibilityRuleEntity> getAll(
-            String search,
-            Boolean isActive,
-            Instant createdAfter,
-            Instant createdBefore,
-            Instant updatedAfter,
-            Instant updatedBefore,
+            String search, Boolean isActive,
+            Instant createdAfter, Instant createdBefore,
+            Instant updatedAfter, Instant updatedBefore,
             Pageable pageable) {
 
         Specification<CompatibilityRuleEntity> spec = CompatibilityRuleSpecification.withFilters(
@@ -40,42 +38,18 @@ public class CompatibilityRuleService extends AbstractValidatingService<Compatib
         return repository.findAll(spec, pageable);
     }
 
-    @Transactional(readOnly = true)
-    public CompatibilityRuleEntity getById(Long id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new NotFoundException(CompatibilityRuleEntity.class, id));
-    }
-
-    @Transactional
-    public CompatibilityRuleEntity create(CompatibilityRuleEntity entity) {
-        validate(entity, null);
-        return repository.save(entity);
-    }
-
-    @Transactional
-    public CompatibilityRuleEntity update(Long id, CompatibilityRuleEntity updatedEntity) {
-        validate(updatedEntity, id);
-        CompatibilityRuleEntity existing = getById(id);
-
-        existing.setRuleCode(updatedEntity.getRuleCode());
-        existing.setExpression(updatedEntity.getExpression());
-        existing.setErrorMessage(updatedEntity.getErrorMessage());
-        existing.setIsActive(updatedEntity.getIsActive());
-        existing.setDescription(updatedEntity.getDescription());
-
-        return repository.save(existing);
-    }
-
-    @Transactional
-    public void delete(Long id) {
-        repository.delete(getById(id));
+    @Override
+    protected void updateFields(CompatibilityRuleEntity existing, CompatibilityRuleEntity updated) {
+        existing.setRuleCode(updated.getRuleCode());
+        existing.setExpression(updated.getExpression());
+        existing.setErrorMessage(updated.getErrorMessage());
+        existing.setIsActive(updated.getIsActive());
+        existing.setDescription(updated.getDescription());
     }
 
     @Override
     protected void validate(CompatibilityRuleEntity entity, Long id) {
-        if (entity == null) {
-            throw new IllegalArgumentException("CompatibilityRule entity is null");
-        }
+        if (entity == null) throw new IllegalArgumentException("CompatibilityRule entity is null");
 
         validateStringField(entity.getRuleCode(), "Rule code");
         validateStringField(entity.getExpression(), "Expression (SpEL)");
