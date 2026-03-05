@@ -11,13 +11,6 @@ public final class QueryUtils {
         return (search != null && !search.isBlank()) ? search.toLowerCase().trim() : null;
     }
 
-    /**
-     * Возвращает null, если список пуст.
-     */
-    public static <T> List<T> nullIfEmpty(List<T> list) {
-        return (list != null && !list.isEmpty()) ? list : null;
-    }
-
     private QueryUtils() {
         throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
     }

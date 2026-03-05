@@ -33,9 +33,9 @@ public class OpticalDriveService extends AbstractHardwareService<OpticalDriveEnt
 
         Specification<OpticalDriveEntity> spec = OpticalDriveSpecification.withFilters(
                 QueryUtils.cleanSearchToken(search),
-                QueryUtils.nullIfEmpty(manufacturerIds),
-                QueryUtils.nullIfEmpty(formFactorIds),
-                QueryUtils.nullIfEmpty(interfaceIds)
+                manufacturerIds,
+                formFactorIds,
+                interfaceIds
         );
         return repository.findAll(spec, pageable);
     }

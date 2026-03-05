@@ -8,7 +8,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CompatibilityRuleSpecification {
+public final class CompatibilityRuleSpecification {
     public static Specification<CompatibilityRuleEntity> withFilters(
             String search,
             Boolean isActive,
@@ -42,7 +42,15 @@ public class CompatibilityRuleSpecification {
                 predicates.add(cb.lessThanOrEqualTo(root.get("updatedAt"), updatedBefore));
             }
 
+            if (predicates.isEmpty()) {
+                return cb.conjunction();
+            }
+
             return cb.and(predicates.toArray(new Predicate[0]));
         };
+    }
+
+    private CompatibilityRuleSpecification() {
+        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
     }
 }
