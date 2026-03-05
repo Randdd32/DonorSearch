@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping(Constants.API_URL + "/components/optical-drives")
+@RequestMapping(Constants.API_URL + Constants.COMPONENTS_URL + "/optical-drives")
 @RequiredArgsConstructor
 public class OpticalDriveController {
     private final OpticalDriveService service;
