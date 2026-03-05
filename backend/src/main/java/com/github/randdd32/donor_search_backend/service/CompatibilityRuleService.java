@@ -4,8 +4,6 @@ import com.github.randdd32.donor_search_backend.core.util.QueryUtils;
 import com.github.randdd32.donor_search_backend.model.CompatibilityRuleEntity;
 import com.github.randdd32.donor_search_backend.repository.CompatibilityRuleRepository;
 import com.github.randdd32.donor_search_backend.repository.specification.CompatibilityRuleSpecification;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -16,13 +14,10 @@ import java.time.Instant;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 public class CompatibilityRuleService extends AbstractCrudService<CompatibilityRuleEntity, CompatibilityRuleRepository> {
-    @Getter
-    private final CompatibilityRuleRepository repository;
-
-    @Getter
-    private final Class<CompatibilityRuleEntity> entityClass = CompatibilityRuleEntity.class;
+    public CompatibilityRuleService(CompatibilityRuleRepository repository) {
+        super(repository, CompatibilityRuleEntity.class);
+    }
 
     @Transactional(readOnly = true)
     public Page<CompatibilityRuleEntity> getAll(

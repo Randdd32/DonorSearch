@@ -4,6 +4,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 public abstract class AbstractCrudService<T, R extends JpaRepository<T, Long>> extends AbstractService<T, R> {
+    protected AbstractCrudService(R repository, Class<T> entityClass) {
+        super(repository, entityClass);
+    }
+
     protected abstract void validate(T entity, Long id);
 
     protected abstract void updateFields(T existing, T updated);
@@ -11,7 +15,7 @@ public abstract class AbstractCrudService<T, R extends JpaRepository<T, Long>> e
     @Transactional
     public T create(T entity) {
         validate(entity, null);
-        return getRepository().save(entity);
+        return repository.save(entity);
     }
 
     @Transactional
@@ -19,12 +23,12 @@ public abstract class AbstractCrudService<T, R extends JpaRepository<T, Long>> e
         validate(updatedEntity, id);
         T existing = getById(id);
         updateFields(existing, updatedEntity);
-        return getRepository().save(existing);
+        return repository.save(existing);
     }
 
     @Transactional
     public void delete(Long id) {
-        getRepository().delete(getById(id));
+        repository.delete(getById(id));
     }
 
     protected void validateStringField(String value, String fieldName) {

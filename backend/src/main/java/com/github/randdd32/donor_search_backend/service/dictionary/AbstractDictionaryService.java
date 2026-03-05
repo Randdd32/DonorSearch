@@ -8,12 +8,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 public abstract class AbstractDictionaryService<T, R extends DictionaryRepository<T>> extends AbstractService<T, R> {
+    protected AbstractDictionaryService(R repository, Class<T> entityClass) {
+        super(repository, entityClass);
+    }
+
     @Transactional(readOnly = true)
     public Page<T> getAll(String search, Pageable pageable) {
         String cleanSearch = QueryUtils.cleanSearchToken(search);
         if (cleanSearch == null) {
-            return getRepository().findAll(pageable);
+            return repository.findAll(pageable);
         }
-        return getRepository().findByNameContainingIgnoreCase(cleanSearch, pageable);
+        return repository.findByNameContainingIgnoreCase(cleanSearch, pageable);
     }
 }
