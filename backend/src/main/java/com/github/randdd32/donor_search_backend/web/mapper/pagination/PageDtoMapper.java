@@ -1,26 +1,27 @@
 package com.github.randdd32.donor_search_backend.web.mapper.pagination;
 
 import com.github.randdd32.donor_search_backend.web.dto.pagination.PageDto;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Page;
 
 import java.util.function.Function;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class PageDtoMapper {
+public final class PageDtoMapper {
     public static <D, E> PageDto<D> toDto(Page<E> page, Function<E, D> mapper) {
-        final PageDto<D> dto = new PageDto<>();
-        dto.setItems(page.getContent().stream().map(mapper).toList());
-        dto.setItemsCount(page.getNumberOfElements());
-        dto.setCurrentPage(page.getNumber());
-        dto.setCurrentSize(page.getSize());
-        dto.setTotalPages(page.getTotalPages());
-        dto.setTotalItems(page.getTotalElements());
-        dto.setFirst(page.isFirst());
-        dto.setLast(page.isLast());
-        dto.setHasNext(page.hasNext());
-        dto.setHasPrevious(page.hasPrevious());
-        return dto;
+        return new PageDto<>(
+                page.getContent().stream().map(mapper).toList(),
+                page.getNumberOfElements(),
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalPages(),
+                page.getTotalElements(),
+                page.isFirst(),
+                page.isLast(),
+                page.hasNext(),
+                page.hasPrevious()
+        );
+    }
+
+    private PageDtoMapper() {
+        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
     }
 }

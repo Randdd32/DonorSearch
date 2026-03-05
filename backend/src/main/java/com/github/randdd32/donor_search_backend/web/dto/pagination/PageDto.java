@@ -1,22 +1,16 @@
 package com.github.randdd32.donor_search_backend.web.dto.pagination;
 
-import lombok.Getter;
-import lombok.Setter;
-
-import java.util.ArrayList;
 import java.util.List;
 
-@Getter
-@Setter
-public class PageDto<D>  {
-    private List<D> items = new ArrayList<>();
-    private int itemsCount;
-    private int currentPage;
-    private int currentSize;
-    private int totalPages;
-    private long totalItems;
-    private boolean isFirst;
-    private boolean isLast;
-    private boolean hasNext;
-    private boolean hasPrevious;
-}
+public record PageDto<T>(
+        List<T> items,
+        int itemsCount,
+        int currentPage,
+        int currentSize,
+        int totalPages,
+        long totalItems,
+        boolean isFirst,
+        boolean isLast,
+        boolean hasNext,
+        boolean hasPrevious
+) {}

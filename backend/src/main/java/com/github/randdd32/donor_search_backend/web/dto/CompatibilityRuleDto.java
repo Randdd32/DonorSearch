@@ -4,35 +4,31 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.time.Instant;
 
-@Getter
-@Setter
-public class CompatibilityRuleDto {
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private Long id;
+public record CompatibilityRuleDto(
+        @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+        Long id,
 
-    @NotBlank
-    @Size(min = 1, max = 100)
-    private String ruleCode;
+        @NotBlank
+        @Size(min = 1, max = 100)
+        String ruleCode,
 
-    @NotBlank
-    private String expression;
+        @NotBlank
+        String expression,
 
-    @NotBlank
-    private String errorMessage;
+        @NotBlank
+        String errorMessage,
 
-    @NotNull
-    private Boolean isActive;
+        @NotNull
+        Boolean isActive,
 
-    private String description;
+        String description,
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private Instant createdAt;
+        @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+        Instant createdAt,
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private Instant updatedAt;
-}
+        @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+        Instant updatedAt
+) {}
