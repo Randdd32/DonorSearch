@@ -1,7 +1,7 @@
 package com.github.randdd32.donor_search_backend.web.mapper.hardware;
 
 import com.github.randdd32.donor_search_backend.model.hardware.OpticalDriveEntity;
-import com.github.randdd32.donor_search_backend.model.hardware.OpticalDrivePartNumberEntity;
+import com.github.randdd32.donor_search_backend.model.hardware.PartNumberEntity;
 import com.github.randdd32.donor_search_backend.web.dto.hardware.OpticalDriveDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -19,12 +19,12 @@ public interface OpticalDriveMapper {
     @Mapping(target = "interfaceName", source = "storageInterface.name")
     OpticalDriveDto toDto(OpticalDriveEntity entity);
 
-    default List<String> mapPartNumbers(Set<OpticalDrivePartNumberEntity> partNumbers) {
+    default List<String> mapPartNumbers(Set<PartNumberEntity> partNumbers) {
         if (partNumbers == null || partNumbers.isEmpty()) {
             return Collections.emptyList();
         }
         return partNumbers.stream()
-                .map(OpticalDrivePartNumberEntity::getPartNumber)
+                .map(PartNumberEntity::getPartNumber)
                 .collect(Collectors.toList());
     }
 }

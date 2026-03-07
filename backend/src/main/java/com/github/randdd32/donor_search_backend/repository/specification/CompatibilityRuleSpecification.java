@@ -1,5 +1,6 @@
 package com.github.randdd32.donor_search_backend.repository.specification;
 
+import com.github.randdd32.donor_search_backend.core.util.CommonSpecificationUtils;
 import com.github.randdd32.donor_search_backend.model.CompatibilityRuleEntity;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
@@ -29,18 +30,7 @@ public final class CompatibilityRuleSpecification {
             if (isActive != null) {
                 predicates.add(cb.equal(root.get("isActive"), isActive));
             }
-            if (createdAfter != null) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get("createdAt"), createdAfter));
-            }
-            if (createdBefore != null) {
-                predicates.add(cb.lessThanOrEqualTo(root.get("createdAt"), createdBefore));
-            }
-            if (updatedAfter != null) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get("updatedAt"), updatedAfter));
-            }
-            if (updatedBefore != null) {
-                predicates.add(cb.lessThanOrEqualTo(root.get("updatedAt"), updatedBefore));
-            }
+            CommonSpecificationUtils.addAuditDateFilters(predicates, root, cb, createdAfter, createdBefore, updatedAfter, updatedBefore);
 
             if (predicates.isEmpty()) {
                 return cb.conjunction();

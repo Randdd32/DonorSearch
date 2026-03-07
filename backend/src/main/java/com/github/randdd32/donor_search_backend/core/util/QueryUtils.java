@@ -1,7 +1,5 @@
 package com.github.randdd32.donor_search_backend.core.util;
 
-import java.util.List;
-
 public final class QueryUtils {
     /**
      * Очищает строку поиска от лишних пробелов и приводит к нижнему регистру.

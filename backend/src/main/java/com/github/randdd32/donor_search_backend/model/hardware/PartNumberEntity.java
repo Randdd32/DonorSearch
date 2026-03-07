@@ -17,19 +17,19 @@ import java.util.Objects;
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(name = "link_optical_drive_part_number")
-public class OpticalDrivePartNumberEntity extends BaseEntity {
+@Table(name = "link_part_number")
+public class PartNumberEntity extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "optical_drive_id", nullable = false)
-    private OpticalDriveEntity opticalDrive;
+    @JoinColumn(name = "component_id", nullable = false)
+    private ComponentEntity component;
 
-    @Column(name = "part_number", nullable = false, unique = true, length = 100)
+    @Column(name = "part_number", nullable = false, length = 100)
     private String partNumber;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof OpticalDrivePartNumberEntity that)) return false;
+        if (!(o instanceof PartNumberEntity that)) return false;
         return partNumber != null && partNumber.equals(that.getPartNumber());
     }
 

@@ -3,7 +3,7 @@ package com.github.randdd32.donor_search_backend.service;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
-public abstract class AbstractCrudService<T, R extends JpaRepository<T, Long>> extends AbstractService<T, R> {
+public abstract class AbstractCrudService<T, R extends JpaRepository<T, Long>> extends AbstractReadService<T, R> {
     protected AbstractCrudService(R repository, Class<T> entityClass) {
         super(repository, entityClass);
     }

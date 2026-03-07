@@ -5,6 +5,8 @@ public final class Constants {
 
     public static final String COMPONENTS_URL = "/components";
 
+    public static final String DICTIONARIES_URL = "/dictionaries";
+
     public static final int DEFAULT_PAGE_SIZE = 20;
 
     private Constants() {

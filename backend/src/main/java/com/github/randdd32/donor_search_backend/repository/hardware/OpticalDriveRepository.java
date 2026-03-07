@@ -8,8 +8,9 @@ import java.util.Optional;
 
 public interface OpticalDriveRepository extends HardwareRepository<OpticalDriveEntity> {
     @Override
-    @Query(value = "SELECT * FROM component_optical_drive " +
-            "ORDER BY search_name <-> :searchToken ASC LIMIT 1",
+    @Query(value = "SELECT child.*, parent.* FROM component_optical_drive child " +
+            "JOIN component parent ON child.id = parent.id " +
+            "ORDER BY parent.search_name <-> :searchToken ASC LIMIT 1",
             nativeQuery = true)
     Optional<OpticalDriveEntity> findMostSimilar(@Param("searchToken") String searchToken);
 }

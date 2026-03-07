@@ -3,10 +3,10 @@ package com.github.randdd32.donor_search_backend.service.hardware;
 import com.github.randdd32.donor_search_backend.core.error.NotFoundException;
 import com.github.randdd32.donor_search_backend.core.util.QueryUtils;
 import com.github.randdd32.donor_search_backend.repository.hardware.HardwareRepository;
-import com.github.randdd32.donor_search_backend.service.AbstractService;
+import com.github.randdd32.donor_search_backend.service.AbstractReadService;
 import org.springframework.transaction.annotation.Transactional;
 
-public abstract class AbstractHardwareService<T, R extends HardwareRepository<T>> extends AbstractService<T, R> {
+public abstract class AbstractHardwareService<T, R extends HardwareRepository<T>> extends AbstractReadService<T, R> {
     protected AbstractHardwareService(R repository, Class<T> entityClass) {
         super(repository, entityClass);
     }
