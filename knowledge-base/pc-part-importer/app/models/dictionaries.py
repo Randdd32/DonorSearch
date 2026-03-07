@@ -16,3 +16,23 @@ class OpticalDriveFormFactor(Base):
     __tablename__ = "dic_form_factor_optical_drive"
     id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
     name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+
+class GpuChipset(Base):
+    __tablename__ = "dic_gpu_chipset"
+    id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
+    name: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
+
+class MemoryType(Base):
+    __tablename__ = "dic_memory_type"
+    id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
+    name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+
+class ExpansionInterface(Base):
+    __tablename__ = "dic_expansion_interface"
+    id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
+    name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+
+class Color(Base):
+    __tablename__ = "dic_color"
+    id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
+    name: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)

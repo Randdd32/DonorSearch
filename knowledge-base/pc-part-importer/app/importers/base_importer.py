@@ -1,5 +1,8 @@
 from sqlalchemy.orm import Session
 from app.models.base import Base
+from app.models.dictionaries import Manufacturer
+from app.models.component import PartNumber
+from app.utils.parsing_utils import parse_separated_string, clean_search_tokens
 
 class BaseImporter:
     def __init__(self, session: Session):
@@ -22,3 +25,29 @@ class BaseImporter:
 
         self._cache[cache_key] = instance.id
         return instance.id
+
+    def build_base_component(self, row, additional_search_tokens=None):
+        manufacturer_id = self.get_or_create_dictionary(Manufacturer, row.get('manufacturer'))
+        part_numbers_list = parse_separated_string(row.get('part_number'))
+        
+        search_tokens =[
+            str(row.get('manufacturer', '')),
+            str(row.get('name', ''))
+        ]
+        if additional_search_tokens:
+            search_tokens.extend(additional_search_tokens)
+        search_tokens.append(" ".join(part_numbers_list))
+        
+        search_name = clean_search_tokens(search_tokens)
+
+        return {
+            "name": row.get('name'),
+            "search_name": search_name,
+            "manufacturer_id": manufacturer_id
+        }, part_numbers_list
+
+    def save_part_numbers(self, component_id: int, part_numbers_list: list[str]):
+        for pn in part_numbers_list:
+            if pn.strip():
+                pn_record = PartNumber(component_id=component_id, part_number=pn.strip())
+                self.session.add(pn_record)
