@@ -13,7 +13,7 @@ class StorageInterface(Base):
     name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
 
 class OpticalDriveFormFactor(Base):
-    __tablename__ = "dic_form_factor_optical_drive"
+    __tablename__ = "dic_optical_drive_form_factor"
     id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
     name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
 
