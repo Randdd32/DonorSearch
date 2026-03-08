@@ -26,6 +26,17 @@ class BaseImporter:
         self._cache[cache_key] = instance.id
         return instance.id
 
+    def get_m2m_entities(self, model: type[Base], raw_string: str) -> list[Base]:
+        values = parse_separated_string(raw_string)
+        entities =[]
+        for val in values:
+            dict_id = self.get_or_create_dictionary(model, val)
+            if dict_id:
+                entity = self.session.get(model, dict_id)
+                if entity:
+                    entities.append(entity)
+        return entities
+
     def build_base_component(self, row, additional_search_tokens=None):
         manufacturer_id = self.get_or_create_dictionary(Manufacturer, row.get('manufacturer'))
         part_numbers_list = parse_separated_string(row.get('part_number'))

@@ -31,7 +31,6 @@ class Case(Component):
     height_mm: Mapped[int | None] = mapped_column(SmallInteger)
     max_gpu_len_mm: Mapped[int | None] = mapped_column(SmallInteger)
     max_cpu_cooler_height_mm: Mapped[int | None] = mapped_column(SmallInteger)
-    psu_w: Mapped[int | None] = mapped_column(SmallInteger)
 
     int_35_bays: Mapped[int] = mapped_column(SmallInteger, nullable=False, default=0)
     ext_525_bays: Mapped[int] = mapped_column(SmallInteger, nullable=False, default=0)

@@ -42,6 +42,11 @@ class CaseType(Base):
     id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
     name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
 
+class SidePanel(Base):
+    __tablename__ = "dic_side_panel"
+    id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
+    name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+
 class MotherboardFormFactor(Base):
     __tablename__ = "dic_motherboard_form_factor"
     id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
