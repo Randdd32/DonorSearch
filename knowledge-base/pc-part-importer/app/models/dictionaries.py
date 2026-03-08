@@ -36,3 +36,18 @@ class Color(Base):
     __tablename__ = "dic_color"
     id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
     name: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
+
+class CaseType(Base):
+    __tablename__ = "dic_case_type"
+    id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
+    name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+
+class MotherboardFormFactor(Base):
+    __tablename__ = "dic_motherboard_form_factor"
+    id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
+    name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+
+class FrontPanelUsb(Base):
+    __tablename__ = "dic_front_panel_usb"
+    id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
+    name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
