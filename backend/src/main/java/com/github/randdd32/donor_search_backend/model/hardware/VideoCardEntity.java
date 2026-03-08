@@ -28,7 +28,6 @@ import java.util.Map;
 @DiscriminatorValue("VIDEO_CARD")
 @PrimaryKeyJoinColumn(name = "id")
 public class VideoCardEntity extends ComponentEntity {
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chipset_id")
     private GpuChipsetEntity chipset;
@@ -47,6 +46,12 @@ public class VideoCardEntity extends ComponentEntity {
 
     @Column(name = "memory_gb", nullable = false)
     private Integer memoryGb;
+
+    @Column(name = "core_clock_mhz")
+    private Integer coreClockMhz;
+
+    @Column(name = "boost_clock_mhz")
+    private Integer boostClockMhz;
 
     @Column(name = "length_mm")
     private Integer lengthMm;

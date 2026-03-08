@@ -2,6 +2,7 @@ package com.github.randdd32.donor_search_backend.model.hardware;
 
 import com.github.randdd32.donor_search_backend.model.dictionary.OpticalDriveFormFactorEntity;
 import com.github.randdd32.donor_search_backend.model.dictionary.StorageInterfaceEntity;
+import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -28,4 +29,13 @@ public class OpticalDriveEntity extends ComponentEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "interface_id")
     private StorageInterfaceEntity storageInterface;
+
+    @Column(name = "bd_speed_x")
+    private Integer bdSpeedX;
+
+    @Column(name = "dvd_speed_x")
+    private Integer dvdSpeedX;
+
+    @Column(name = "cd_speed_x")
+    private Integer cdSpeedX;
 }

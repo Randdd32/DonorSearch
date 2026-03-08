@@ -8,5 +8,8 @@ public record OpticalDriveDto(
         String manufacturerName,
         String formFactorName,
         String interfaceName,
+        Integer bdSpeedX,
+        Integer dvdSpeedX,
+        Integer cdSpeedX,
         List<String> partNumbers
 ) {}
