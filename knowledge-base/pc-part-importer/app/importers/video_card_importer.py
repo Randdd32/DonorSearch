@@ -2,7 +2,7 @@ import pandas as pd
 from app.models.dictionaries import GpuChipset, MemoryType, ExpansionInterface, Color
 from app.models.video_card import VideoCard
 from app.importers.base_importer import BaseImporter
-from app.utils import safe_int
+from app.utils.parsing_utils import safe_int
 
 class VideoCardImporter(BaseImporter):
     def import_data(self, csv_path: str):
@@ -41,6 +41,8 @@ class VideoCardImporter(BaseImporter):
                 color_id=color_id,
                 
                 memory_gb=safe_int(row.get('memory')),
+                core_clock_mhz=safe_int(row.get('core_clock')),
+                boost_clock_mhz=safe_int(row.get('boost_clock')),
                 length_mm=safe_int(row.get('length')),
                 tdp_w=safe_int(row.get('tdp')),
                 slot_width=safe_int(row.get('slot_width')),

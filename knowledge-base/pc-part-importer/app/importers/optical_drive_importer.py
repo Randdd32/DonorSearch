@@ -26,7 +26,10 @@ class OpticalDriveImporter(BaseImporter):
             drive = OpticalDrive(
                 **base_kwargs,
                 form_factor_id=form_factor_id,
-                interface_id=interface_id
+                interface_id=interface_id,
+                bd_speed_x=safe_int(row.get('bd')),
+                dvd_speed_x=safe_int(row.get('dvd')),
+                cd_speed_x=safe_int(row.get('cd'))
             )
             self.session.add(drive)
             self.session.flush() 

@@ -9,4 +9,8 @@ class OpticalDrive(Component):
     form_factor_id: Mapped[int | None] = mapped_column(ForeignKey("dic_form_factor_optical_drive.id"))
     interface_id: Mapped[int | None] = mapped_column(ForeignKey("dic_storage_interface.id"))
 
+    bd_speed_x: Mapped[int | None] = mapped_column(SmallInteger)
+    dvd_speed_x: Mapped[int | None] = mapped_column(SmallInteger)
+    cd_speed_x: Mapped[int | None] = mapped_column(SmallInteger)
+
     __mapper_args__ = {"polymorphic_identity": "OPTICAL_DRIVE"}

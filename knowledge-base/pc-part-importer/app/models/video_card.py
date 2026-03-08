@@ -13,6 +13,9 @@ class VideoCard(Component):
     color_id: Mapped[int | None] = mapped_column(ForeignKey("dic_color.id"))
 
     memory_gb: Mapped[int] = mapped_column(SmallInteger, nullable=False)
+    core_clock_mhz: Mapped[int | None] = mapped_column(SmallInteger)
+    boost_clock_mhz: Mapped[int | None] = mapped_column(SmallInteger)
+    
     length_mm: Mapped[int | None] = mapped_column(SmallInteger)
     tdp_w: Mapped[int] = mapped_column(SmallInteger, nullable=False)
     slot_width: Mapped[int] = mapped_column(SmallInteger, nullable=False)
