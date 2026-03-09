@@ -52,3 +52,29 @@ def clean_search_tokens(tokens: list) -> str:
     """
     clean = [str(t).strip().lower() for t in tokens if t and str(t).strip() and str(t).lower() not in ('none', 'nan')]
     return " ".join(clean)
+
+def parse_range(val_str) -> tuple[int | None, int | None]:
+    """
+    Безопасно преобразует строку с диапазоном значений в кортеж из двух чисел.
+
+    Ожидает строку, содержащую одно число или два числа, разделённых запятой.
+    Если указано одно значение, оно используется как минимальное и максимальное.
+    Возвращает (None, None), если значение является NaN, None, пустой строкой,
+    'nan'/'none' или если преобразование в число невозможно.
+    """
+    if pd.isna(val_str) or val_str is None:
+        return None, None
+    s = str(val_str).strip()
+    if s.lower() in ('nan', 'none', ''):
+        return None, None
+    
+    parts =[p.strip() for p in s.split(',')]
+    try:
+        if len(parts) == 1:
+            v = int(float(parts[0]))
+            return v, v
+        elif len(parts) >= 2:
+            return int(float(parts[0])), int(float(parts[1]))
+    except ValueError:
+        pass
+    return None, None

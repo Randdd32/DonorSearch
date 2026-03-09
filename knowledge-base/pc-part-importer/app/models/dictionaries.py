@@ -76,3 +76,8 @@ class ModularType(Base):
     __tablename__ = "dic_modular_type"
     id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
     name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+
+class FanConnector(Base):
+    __tablename__ = "dic_fan_connector"
+    id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
+    name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
