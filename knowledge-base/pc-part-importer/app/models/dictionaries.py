@@ -61,3 +61,18 @@ class CpuSocket(Base):
     __tablename__ = "dic_cpu_socket"
     id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
     name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+
+class PowerSupplyType(Base):
+    __tablename__ = "dic_power_supply_type"
+    id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
+    name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+
+class EfficiencyRating(Base):
+    __tablename__ = "dic_efficiency_rating"
+    id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
+    name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+
+class ModularType(Base):
+    __tablename__ = "dic_modular_type"
+    id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
+    name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
