@@ -8,12 +8,12 @@ import java.util.Objects;
 
 @NoArgsConstructor
 @Entity
-@Table(name = "dic_storage_interface")
-public class StorageInterfaceEntity extends NamedDictionaryEntity {
+@Table(name = "dic_cpu_socket")
+public class CpuSocketEntity extends NamedDictionaryEntity {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof StorageInterfaceEntity that)) return false;
+        if (!(o instanceof CpuSocketEntity that)) return false;
         return name != null && name.equals(that.getName());
     }
 

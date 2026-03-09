@@ -2,9 +2,11 @@ package com.github.randdd32.donor_search_backend.model.dictionary;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import lombok.NoArgsConstructor;
 
 import java.util.Objects;
 
+@NoArgsConstructor
 @Entity
 @Table(name = "dic_motherboard_form_factor")
 public class MotherboardFormFactorEntity extends NamedDictionaryEntity {
