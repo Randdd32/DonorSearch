@@ -2,6 +2,7 @@ package com.github.randdd32.donor_search_backend.web.mapper.dictionary;
 
 import com.github.randdd32.donor_search_backend.model.dictionary.CaseTypeEntity;
 import com.github.randdd32.donor_search_backend.model.dictionary.ColorEntity;
+import com.github.randdd32.donor_search_backend.model.dictionary.CpuSocketEntity;
 import com.github.randdd32.donor_search_backend.model.dictionary.ExpansionInterfaceEntity;
 import com.github.randdd32.donor_search_backend.model.dictionary.FrontPanelUsbEntity;
 import com.github.randdd32.donor_search_backend.model.dictionary.GpuChipsetEntity;
@@ -28,4 +29,5 @@ public interface DictionaryMapper {
     NamedDictionaryDto toDto(FrontPanelUsbEntity entity);
     NamedDictionaryDto toDto(MotherboardFormFactorEntity entity);
     NamedDictionaryDto toDto(SidePanelEntity entity);
+    NamedDictionaryDto toDto(CpuSocketEntity entity);
 }
