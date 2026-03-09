@@ -1,24 +1,16 @@
 package com.github.randdd32.donor_search_backend.model.dictionary;
 
-import com.github.randdd32.donor_search_backend.model.BaseEntity;
+import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.util.Objects;
 
-@Getter
-@Setter
-@NoArgsConstructor
 @Entity
 @Table(name = "dic_gpu_chipset")
-public class GpuChipsetEntity extends BaseEntity {
-    @Column(nullable = false, unique = true, length = 100)
-    private String name;
-
+@AttributeOverride(name = "name", column = @Column(name = "name", nullable = false, unique = true, length = 100))
+public class GpuChipsetEntity extends NamedDictionaryEntity {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

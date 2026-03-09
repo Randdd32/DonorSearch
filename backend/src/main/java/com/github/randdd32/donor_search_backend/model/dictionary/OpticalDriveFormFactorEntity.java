@@ -1,24 +1,13 @@
 package com.github.randdd32.donor_search_backend.model.dictionary;
 
-import com.github.randdd32.donor_search_backend.model.BaseEntity;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.util.Objects;
 
-@Getter
-@Setter
-@NoArgsConstructor
 @Entity
-@Table(name = "dic_form_factor_optical_drive")
-public class OpticalDriveFormFactorEntity extends BaseEntity {
-    @Column(nullable = false, unique = true, length = 50)
-    private String name;
-
+@Table(name = "dic_optical_drive_form_factor")
+public class OpticalDriveFormFactorEntity extends NamedDictionaryEntity {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

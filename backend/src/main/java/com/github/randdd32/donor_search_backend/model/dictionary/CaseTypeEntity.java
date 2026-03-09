@@ -6,12 +6,12 @@ import jakarta.persistence.Table;
 import java.util.Objects;
 
 @Entity
-@Table(name = "dic_memory_type")
-public class MemoryTypeEntity extends NamedDictionaryEntity {
+@Table(name = "dic_case_type")
+public class CaseTypeEntity extends NamedDictionaryEntity {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof MemoryTypeEntity that)) return false;
+        if (!(o instanceof CaseTypeEntity that)) return false;
         return name != null && name.equals(that.getName());
     }
 
