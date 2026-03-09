@@ -29,6 +29,19 @@ def safe_int(val) -> int | None:
     except ValueError: 
         return None
 
+def safe_bool(val) -> bool:
+    """
+    Безопасно преобразует значение в логический тип (bool).
+
+    Возвращает False, если значение является NaN, None или не относится
+    к допустимым "истинным" значениям. Значение считается True, если
+    после приведения к строке и нижнему регистру оно совпадает с одним
+    из следующих: 'true', '1', 'yes', 'y'.
+    """
+    if pd.isna(val) or val is None: 
+        return False
+    return str(val).strip().lower() in ('true', '1', 'yes', 'y')
+
 def clean_search_tokens(tokens: list) -> str:
     """
     Очищает список токенов для использования в поисковых строках.

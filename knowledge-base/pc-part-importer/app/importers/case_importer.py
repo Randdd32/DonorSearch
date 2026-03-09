@@ -6,7 +6,7 @@ from app.importers.base_importer import BaseImporter
 from app.utils.parsing_utils import parse_separated_string, safe_int
 
 class CaseImporter(BaseImporter):
-    def extract_sizes_mm(self, text: str) -> list[int]:
+    def _extract_sizes_mm(self, text: str) -> list[int]:
         if pd.isna(text) or not str(text).strip():
             return []
         
@@ -62,8 +62,8 @@ class CaseImporter(BaseImporter):
                 radiator_support_text=row.get('radiator_support'),
                 fan_support_text=row.get('fan_support'),
                 
-                radiator_sizes=self.extract_sizes_mm(row.get('radiator_support')),
-                fan_sizes=self.extract_sizes_mm(row.get('fan_support')),
+                radiator_sizes=self._extract_sizes_mm(row.get('radiator_support')),
+                fan_sizes=self._extract_sizes_mm(row.get('fan_support')),
 
                 mobo_form_factors=mobo_entities,
                 front_panel_usbs=usb_entities
@@ -74,4 +74,4 @@ class CaseImporter(BaseImporter):
             self.save_part_numbers(pc_case.id, part_numbers)
 
         self.session.commit()
-        print("Cases imported successfully!")
+        print("Cases imported successfully")

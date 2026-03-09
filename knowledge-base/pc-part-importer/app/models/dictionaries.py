@@ -56,3 +56,8 @@ class FrontPanelUsb(Base):
     __tablename__ = "dic_front_panel_usb"
     id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
     name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+
+class CpuSocket(Base):
+    __tablename__ = "dic_cpu_socket"
+    id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
+    name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
