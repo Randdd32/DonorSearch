@@ -31,7 +31,6 @@ public class VideoCardService extends AbstractHardwareService<VideoCardEntity, V
                 manufacturerIds, chipsetIds, memoryTypeIds,
                 minLength, maxLength, minTdp, maxTdp, slotWidth
         );
-
         return repository.findAll(spec, pageable);
     }
 }

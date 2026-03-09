@@ -27,9 +27,7 @@ public final class CompatibilityRuleSpecification {
                 Predicate descMatch = cb.like(cb.lower(root.get("description")), "%" + search + "%");
                 predicates.add(cb.or(codeMatch, exprMatch, descMatch));
             }
-            if (isActive != null) {
-                predicates.add(cb.equal(root.get("isActive"), isActive));
-            }
+            CommonSpecificationUtils.addEqualityFilter(predicates, root, cb, "isActive", isActive);
             CommonSpecificationUtils.addAuditDateFilters(predicates, root, cb, createdAfter, createdBefore, updatedAfter, updatedBefore);
 
             if (predicates.isEmpty()) {

@@ -11,6 +11,10 @@ spring:
     hikari:
       maximum-pool-size: 10
       connection-timeout: 30000
+  jpa:
+    properties:
+      hibernate:
+        default_batch_fetch_size: 100
 
 server:
   port: 8080

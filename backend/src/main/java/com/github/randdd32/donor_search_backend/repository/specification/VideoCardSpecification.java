@@ -34,22 +34,9 @@ public final class VideoCardSpecification {
             CommonSpecificationUtils.addDictionaryFilter(predicates, root, "manufacturer", manufacturerIds);
             CommonSpecificationUtils.addDictionaryFilter(predicates, root, "chipset", chipsetIds);
             CommonSpecificationUtils.addDictionaryFilter(predicates, root, "memoryType", memoryTypeIds);
-
-            if (minLength != null) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get("lengthMm"), minLength));
-            }
-            if (maxLength != null) {
-                predicates.add(cb.lessThanOrEqualTo(root.get("lengthMm"), maxLength));
-            }
-            if (minTdp != null) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get("tdpW"), minTdp));
-            }
-            if (maxTdp != null) {
-                predicates.add(cb.lessThanOrEqualTo(root.get("tdpW"), maxTdp));
-            }
-            if (slotWidth != null) {
-                predicates.add(cb.equal(root.get("slotWidth"), slotWidth));
-            }
+            CommonSpecificationUtils.addRangeFilter(predicates, root, cb, "lengthMm", minLength, maxLength);
+            CommonSpecificationUtils.addRangeFilter(predicates, root, cb, "tdpW", minTdp, maxTdp);
+            CommonSpecificationUtils.addEqualityFilter(predicates, root, cb, "slotWidth", slotWidth);
 
             if (predicates.isEmpty()) {
                 return cb.conjunction();

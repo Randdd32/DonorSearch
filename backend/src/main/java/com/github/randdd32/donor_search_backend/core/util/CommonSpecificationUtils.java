@@ -21,13 +21,34 @@ public final class CommonSpecificationUtils {
         }
     }
 
+    public static void addManyToManyFilter(List<Predicate> predicates, Root<?> root, String relationField, List<Long> ids) {
+        if (!CollectionUtils.isEmpty(ids)) {
+            predicates.add(root.join(relationField).get("id").in(ids));
+        }
+    }
+
+    public static <Y extends Comparable<? super Y>> void addRangeFilter(List<Predicate> predicates, Root<?> root,
+                                                                        CriteriaBuilder cb, String field, Y min, Y max) {
+        if (min != null) {
+            predicates.add(cb.greaterThanOrEqualTo(root.get(field), min));
+        }
+        if (max != null) {
+            predicates.add(cb.lessThanOrEqualTo(root.get(field), max));
+        }
+    }
+
+    public static void addEqualityFilter(List<Predicate> predicates, Root<?> root, CriteriaBuilder cb, String field,
+                                         Object value) {
+        if (value != null) {
+            predicates.add(cb.equal(root.get(field), value));
+        }
+    }
+
     public static void addAuditDateFilters(List<Predicate> predicates, Root<?> root, CriteriaBuilder cb,
                                            Instant createdAfter, Instant createdBefore,
                                            Instant updatedAfter, Instant updatedBefore) {
-        if (createdAfter != null) predicates.add(cb.greaterThanOrEqualTo(root.get("createdAt"), createdAfter));
-        if (createdBefore != null) predicates.add(cb.lessThanOrEqualTo(root.get("createdAt"), createdBefore));
-        if (updatedAfter != null) predicates.add(cb.greaterThanOrEqualTo(root.get("updatedAt"), updatedAfter));
-        if (updatedBefore != null) predicates.add(cb.lessThanOrEqualTo(root.get("updatedAt"), updatedBefore));
+        addRangeFilter(predicates, root, cb, "createdAt", createdAfter, createdBefore);
+        addRangeFilter(predicates, root, cb, "updatedAt", updatedAfter, updatedBefore);
     }
 
     private CommonSpecificationUtils() {

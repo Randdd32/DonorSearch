@@ -12,7 +12,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-public class IntegrationMappingSpecification {
+public final class IntegrationMappingSpecification {
     public static Specification<IntegrationMappingEntity> withFilters(
             String search, MappingConfidence confidence, ComponentType componentType,
             Instant createdAfter, Instant createdBefore, Instant updatedAfter, Instant updatedBefore) {
@@ -29,9 +29,7 @@ public class IntegrationMappingSpecification {
                 Predicate intSearchName = cb.like(cb.lower(root.get("internalComponent").get("searchName")), "%" + search + "%");
                 predicates.add(cb.or(extName, intSearchName));
             }
-            if (confidence != null) {
-                predicates.add(cb.equal(root.get("confidence"), confidence));
-            }
+            CommonSpecificationUtils.addEqualityFilter(predicates, root, cb, "confidence", confidence);
             if (componentType != null) {
                 predicates.add(cb.equal(root.get("internalComponent").get("type"), componentType));
             }
