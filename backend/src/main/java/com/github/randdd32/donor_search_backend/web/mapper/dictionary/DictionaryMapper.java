@@ -3,13 +3,16 @@ package com.github.randdd32.donor_search_backend.web.mapper.dictionary;
 import com.github.randdd32.donor_search_backend.model.dictionary.CaseTypeEntity;
 import com.github.randdd32.donor_search_backend.model.dictionary.ColorEntity;
 import com.github.randdd32.donor_search_backend.model.dictionary.CpuSocketEntity;
+import com.github.randdd32.donor_search_backend.model.dictionary.EfficiencyRatingEntity;
 import com.github.randdd32.donor_search_backend.model.dictionary.ExpansionInterfaceEntity;
 import com.github.randdd32.donor_search_backend.model.dictionary.FrontPanelUsbEntity;
 import com.github.randdd32.donor_search_backend.model.dictionary.GpuChipsetEntity;
 import com.github.randdd32.donor_search_backend.model.dictionary.ManufacturerEntity;
 import com.github.randdd32.donor_search_backend.model.dictionary.MemoryTypeEntity;
+import com.github.randdd32.donor_search_backend.model.dictionary.ModularTypeEntity;
 import com.github.randdd32.donor_search_backend.model.dictionary.MotherboardFormFactorEntity;
 import com.github.randdd32.donor_search_backend.model.dictionary.OpticalDriveFormFactorEntity;
+import com.github.randdd32.donor_search_backend.model.dictionary.PowerSupplyTypeEntity;
 import com.github.randdd32.donor_search_backend.model.dictionary.SidePanelEntity;
 import com.github.randdd32.donor_search_backend.model.dictionary.StorageInterfaceEntity;
 import com.github.randdd32.donor_search_backend.web.dto.dictionary.NamedDictionaryDto;
@@ -30,4 +33,7 @@ public interface DictionaryMapper {
     NamedDictionaryDto toDto(MotherboardFormFactorEntity entity);
     NamedDictionaryDto toDto(SidePanelEntity entity);
     NamedDictionaryDto toDto(CpuSocketEntity entity);
+    NamedDictionaryDto toDto(PowerSupplyTypeEntity entity);
+    NamedDictionaryDto toDto(EfficiencyRatingEntity entity);
+    NamedDictionaryDto toDto(ModularTypeEntity entity);
 }
