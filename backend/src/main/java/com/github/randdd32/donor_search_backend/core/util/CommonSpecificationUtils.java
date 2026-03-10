@@ -21,6 +21,12 @@ public final class CommonSpecificationUtils {
         }
     }
 
+    public static <T> void addInFilter(List<Predicate> predicates, Root<?> root, String field, List<T> values) {
+        if (!CollectionUtils.isEmpty(values)) {
+            predicates.add(root.get(field).in(values));
+        }
+    }
+
     public static void addManyToManyFilter(List<Predicate> predicates, Root<?> root, String relationField, List<Long> ids) {
         if (!CollectionUtils.isEmpty(ids)) {
             predicates.add(root.join(relationField).get("id").in(ids));

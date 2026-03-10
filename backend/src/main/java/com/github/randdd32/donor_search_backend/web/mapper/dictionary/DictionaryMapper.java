@@ -5,6 +5,7 @@ import com.github.randdd32.donor_search_backend.model.dictionary.ColorEntity;
 import com.github.randdd32.donor_search_backend.model.dictionary.CpuSocketEntity;
 import com.github.randdd32.donor_search_backend.model.dictionary.EfficiencyRatingEntity;
 import com.github.randdd32.donor_search_backend.model.dictionary.ExpansionInterfaceEntity;
+import com.github.randdd32.donor_search_backend.model.dictionary.FanConnectorEntity;
 import com.github.randdd32.donor_search_backend.model.dictionary.FrontPanelUsbEntity;
 import com.github.randdd32.donor_search_backend.model.dictionary.GpuChipsetEntity;
 import com.github.randdd32.donor_search_backend.model.dictionary.ManufacturerEntity;
@@ -36,4 +37,5 @@ public interface DictionaryMapper {
     NamedDictionaryDto toDto(PowerSupplyTypeEntity entity);
     NamedDictionaryDto toDto(EfficiencyRatingEntity entity);
     NamedDictionaryDto toDto(ModularTypeEntity entity);
+    NamedDictionaryDto toDto(FanConnectorEntity entity);
 }
