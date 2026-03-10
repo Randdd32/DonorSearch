@@ -25,6 +25,7 @@ IMPORTER_MAP = {
     'internal-hard-drive': (StorageImporter, 'import_internal'),
     'external-hard-drive': (StorageImporter, 'import_external'),
     'memory': (MemoryImporter, 'import_data'),
+    'monitor': (MonitorImporter, 'import_data'),
 }
 
 ALL_PART_TYPES = sorted(list(IMPORTER_MAP.keys()))

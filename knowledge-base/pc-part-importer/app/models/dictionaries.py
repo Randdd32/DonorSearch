@@ -106,3 +106,18 @@ class RamFormFactor(Base):
     __tablename__ = "dic_ram_form_factor"
     id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
     name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+
+class MonitorResolution(Base):
+    __tablename__ = "dic_monitor_resolution"
+    id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
+    name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+
+class PanelType(Base):
+    __tablename__ = "dic_panel_type"
+    id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
+    name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+
+class AspectRatio(Base):
+    __tablename__ = "dic_aspect_ratio"
+    id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
+    name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
