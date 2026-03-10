@@ -1,6 +1,5 @@
 import os
 from app.database import init_db, SessionLocal
-from app.importers.optical_drive_importer import OpticalDriveImporter
 from app.utils.constants import DATA_DIR, IMPORTER_MAP, ALL_PART_TYPES
 
 def main():
@@ -14,12 +13,14 @@ def main():
             print(f"Skipping '{part_type}': file not found ({csv_path})")
             continue
             
-        importer_class = IMPORTER_MAP[part_type]
+        importer_class, target_method = IMPORTER_MAP[part_type]
         session = SessionLocal()
         
         try:
             importer = importer_class(session)
-            importer.import_data(csv_path)
+            import_func = getattr(importer, target_method)
+            import_func(csv_path)
+            
         except Exception as e:
             session.rollback()
             print(f"Error importing '{part_type}': {e}")

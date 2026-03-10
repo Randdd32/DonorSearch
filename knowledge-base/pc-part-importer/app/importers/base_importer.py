@@ -26,8 +26,8 @@ class BaseImporter:
         self._cache[cache_key] = instance.id
         return instance.id
 
-    def get_m2m_entities(self, model: type[Base], raw_string: str) -> list[Base]:
-        values = parse_separated_string(raw_string)
+    def get_m2m_entities(self, model: type[Base], raw_string: str, separator: str = '|') -> list[Base]:
+        values = parse_separated_string(raw_string, separator=separator)
         entities =[]
         for val in values:
             dict_id = self.get_or_create_dictionary(model, val)

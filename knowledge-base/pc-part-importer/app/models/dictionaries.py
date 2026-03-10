@@ -91,3 +91,13 @@ class IntegratedGraphics(Base):
     __tablename__ = "dic_integrated_graphics"
     id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
     name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+
+class StorageType(Base):
+    __tablename__ = "dic_storage_type"
+    id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
+    name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+
+class StorageFormFactor(Base):
+    __tablename__ = "dic_storage_form_factor"
+    id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
+    name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)

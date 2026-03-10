@@ -1,22 +1,28 @@
 import os
 
-from app import importers
+from app.importers.optical_drive_importer import OpticalDriveImporter
+from app.importers.video_card_importer import VideoCardImporter
+from app.importers.case_importer import CaseImporter
+from app.importers.power_supply_importer import PowerSupplyImporter
+from app.importers.case_fan_importer import CaseFanImporter
+from app.importers.cpu_importer import CpuImporter
+from app.importers.cpu_cooler_importer import CpuCoolerImporter
+from app.importers.storage_importer import StorageImporter
 
 DB_URL = os.getenv("DB_URL", "postgresql://postgres:postgres@localhost:5432/donor_search_db")
 
 DATA_DIR = os.getenv("DATA_DIR", "./data")
 
 IMPORTER_MAP = {
-    'optical-drive': importers.OpticalDriveImporter,
-    'case': importers.CaseImporter,
-    'cpu': importers.CPUImporter,
-    'cpu-cooler': importers.CPUCoolerImporter,
-    'motherboard': importers.MotherboardImporter,
-    'memory': importers.MemoryImporter,
-    'video-card': importers.VideoCardImporter,
-    'power-supply': importers.PowerSupplyImporter,
-    'case-fan': importers.CaseFanImporter,
-    'monitor': importers.MonitorImporter
+    'optical-drive': (OpticalDriveImporter, 'import_data'),
+    'video-card': (VideoCardImporter, 'import_data'),
+    'case': (CaseImporter, 'import_data'),
+    'power-supply': (PowerSupplyImporter, 'import_data'),
+    'case-fan': (CaseFanImporter, 'import_data'),
+    'cpu': (CpuImporter, 'import_data'),
+    'cpu-cooler': (CpuCoolerImporter, 'import_data'),
+    'internal-hard-drive': (StorageImporter, 'import_internal'),
+    'external-hard-drive': (StorageImporter, 'import_external')
 }
 
 ALL_PART_TYPES = sorted(list(IMPORTER_MAP.keys()))
