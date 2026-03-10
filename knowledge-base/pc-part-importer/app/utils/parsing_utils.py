@@ -29,6 +29,21 @@ def safe_int(val) -> int | None:
     except ValueError: 
         return None
 
+def safe_float(val) -> float | None:
+    """
+    Безопасно преобразует значение в число с плавающей точкой (float).
+
+    Возвращает None, если значение является NaN, None, пустой строкой
+    или строкой 'nan'. Если преобразование невозможно, также
+    возвращает None вместо выброса исключения.
+    """
+    if pd.isna(val) or val is None or str(val).strip().lower() == 'nan':
+        return None
+    try:
+        return float(val)
+    except ValueError:
+        return None
+
 def safe_bool(val) -> bool:
     """
     Безопасно преобразует значение в логический тип (bool).

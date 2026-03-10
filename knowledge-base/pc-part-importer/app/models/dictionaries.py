@@ -81,3 +81,13 @@ class FanConnector(Base):
     __tablename__ = "dic_fan_connector"
     id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
     name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+
+class Microarchitecture(Base):
+    __tablename__ = "dic_microarchitecture"
+    id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
+    name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+
+class IntegratedGraphics(Base):
+    __tablename__ = "dic_integrated_graphics"
+    id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
+    name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
