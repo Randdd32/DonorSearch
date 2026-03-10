@@ -49,4 +49,4 @@ class CpuImporter(BaseImporter):
             self.save_part_numbers(cpu.id, part_numbers)
 
         self.session.commit()
-        print("CPUs imported successfully!")
+        print("CPUs imported successfully")

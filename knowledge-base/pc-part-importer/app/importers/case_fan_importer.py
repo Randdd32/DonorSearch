@@ -48,4 +48,4 @@ class CaseFanImporter(BaseImporter):
             self.save_part_numbers(fan.id, part_numbers)
 
         self.session.commit()
-        print("Case Fans imported successfully!")
+        print("Case Fans imported successfully")
