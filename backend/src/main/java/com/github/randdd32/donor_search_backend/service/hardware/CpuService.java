@@ -14,7 +14,6 @@ import java.util.List;
 
 @Service
 public class CpuService extends AbstractHardwareService<CpuEntity, CpuRepository> {
-
     public CpuService(CpuRepository repository) {
         super(repository, CpuEntity.class);
     }

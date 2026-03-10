@@ -27,4 +27,5 @@ public interface DictionaryMapper {
     NamedDictionaryDto toDto(IntegratedGraphicsEntity entity);
     NamedDictionaryDto toDto(StorageTypeEntity entity);
     NamedDictionaryDto toDto(StorageFormFactorEntity entity);
+    NamedDictionaryDto toDto(RamFormFactorEntity entity);
 }
