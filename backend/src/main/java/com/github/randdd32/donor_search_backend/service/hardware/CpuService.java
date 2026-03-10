@@ -1,4 +1,41 @@
 package com.github.randdd32.donor_search_backend.service.hardware;
 
-public class CpuService {
+import com.github.randdd32.donor_search_backend.core.util.QueryUtils;
+import com.github.randdd32.donor_search_backend.model.hardware.CpuEntity;
+import com.github.randdd32.donor_search_backend.repository.hardware.CpuRepository;
+import com.github.randdd32.donor_search_backend.repository.specification.CpuSpecification;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Service
+public class CpuService extends AbstractHardwareService<CpuEntity, CpuRepository> {
+
+    public CpuService(CpuRepository repository) {
+        super(repository, CpuEntity.class);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<CpuEntity> getAll(
+            String search,
+            List<Long> manufacturerIds, List<Long> socketIds,
+            List<Long> microarchitectureIds, List<Long> graphicsIds,
+            Integer minCoreCount, Integer maxCoreCount,
+            Double minCoreClock, Double maxCoreClock,
+            Double minBoostClock, Double maxBoostClock,
+            Integer minTdp, Integer maxTdp,
+            Boolean eccSupport, Pageable pageable) {
+
+        Specification<CpuEntity> spec = CpuSpecification.withFilters(
+                QueryUtils.cleanSearchToken(search),
+                manufacturerIds, socketIds, microarchitectureIds, graphicsIds,
+                minCoreCount, maxCoreCount, minCoreClock, maxCoreClock,
+                minBoostClock, maxBoostClock, minTdp, maxTdp, eccSupport
+        );
+        return repository.findAll(spec, pageable);
+    }
 }

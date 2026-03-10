@@ -8,8 +8,10 @@ import com.github.randdd32.donor_search_backend.model.dictionary.ExpansionInterf
 import com.github.randdd32.donor_search_backend.model.dictionary.FanConnectorEntity;
 import com.github.randdd32.donor_search_backend.model.dictionary.FrontPanelUsbEntity;
 import com.github.randdd32.donor_search_backend.model.dictionary.GpuChipsetEntity;
+import com.github.randdd32.donor_search_backend.model.dictionary.IntegratedGraphicsEntity;
 import com.github.randdd32.donor_search_backend.model.dictionary.ManufacturerEntity;
 import com.github.randdd32.donor_search_backend.model.dictionary.MemoryTypeEntity;
+import com.github.randdd32.donor_search_backend.model.dictionary.MicroarchitectureEntity;
 import com.github.randdd32.donor_search_backend.model.dictionary.ModularTypeEntity;
 import com.github.randdd32.donor_search_backend.model.dictionary.MotherboardFormFactorEntity;
 import com.github.randdd32.donor_search_backend.model.dictionary.OpticalDriveFormFactorEntity;
@@ -38,4 +40,6 @@ public interface DictionaryMapper {
     NamedDictionaryDto toDto(EfficiencyRatingEntity entity);
     NamedDictionaryDto toDto(ModularTypeEntity entity);
     NamedDictionaryDto toDto(FanConnectorEntity entity);
+    NamedDictionaryDto toDto(MicroarchitectureEntity entity);
+    NamedDictionaryDto toDto(IntegratedGraphicsEntity entity);
 }
