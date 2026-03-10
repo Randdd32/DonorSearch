@@ -1,7 +1,7 @@
 import pandas as pd
-from models.dictionaries import Manufacturer, Color, StorageType, StorageFormFactor, StorageInterface
-from models.storage import Storage
-from importers.base_importer import BaseImporter
+from app.models.dictionaries import Manufacturer, Color, StorageType, StorageFormFactor, StorageInterface
+from app.models.storage import Storage
+from app.importers.base_importer import BaseImporter
 from app.utils.parsing_utils import safe_int, parse_separated_string
 
 class StorageImporter(BaseImporter):

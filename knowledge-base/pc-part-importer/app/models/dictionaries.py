@@ -101,3 +101,8 @@ class StorageFormFactor(Base):
     __tablename__ = "dic_storage_form_factor"
     id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
     name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+
+class RamFormFactor(Base):
+    __tablename__ = "dic_ram_form_factor"
+    id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
+    name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
