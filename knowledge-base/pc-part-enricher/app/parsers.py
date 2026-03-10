@@ -186,7 +186,7 @@ def parse_cpu_cooler(specs, base_row):
         data['water_cooled_size'] = None
         data['is_water_cooled'] = False
 
-    remove_keys(data, ['price', 'noise_level'])    
+    remove_keys(data, ['price', 'noise_level', 'size'])    
     return data
 
 def parse_motherboard(specs, base_row):
