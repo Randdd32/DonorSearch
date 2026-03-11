@@ -28,4 +28,7 @@ public interface DictionaryMapper {
     NamedDictionaryDto toDto(StorageTypeEntity entity);
     NamedDictionaryDto toDto(StorageFormFactorEntity entity);
     NamedDictionaryDto toDto(RamFormFactorEntity entity);
+    NamedDictionaryDto toDto(MonitorResolutionEntity entity);
+    NamedDictionaryDto toDto(PanelTypeEntity entity);
+    NamedDictionaryDto toDto(AspectRatioEntity entity);
 }
