@@ -33,6 +33,11 @@ def validate_args(args):
     if args.all:
         return ALL_PART_TYPES
     elif args.part_types:
-        return args.part_types
+        valid_types =[pt for pt in args.part_types if pt in ALL_PART_TYPES]
+        invalid_types = set(args.part_types) - set(valid_types)
+        if invalid_types:
+            print(f"Warning: Ignoring unknown part types: {', '.join(invalid_types)}")
+        return valid_types
     else:
-        return None
+        print("No specific parts or --all flag provided. Defaulting to processing ALL part types.")
+        return ALL_PART_TYPES

@@ -12,7 +12,7 @@ async def main():
 
     targets = validate_args(args)
     if not targets:
-        print("Error: Please specify part types or use --all")
+        print("Error: No valid part types to process. Exiting.")
         print(f"Supported types: {', '.join(ALL_PART_TYPES)}")
         sys.exit(1)
 
