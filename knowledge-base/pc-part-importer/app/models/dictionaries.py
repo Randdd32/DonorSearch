@@ -121,3 +121,13 @@ class AspectRatio(Base):
     __tablename__ = "dic_aspect_ratio"
     id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
     name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+
+class AudioChipset(Base):
+    __tablename__ = "dic_audio_chipset"
+    id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
+    name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+
+class WirelessProtocol(Base):
+    __tablename__ = "dic_wireless_protocol"
+    id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
+    name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
