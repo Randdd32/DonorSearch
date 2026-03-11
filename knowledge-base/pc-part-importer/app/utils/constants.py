@@ -15,8 +15,6 @@ from app.importers.expansion_card_importer import ExpansionCardImporter
 
 DB_URL = os.getenv("DB_URL", "postgresql://postgres:postgres@localhost:5432/donor_search_db")
 
-DATA_DIR = os.getenv("DATA_DIR", "./data")
-
 IMPORTER_MAP = {
     'optical-drive': (OpticalDriveImporter, 'import_data'),
     'video-card': (VideoCardImporter, 'import_data'),
