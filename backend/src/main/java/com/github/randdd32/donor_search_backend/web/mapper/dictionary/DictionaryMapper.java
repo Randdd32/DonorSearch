@@ -31,4 +31,6 @@ public interface DictionaryMapper {
     NamedDictionaryDto toDto(MonitorResolutionEntity entity);
     NamedDictionaryDto toDto(PanelTypeEntity entity);
     NamedDictionaryDto toDto(AspectRatioEntity entity);
+    NamedDictionaryDto toDto(AudioChipsetEntity entity);
+    NamedDictionaryDto toDto(WirelessProtocolEntity entity);
 }
