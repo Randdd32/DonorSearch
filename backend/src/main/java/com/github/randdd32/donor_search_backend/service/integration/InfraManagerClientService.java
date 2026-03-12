@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@ Service
+@Service
 @RequiredArgsConstructor
 public class InfraManagerClientService {
     private final NamedParameterJdbcTemplate msSqlJdbcTemplate;
