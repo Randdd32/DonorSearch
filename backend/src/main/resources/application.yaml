@@ -4,13 +4,19 @@ spring:
   profiles:
     active: "dev"
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/donor_search_db}
-    username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:postgres}
-    driver-class-name: org.postgresql.Driver
-    hikari:
-      maximum-pool-size: 10
-      connection-timeout: 30000
+    primary:
+      jdbc-url: ${PRIMARY_DB_URL:jdbc:postgresql://localhost:5432/donor_search_db}
+      username: ${PRIMARY_DB_USERNAME:postgres}
+      password: ${PRIMARY_DB_PASSWORD:postgres}
+      driver-class-name: org.postgresql.Driver
+      hikari:
+        maximum-pool-size: 10
+        connection-timeout: 30000
+    secondary:
+      jdbc-url: ${SECONDARY_DB_URL:jdbc:sqlserver://infra-server:1433;databaseName=InfraManager;encrypt=false}
+      username: ${SECONDARY_DB_USERNAME:sa}
+      password: ${SECONDARY_DB_PASSWORD:password}
+      driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
   jpa:
     properties:
       hibernate:
