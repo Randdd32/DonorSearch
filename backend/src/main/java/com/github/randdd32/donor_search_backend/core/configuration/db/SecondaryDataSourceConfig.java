@@ -1,5 +1,6 @@
 package com.github.randdd32.donor_search_backend.core.configuration.db;
 
+import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -18,8 +19,12 @@ public class SecondaryDataSourceConfig {
     }
 
     @Bean
-    public DataSource secondaryDataSource() {
-        return secondaryDataSourceProperties().initializeDataSourceBuilder().build();
+    @ConfigurationProperties("spring.datasource.secondary.hikari")
+    public HikariDataSource secondaryDataSource() {
+        return secondaryDataSourceProperties()
+                .initializeDataSourceBuilder()
+                .type(HikariDataSource.class)
+                .build();
     }
 
     @Bean

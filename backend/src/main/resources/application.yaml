@@ -2,10 +2,10 @@ spring:
   application:
     name: Donor Search backend
   profiles:
-    active: "dev"
+    default: "dev"
   datasource:
     primary:
-      jdbc-url: ${PRIMARY_DB_URL:jdbc:postgresql://localhost:5432/donor_search_db}
+      url: ${PRIMARY_DB_URL:jdbc:postgresql://localhost:5432/hardware_db}
       username: ${PRIMARY_DB_USERNAME:postgres}
       password: ${PRIMARY_DB_PASSWORD:postgres}
       driver-class-name: org.postgresql.Driver
@@ -13,10 +13,13 @@ spring:
         maximum-pool-size: 10
         connection-timeout: 30000
     secondary:
-      jdbc-url: ${SECONDARY_DB_URL:jdbc:sqlserver://infra-server:1433;databaseName=InfraManager;encrypt=false}
+      url: ${SECONDARY_DB_URL:jdbc:sqlserver://infra-server:1433;databaseName=InfraManager;trustServerCertificate=true}
       username: ${SECONDARY_DB_USERNAME:sa}
       password: ${SECONDARY_DB_PASSWORD:password}
       driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+      hikari:
+        maximum-pool-size: 10
+        connection-timeout: 30000
   jpa:
     properties:
       hibernate:
