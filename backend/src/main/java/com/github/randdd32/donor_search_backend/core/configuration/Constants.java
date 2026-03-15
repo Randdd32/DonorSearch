@@ -7,6 +7,8 @@ public final class Constants {
 
     public static final String DICTIONARIES_URL = "/dictionaries";
 
+    public static final String INFRA_URL = "/infra";
+
     public static final int DEFAULT_PAGE_SIZE = 20;
 
     private Constants() {
