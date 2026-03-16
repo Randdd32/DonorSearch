@@ -12,26 +12,26 @@ public class InfraDeviceTypeService extends AbstractInfraDictionaryService {
 
     @Override
     protected String getBaseSql() {
-        return "FROM dbo.[Типы оконечного оборудования] t LEFT JOIN dbo.[Производители] m ON t.[ИД производителя] = m.[Идентификатор]";
+        return "FROM dbo.[ProductCatalogType] pct";
     }
 
     @Override
     protected String getIdColumn() {
-        return "t.[Идентификатор]";
+        return "pct.[ID]";
     }
 
     @Override
     protected String getDisplayColumn() {
-        return "t.[Название] + ISNULL(' (' + m.[Название] + ')', '')";
+        return "pct.[Name]";
     }
 
     @Override
     protected String getParentColumn() {
-        return "t.[ИД производителя]";
+        return null;
     }
 
     @Override
     protected String getSortColumn() {
-        return "t.[Название]";
+        return "pct.[Name]";
     }
 }

@@ -1,8 +1,13 @@
 package com.github.randdd32.donor_search_backend.web.dto.integration;
 
+import com.github.randdd32.donor_search_backend.web.dto.integration.enums.ExternalComponentCategory;
+
 public record ExternalComponentDto(
         Long adapterId,
-        Long pcId,
+        Long categoryId,
         String externalName,
-        String adapterCategory
+        ExternalComponentCategory category,
+        String manufacturerName,
+        String serialNumber,
+        Long mappedComponentId
 ) {}

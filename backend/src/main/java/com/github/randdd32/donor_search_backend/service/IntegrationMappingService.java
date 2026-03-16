@@ -14,9 +14,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.time.Instant;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class IntegrationMappingService extends AbstractCrudService<IntegrationMappingEntity, IntegrationMappingRepository> {
@@ -25,6 +29,14 @@ public class IntegrationMappingService extends AbstractCrudService<IntegrationMa
     public IntegrationMappingService(IntegrationMappingRepository repository, ComponentRepository componentRepository) {
         super(repository, IntegrationMappingEntity.class);
         this.componentRepository = componentRepository;
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<IntegrationMappingEntity> findByExternalName(String externalName) {
+        if (externalName == null || externalName.isBlank()) {
+            return Optional.empty();
+        }
+        return repository.findByExternalNameIgnoreCase(externalName.trim());
     }
 
     @Transactional(readOnly = true)
@@ -38,6 +50,28 @@ public class IntegrationMappingService extends AbstractCrudService<IntegrationMa
                 createdAfter, createdBefore, updatedAfter, updatedBefore
         );
         return repository.findAll(spec, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Map<String, Long> getMappedComponentIds(List<String> externalNames) {
+        if (CollectionUtils.isEmpty(externalNames)) {
+            return java.util.Collections.emptyMap();
+        }
+
+        List<String> lowerNames = externalNames.stream()
+                .filter(name -> name != null && !name.isBlank())
+                .map(String::toLowerCase)
+                .toList();
+        if (lowerNames.isEmpty()) {
+            return java.util.Collections.emptyMap();
+        }
+
+        List<Object[]> results = repository.findMappedIdsByNames(lowerNames);
+        return results.stream().collect(Collectors.toMap(
+                row -> ((String) row[0]).toLowerCase(),
+                row -> (Long) row[1],
+                (id1, id2) -> id1
+        ));
     }
 
     @Transactional

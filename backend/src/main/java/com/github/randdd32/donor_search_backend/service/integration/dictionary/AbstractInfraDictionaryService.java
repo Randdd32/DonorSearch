@@ -3,6 +3,7 @@ package com.github.randdd32.donor_search_backend.service.integration.dictionary;
 import com.github.randdd32.donor_search_backend.core.util.QueryUtils;
 import com.github.randdd32.donor_search_backend.web.dto.dictionary.NamedDictionaryDto;
 import com.github.randdd32.donor_search_backend.web.dto.pagination.PageDto;
+import com.github.randdd32.donor_search_backend.web.mapper.pagination.PageDtoMapper;
 import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -46,11 +47,10 @@ public abstract class AbstractInfraDictionaryService {
 
         String countSql = "SELECT COUNT(1) " + getBaseSql() + " " + where;
         Long totalCountObj = jdbcTemplate.queryForObject(countSql, params, Long.class);
-        long totalCount = totalCountObj != null ? totalCountObj : 0;
+        long totalCount = totalCountObj != null ? totalCountObj : 0L;
 
         if (totalCount == 0) {
-            return new PageDto<>(Collections.emptyList(), 0, page, size, 0, 0,
-                    true, true, false, false);
+            return PageDtoMapper.emptyPage(page, size);
         }
 
         params.addValue("offset", page * size);
@@ -64,9 +64,7 @@ public abstract class AbstractInfraDictionaryService {
         List<NamedDictionaryDto> items = jdbcTemplate.query(fetchSql, params,
                 (rs, rowNum) -> new NamedDictionaryDto(rs.getLong("id"), rs.getString("name")));
 
-        int totalPages = size > 0 ? (int) Math.ceil((double) totalCount / size) : 0;
-        return new PageDto<>(items, items.size(), page, size, totalPages, totalCount,
-                page == 0, page >= totalPages - 1, page < totalPages - 1, page > 0);
+        return PageDtoMapper.toDto(items, totalCount, page, size);
     }
 
     public List<NamedDictionaryDto> getByIds(List<Long> ids) {
