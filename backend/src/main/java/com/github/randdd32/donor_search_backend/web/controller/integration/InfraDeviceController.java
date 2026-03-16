@@ -3,7 +3,6 @@ package com.github.randdd32.donor_search_backend.web.controller.integration;
 import com.github.randdd32.donor_search_backend.core.configuration.Constants;
 import com.github.randdd32.donor_search_backend.service.integration.InfraDeviceService;
 import com.github.randdd32.donor_search_backend.web.dto.integration.ExternalDeviceDto;
-import com.github.randdd32.donor_search_backend.web.dto.integration.enums.ExternalDeviceSortType;
 import com.github.randdd32.donor_search_backend.web.dto.pagination.PageDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
