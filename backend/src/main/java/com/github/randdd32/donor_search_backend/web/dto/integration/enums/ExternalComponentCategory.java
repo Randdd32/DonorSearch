@@ -1,5 +1,8 @@
 package com.github.randdd32.donor_search_backend.web.dto.integration.enums;
 
+import lombok.Getter;
+
+@Getter
 public enum ExternalComponentCategory {
     CPU("Процессор"),
     CPU_COOLER("Кулер"),

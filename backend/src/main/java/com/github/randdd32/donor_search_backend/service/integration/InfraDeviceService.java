@@ -20,6 +20,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -239,6 +242,89 @@ public class InfraDeviceService {
 
         device.components().addAll(enrichedComponents);
         return device;
+    }
+
+    public List<ExternalDeviceDto> getPotentialDonors(Long excludeDeviceId, ExternalComponentCategory category) {
+        String sql = BASE_DEVICE_SELECT + """
+            ,
+            ad.[AdapterID] AS adapter_id,
+            pct_comp.[ID] AS category_id,
+            ad.[Name] AS external_name,
+            pct_comp.[Name] AS category_name_ru,
+            comp_manuf.[Название] AS comp_manufacturer_name,
+            ad.[SerialNo] AS comp_serial_number
+       
+        """ + BASE_DEVICE_FROM_JOINS + """
+            
+            JOIN dbo.[Adapter] ad ON pc.[Идентификатор] = ad.[TerminalDeviceID]
+            JOIN dbo.[AdapterType] at ON ad.[AdapterTypeID] = at.[AdapterTypeID]
+            JOIN dbo.[ProductCatalogType] pct_comp ON at.[ProductCatalogTypeID] = pct_comp.[ID]
+            LEFT JOIN dbo.[Производители] comp_manuf ON at.[VendorID] = comp_manuf.[Идентификатор]
+            
+            WHERE pc.[Идентификатор] != :excludeId
+              AND LOWER(pct_comp.[Name]) LIKE '%' + LOWER(:categoryName) + '%'
+        """;
+
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("excludeId", excludeDeviceId)
+                .addValue("categoryName", category.getInfraName());
+
+        Map<Long, ExternalDeviceDto> deviceMap = new LinkedHashMap<>();
+        Map<Long, List<ExternalComponentDto>> componentsByDeviceId = new HashMap<>();
+        List<ExternalComponentDto> allRawComponents = new ArrayList<>();
+
+        jdbcTemplate.query(sql, params, rs -> {
+            Long deviceId = rs.getLong("id");
+
+            if (!deviceMap.containsKey(deviceId)) {
+                try {
+                    deviceMap.put(deviceId, mapDeviceRow(rs, 0));
+                } catch (SQLException e) {
+                    throw new RuntimeException("Error mapping base device row", e);
+                }
+            }
+
+            ExternalComponentDto comp = new ExternalComponentDto(
+                    rs.getLong("adapter_id"),
+                    rs.getLong("category_id"),
+                    rs.getString("external_name"),
+                    ExternalComponentCategory.fromInfraName(rs.getString("category_name_ru")),
+                    rs.getString("comp_manufacturer_name"),
+                    rs.getString("comp_serial_number"),
+                    null
+            );
+
+            allRawComponents.add(comp);
+            componentsByDeviceId.computeIfAbsent(deviceId, k -> new ArrayList<>()).add(comp);
+        });
+
+        if (deviceMap.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<String> extNames = allRawComponents.stream()
+                .map(ExternalComponentDto::externalName)
+                .distinct()
+                .toList();
+
+        java.util.Map<String, Long> mappedIdsCache = mappingService.getMappedComponentIds(extNames);
+
+        for (ExternalDeviceDto device : deviceMap.values()) {
+            List<ExternalComponentDto> rawComps = componentsByDeviceId.get(device.externalId());
+            if (rawComps != null) {
+                List<ExternalComponentDto> enriched = rawComps.stream().map(c -> {
+                    Long mappedId = c.externalName() != null ? mappedIdsCache.get(c.externalName().toLowerCase()) : null;
+                    return new ExternalComponentDto(
+                            c.adapterId(), c.categoryId(), c.externalName(), c.category(),
+                            c.manufacturerName(), c.serialNumber(), mappedId
+                    );
+                }).toList();
+
+                device.components().addAll(enriched);
+            }
+        }
+
+        return new ArrayList<>(deviceMap.values());
     }
 
     private ExternalDeviceDto mapDeviceRow(ResultSet rs, int rowNum) throws SQLException {
