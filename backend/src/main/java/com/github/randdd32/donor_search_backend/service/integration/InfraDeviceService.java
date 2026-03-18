@@ -21,7 +21,6 @@ import java.sql.SQLException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -253,9 +252,7 @@ public class InfraDeviceService {
             pct_comp.[Name] AS category_name_ru,
             comp_manuf.[Название] AS comp_manufacturer_name,
             ad.[SerialNo] AS comp_serial_number
-       
-        """ + BASE_DEVICE_FROM_JOINS + """
-            
+            """ + BASE_DEVICE_FROM_JOINS + """
             JOIN dbo.[Adapter] ad ON pc.[Идентификатор] = ad.[TerminalDeviceID]
             JOIN dbo.[AdapterType] at ON ad.[AdapterTypeID] = at.[AdapterTypeID]
             JOIN dbo.[ProductCatalogType] pct_comp ON at.[ProductCatalogTypeID] = pct_comp.[ID]
@@ -269,50 +266,51 @@ public class InfraDeviceService {
                 .addValue("excludeId", excludeDeviceId)
                 .addValue("categoryName", category.getInfraName());
 
-        Map<Long, ExternalDeviceDto> deviceMap = new LinkedHashMap<>();
-        Map<Long, List<ExternalComponentDto>> componentsByDeviceId = new HashMap<>();
-        List<ExternalComponentDto> allRawComponents = new ArrayList<>();
+        List<ExternalDeviceDto> devices = jdbcTemplate.query(sql, params, rs -> {
+            Map<Long, ExternalDeviceDto> deviceMap = new LinkedHashMap<>();
 
-        jdbcTemplate.query(sql, params, rs -> {
-            Long deviceId = rs.getLong("id");
+            while (rs.next()) {
+                Long deviceId = rs.getLong("id");
 
-            if (!deviceMap.containsKey(deviceId)) {
-                try {
-                    deviceMap.put(deviceId, mapDeviceRow(rs, 0));
-                } catch (SQLException e) {
-                    throw new RuntimeException("Error mapping base device row", e);
-                }
+                ExternalDeviceDto device = deviceMap.computeIfAbsent(deviceId, id -> {
+                    try {
+                        return mapDeviceRow(rs, 0);
+                    } catch (java.sql.SQLException e) {
+                        throw new RuntimeException("Ошибка маппинга базовой строки устройства", e);
+                    }
+                });
+
+                ExternalComponentDto component = new ExternalComponentDto(
+                        rs.getLong("adapter_id"),
+                        rs.getLong("category_id"),
+                        rs.getString("external_name"),
+                        ExternalComponentCategory.fromInfraName(rs.getString("category_name_ru")),
+                        rs.getString("comp_manufacturer_name"),
+                        rs.getString("comp_serial_number"),
+                        null
+                );
+
+                device.components().add(component);
             }
-
-            ExternalComponentDto comp = new ExternalComponentDto(
-                    rs.getLong("adapter_id"),
-                    rs.getLong("category_id"),
-                    rs.getString("external_name"),
-                    ExternalComponentCategory.fromInfraName(rs.getString("category_name_ru")),
-                    rs.getString("comp_manufacturer_name"),
-                    rs.getString("comp_serial_number"),
-                    null
-            );
-
-            allRawComponents.add(comp);
-            componentsByDeviceId.computeIfAbsent(deviceId, k -> new ArrayList<>()).add(comp);
+            return new ArrayList<>(deviceMap.values());
         });
 
-        if (deviceMap.isEmpty()) {
+        if (devices == null || devices.isEmpty()) {
             return Collections.emptyList();
         }
 
-        List<String> extNames = allRawComponents.stream()
+        List<String> extNamesToFetch = devices.stream()
+                .flatMap(device -> device.components().stream())
                 .map(ExternalComponentDto::externalName)
+                .filter(name -> name != null && !name.isBlank())
                 .distinct()
                 .toList();
 
-        java.util.Map<String, Long> mappedIdsCache = mappingService.getMappedComponentIds(extNames);
+        if (!extNamesToFetch.isEmpty()) {
+            Map<String, Long> mappedIdsCache = mappingService.getMappedComponentIds(extNamesToFetch);
 
-        for (ExternalDeviceDto device : deviceMap.values()) {
-            List<ExternalComponentDto> rawComps = componentsByDeviceId.get(device.externalId());
-            if (rawComps != null) {
-                List<ExternalComponentDto> enriched = rawComps.stream().map(c -> {
+            for (ExternalDeviceDto device : devices) {
+                List<ExternalComponentDto> enrichedComponents = device.components().stream().map(c -> {
                     Long mappedId = c.externalName() != null ? mappedIdsCache.get(c.externalName().toLowerCase()) : null;
                     return new ExternalComponentDto(
                             c.adapterId(), c.categoryId(), c.externalName(), c.category(),
@@ -320,11 +318,12 @@ public class InfraDeviceService {
                     );
                 }).toList();
 
-                device.components().addAll(enriched);
+                device.components().clear();
+                device.components().addAll(enrichedComponents);
             }
         }
 
-        return new ArrayList<>(deviceMap.values());
+        return devices;
     }
 
     private ExternalDeviceDto mapDeviceRow(ResultSet rs, int rowNum) throws SQLException {
