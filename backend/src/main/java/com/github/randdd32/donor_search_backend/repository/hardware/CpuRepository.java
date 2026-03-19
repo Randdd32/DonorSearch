@@ -6,11 +6,4 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
-public interface CpuRepository extends HardwareRepository<CpuEntity> {
-    @Override
-    @Query(value = "SELECT child.*, parent.* FROM component_cpu child " +
-            "JOIN component parent ON child.id = parent.id " +
-            "ORDER BY parent.search_name <-> :searchToken ASC LIMIT 1",
-            nativeQuery = true)
-    Optional<CpuEntity> findMostSimilar(@Param("searchToken") String searchToken);
-}
+public interface CpuRepository extends HardwareRepository<CpuEntity> {}

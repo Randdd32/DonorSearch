@@ -15,6 +15,7 @@ public enum ExternalComponentCategory {
     CASE("Корпус"),
     CASE_FAN("Корпусной вентилятор"),
     EXPANSION_CARD("Сетевой адаптер"),
+    MONITOR("Монитор"),
     UNKNOWN("Неизвестно");
 
     private final String infraName;

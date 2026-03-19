@@ -48,7 +48,6 @@ public abstract class AbstractInfraDictionaryService {
         String countSql = "SELECT COUNT(1) " + getBaseSql() + " " + where;
         Long totalCountObj = jdbcTemplate.queryForObject(countSql, params, Long.class);
         long totalCount = totalCountObj != null ? totalCountObj : 0L;
-
         if (totalCount == 0) {
             return PageDtoMapper.emptyPage(page, size);
         }

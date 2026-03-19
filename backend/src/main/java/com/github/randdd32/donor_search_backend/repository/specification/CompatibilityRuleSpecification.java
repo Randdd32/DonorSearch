@@ -1,9 +1,11 @@
 package com.github.randdd32.donor_search_backend.repository.specification;
 
 import com.github.randdd32.donor_search_backend.core.util.CommonSpecificationUtils;
-import com.github.randdd32.donor_search_backend.model.CompatibilityRuleEntity;
+import com.github.randdd32.donor_search_backend.model.compatibility.CompatibilityRuleEntity;
+import com.github.randdd32.donor_search_backend.model.enums.ComponentType;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.util.CollectionUtils;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -13,6 +15,7 @@ public final class CompatibilityRuleSpecification {
     public static Specification<CompatibilityRuleEntity> withFilters(
             String search,
             Boolean isActive,
+            List<ComponentType> targetTypes,
             Instant createdAfter,
             Instant createdBefore,
             Instant updatedAfter,
@@ -28,6 +31,9 @@ public final class CompatibilityRuleSpecification {
                 predicates.add(cb.or(codeMatch, exprMatch, descMatch));
             }
             CommonSpecificationUtils.addEqualityFilter(predicates, root, cb, "isActive", isActive);
+            if (!CollectionUtils.isEmpty(targetTypes)) {
+                predicates.add(root.join("targetComponentTypes").in(targetTypes));
+            }
             CommonSpecificationUtils.addAuditDateFilters(predicates, root, cb, createdAfter, createdBefore, updatedAfter, updatedBefore);
 
             if (predicates.isEmpty()) {

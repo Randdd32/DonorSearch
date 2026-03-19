@@ -4,6 +4,7 @@ import com.github.randdd32.donor_search_backend.core.util.QueryUtils;
 import com.github.randdd32.donor_search_backend.model.hardware.CpuEntity;
 import com.github.randdd32.donor_search_backend.repository.hardware.CpuRepository;
 import com.github.randdd32.donor_search_backend.repository.specification.CpuSpecification;
+import com.github.randdd32.donor_search_backend.service.AbstractReadService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -13,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
-public class CpuService extends AbstractHardwareService<CpuEntity, CpuRepository> {
+public class CpuService extends AbstractReadService<CpuEntity, CpuRepository> {
     public CpuService(CpuRepository repository) {
         super(repository, CpuEntity.class);
     }

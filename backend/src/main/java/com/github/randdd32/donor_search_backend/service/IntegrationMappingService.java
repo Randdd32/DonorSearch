@@ -8,7 +8,9 @@ import com.github.randdd32.donor_search_backend.model.enums.MappingConfidence;
 import com.github.randdd32.donor_search_backend.model.hardware.ComponentEntity;
 import com.github.randdd32.donor_search_backend.repository.IntegrationMappingRepository;
 import com.github.randdd32.donor_search_backend.repository.hardware.ComponentRepository;
+import com.github.randdd32.donor_search_backend.repository.hardware.ComponentScoreProjection;
 import com.github.randdd32.donor_search_backend.repository.specification.IntegrationMappingSpecification;
+import com.github.randdd32.donor_search_backend.service.hardware.ComponentService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -24,11 +26,11 @@ import java.util.stream.Collectors;
 
 @Service
 public class IntegrationMappingService extends AbstractCrudService<IntegrationMappingEntity, IntegrationMappingRepository> {
-    private final ComponentRepository componentRepository;
+    private final ComponentService componentService;
 
-    public IntegrationMappingService(IntegrationMappingRepository repository, ComponentRepository componentRepository) {
+    public IntegrationMappingService(IntegrationMappingRepository repository, ComponentService componentService) {
         super(repository, IntegrationMappingEntity.class);
-        this.componentRepository = componentRepository;
+        this.componentService = componentService;
     }
 
     @Transactional(readOnly = true)
@@ -77,10 +79,42 @@ public class IntegrationMappingService extends AbstractCrudService<IntegrationMa
     @Transactional
     public IntegrationMappingEntity createFromDto(IntegrationMappingEntity entity, Long internalComponentId) {
         validate(entity, null);
-        ComponentEntity component = componentRepository.findById(internalComponentId)
-                .orElseThrow(() -> new NotFoundException(ComponentEntity.class, internalComponentId));
+        ComponentEntity component = componentService.getById(internalComponentId);
         entity.setInternalComponent(component);
         return repository.save(entity);
+    }
+
+    @Transactional
+    public IntegrationMappingEntity resolveAndSaveMapping(String externalName, ComponentType expectedType) {
+        if (externalName == null || externalName.isBlank()) {
+            return null;
+        }
+
+        String cleanName = externalName.trim();
+        Optional<IntegrationMappingEntity> existing = repository.findByExternalNameIgnoreCase(cleanName);
+        if (existing.isPresent()) {
+            return existing.get();
+        }
+
+        Optional<ComponentScoreProjection> matchOpt = componentService.findBestMatchWithScore(cleanName, expectedType);
+        if (matchOpt.isEmpty()) {
+            return null;
+        }
+
+        ComponentScoreProjection match = matchOpt.get();
+        double score = match.getScore();
+
+        MappingConfidence confidence;
+        if (score >= 0.90) confidence = MappingConfidence.AUTO;
+        else if (score >= 0.60) confidence = MappingConfidence.NEEDS_REVIEW;
+        else confidence = MappingConfidence.BAD_MATCH;
+
+        IntegrationMappingEntity mapping = new IntegrationMappingEntity();
+        mapping.setExternalName(cleanName);
+        mapping.setInternalComponent(componentService.getById(match.getId()));
+        mapping.setConfidence(confidence);
+
+        return repository.save(mapping);
     }
 
     @Override
@@ -92,8 +126,7 @@ public class IntegrationMappingService extends AbstractCrudService<IntegrationMa
     @Transactional
     public IntegrationMappingEntity updateInternalComponent(Long mappingId, Long newComponentId, MappingConfidence newConfidence) {
         IntegrationMappingEntity mapping = getById(mappingId);
-        ComponentEntity component = componentRepository.findById(newComponentId)
-                .orElseThrow(() -> new NotFoundException(ComponentEntity.class, newComponentId));
+        ComponentEntity component = componentService.getById(newComponentId);
         mapping.setInternalComponent(component);
         mapping.setConfidence(newConfidence);
         return repository.save(mapping);

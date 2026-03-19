@@ -6,6 +6,7 @@ import com.github.randdd32.donor_search_backend.service.IntegrationMappingServic
 import com.github.randdd32.donor_search_backend.web.dto.integration.ExternalComponentDto;
 import com.github.randdd32.donor_search_backend.web.dto.integration.ExternalDeviceDto;
 import com.github.randdd32.donor_search_backend.web.dto.integration.enums.ExternalComponentCategory;
+import com.github.randdd32.donor_search_backend.web.dto.integration.enums.ExternalDeviceState;
 import com.github.randdd32.donor_search_backend.web.dto.pagination.PageDto;
 import com.github.randdd32.donor_search_backend.web.mapper.pagination.PageDtoMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -40,9 +41,13 @@ public class InfraDeviceService {
     private static final String BASE_DEVICE_SELECT = """
         SELECT 
             pc.[Идентификатор] AS id, pc.[Название] AS name, pc.[Инвентарный номер] AS inv_num, pc.[SerialNumber] AS serial_num,
-            too.[Название] AS model_name, manuf.[Название] AS manuf_name, pct.[Name] AS type_name, state.[Name] AS state_name,
+            too.[Идентификатор] AS model_id, too.[Название] AS model_name, 
+            manuf.[Идентификатор] AS manuf_id, manuf.[Название] AS manuf_name, 
+            pct.[ID] AS type_id, pct.[Name] AS type_name, 
+            state.[ID] AS state_id, state.[Name] AS state_name,
             LTRIM(RTRIM(ISNULL(u.[Фамилия], '') + ' ' + ISNULL(u.[Имя], '') + ' ' + ISNULL(u.[Отчество], ''))) AS owner_name,
-            ISNULL(dep.[Название], 'Без отдела') AS dept_name,
+            dep.[Идентификатор] AS dept_id, ISNULL(dep.[Название], 'Без отдела') AS dept_name,
+            b.[Идентификатор] AS building_id, f.[Идентификатор] AS floor_id, r.[Идентификатор] AS room_id,
             ISNULL(b.[Название], 'Без здания') + ' -> ' + ISNULL(f.[Название], 'Без этажа') + ' -> ' + 
             ISNULL(r.[Название], 'Без комнаты') + ' -> ' + ISNULL(wp.[Название], 'Без РМ') AS location_path,
             a.[DateReceived] AS date_received, a.[IsWorking] AS is_working
@@ -86,38 +91,14 @@ public class InfraDeviceService {
             params.addValue("search", cleanSearch);
         }
 
-        if (!CollectionUtils.isEmpty(stateIds)) {
-            where.append(" AND state.[ID] IN (:stateIds) ");
-            params.addValue("stateIds", stateIds);
-        }
-        if (!CollectionUtils.isEmpty(departmentIds)) {
-            where.append(" AND dep.[Идентификатор] IN (:departmentIds) ");
-            params.addValue("departmentIds", departmentIds);
-        }
-        if (!CollectionUtils.isEmpty(manufacturerIds)) {
-            where.append(" AND manuf.[Идентификатор] IN (:manufacturerIds) ");
-            params.addValue("manufacturerIds", manufacturerIds);
-        }
-        if (!CollectionUtils.isEmpty(typeIds)) {
-            where.append(" AND pct.[ID] IN (:typeIds) ");
-            params.addValue("typeIds", typeIds);
-        }
-        if (!CollectionUtils.isEmpty(modelIds)) {
-            where.append(" AND too.[Идентификатор] IN (:modelIds) ");
-            params.addValue("modelIds", modelIds);
-        }
-        if (!CollectionUtils.isEmpty(buildingIds)) {
-            where.append(" AND b.[Идентификатор] IN (:buildingIds) ");
-            params.addValue("buildingIds", buildingIds);
-        }
-        if (!CollectionUtils.isEmpty(floorIds)) {
-            where.append(" AND f.[Идентификатор] IN (:floorIds) ");
-            params.addValue("floorIds", floorIds);
-        }
-        if (!CollectionUtils.isEmpty(roomIds)) {
-            where.append(" AND r.[Идентификатор] IN (:roomIds) ");
-            params.addValue("roomIds", roomIds);
-        }
+        addListFilter(where, params, "state.[ID]", "stateIds", stateIds);
+        addListFilter(where, params, "dep.[Идентификатор]", "departmentIds", departmentIds);
+        addListFilter(where, params, "manuf.[Идентификатор]", "manufacturerIds", manufacturerIds);
+        addListFilter(where, params, "pct.[ID]", "typeIds", typeIds);
+        addListFilter(where, params, "too.[Идентификатор]", "modelIds", modelIds);
+        addListFilter(where, params, "b.[Идентификатор]", "buildingIds", buildingIds);
+        addListFilter(where, params, "f.[Идентификатор]", "floorIds", floorIds);
+        addListFilter(where, params, "r.[Идентификатор]", "roomIds", roomIds);
 
         if (isWorking != null) {
             where.append(" AND a.[IsWorking] = :isWorking ");
@@ -135,7 +116,6 @@ public class InfraDeviceService {
         String countSql = "SELECT COUNT(1) " + BASE_DEVICE_FROM_JOINS + where;
         Long totalCountObj = jdbcTemplate.queryForObject(countSql, params, Long.class);
         long totalCount = totalCountObj != null ? totalCountObj : 0L;
-
         if (totalCount == 0) {
             return PageDtoMapper.emptyPage(page, size);
         }
@@ -188,6 +168,7 @@ public class InfraDeviceService {
                 pct.[ID] AS category_id,
                 ad.[Name] AS external_name,
                 pct.[Name] AS category_name_ru,
+                m.[Идентификатор] AS manufacturer_id,
                 m.[Название] AS manufacturer_name,
                 ad.[SerialNo] AS serial_number
             FROM dbo.[Adapter] ad
@@ -205,6 +186,7 @@ public class InfraDeviceService {
                         rs.getLong("category_id"),
                         rs.getString("external_name"),
                         ExternalComponentCategory.fromInfraName(rs.getString("category_name_ru")),
+                        rs.getLong("manufacturer_id"),
                         rs.getString("manufacturer_name"),
                         rs.getString("serial_number"),
                         null
@@ -233,6 +215,7 @@ public class InfraDeviceService {
                     comp.categoryId(),
                     comp.externalName(),
                     comp.category(),
+                    comp.manufacturerId(),
                     comp.manufacturerName(),
                     comp.serialNumber(),
                     mappedId
@@ -250,6 +233,7 @@ public class InfraDeviceService {
             pct_comp.[ID] AS category_id,
             ad.[Name] AS external_name,
             pct_comp.[Name] AS category_name_ru,
+            comp_manuf.[Идентификатор] AS comp_manufacturer_id,
             comp_manuf.[Название] AS comp_manufacturer_name,
             ad.[SerialNo] AS comp_serial_number
             """ + BASE_DEVICE_FROM_JOINS + """
@@ -285,6 +269,7 @@ public class InfraDeviceService {
                         rs.getLong("category_id"),
                         rs.getString("external_name"),
                         ExternalComponentCategory.fromInfraName(rs.getString("category_name_ru")),
+                        rs.getLong("comp_manufacturer_id"),
                         rs.getString("comp_manufacturer_name"),
                         rs.getString("comp_serial_number"),
                         null
@@ -314,7 +299,7 @@ public class InfraDeviceService {
                     Long mappedId = c.externalName() != null ? mappedIdsCache.get(c.externalName().toLowerCase()) : null;
                     return new ExternalComponentDto(
                             c.adapterId(), c.categoryId(), c.externalName(), c.category(),
-                            c.manufacturerName(), c.serialNumber(), mappedId
+                            c.manufacturerId(),c.manufacturerName(), c.serialNumber(), mappedId
                     );
                 }).toList();
 
@@ -328,20 +313,24 @@ public class InfraDeviceService {
 
     private ExternalDeviceDto mapDeviceRow(ResultSet rs, int rowNum) throws SQLException {
         return new ExternalDeviceDto(
-                rs.getLong("id"),
-                rs.getString("name"),
-                rs.getString("inv_num"),
-                rs.getString("serial_num"),
-                rs.getString("model_name"),
-                rs.getString("manuf_name"),
-                rs.getString("type_name"),
-                rs.getString("state_name"),
+                rs.getLong("id"), rs.getString("name"), rs.getString("inv_num"), rs.getString("serial_num"),
+                rs.getLong("model_id"), rs.getString("model_name"),
+                rs.getLong("manuf_id"), rs.getString("manuf_name"),
+                rs.getLong("type_id"), rs.getString("type_name"),
+                rs.getLong("state_id"), ExternalDeviceState.fromInfraName(rs.getString("state_name")),
                 rs.getString("owner_name").isBlank() ? "Неизвестно" : rs.getString("owner_name"),
-                rs.getString("dept_name"),
+                rs.getLong("dept_id"), rs.getString("dept_name"),
+                rs.getLong("building_id"), rs.getLong("floor_id"), rs.getLong("room_id"),
                 rs.getString("location_path"),
                 rs.getTimestamp("date_received") != null ? rs.getTimestamp("date_received").toInstant() : null,
-                rs.getBoolean("is_working"),
-                new ArrayList<>()
+                rs.getBoolean("is_working"), new ArrayList<>()
         );
+    }
+
+    private void addListFilter(StringBuilder where, MapSqlParameterSource params, String column, String paramName, List<Long> values) {
+        if (!CollectionUtils.isEmpty(values)) {
+            where.append(" AND ").append(column).append(" IN (:").append(paramName).append(") ");
+            params.addValue(paramName, values);
+        }
     }
 }

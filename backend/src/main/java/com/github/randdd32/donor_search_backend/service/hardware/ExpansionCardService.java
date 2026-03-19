@@ -5,6 +5,7 @@ import com.github.randdd32.donor_search_backend.model.enums.ExpansionCardType;
 import com.github.randdd32.donor_search_backend.model.hardware.ExpansionCardEntity;
 import com.github.randdd32.donor_search_backend.repository.hardware.ExpansionCardRepository;
 import com.github.randdd32.donor_search_backend.repository.specification.ExpansionCardSpecification;
+import com.github.randdd32.donor_search_backend.service.AbstractReadService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -14,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
-public class ExpansionCardService extends AbstractHardwareService<ExpansionCardEntity, ExpansionCardRepository> {
+public class ExpansionCardService extends AbstractReadService<ExpansionCardEntity, ExpansionCardRepository> {
     public ExpansionCardService(ExpansionCardRepository repository) {
         super(repository, ExpansionCardEntity.class);
     }

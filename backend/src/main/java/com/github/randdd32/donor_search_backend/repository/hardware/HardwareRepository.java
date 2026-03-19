@@ -7,6 +7,4 @@ import org.springframework.data.repository.NoRepositoryBean;
 import java.util.Optional;
 
 @NoRepositoryBean
-public interface HardwareRepository<T> extends JpaRepository<T, Long>, JpaSpecificationExecutor<T> {
-    Optional<T> findMostSimilar(String searchToken);
-}
+public interface HardwareRepository<T> extends JpaRepository<T, Long>, JpaSpecificationExecutor<T> {}
