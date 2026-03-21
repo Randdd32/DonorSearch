@@ -126,7 +126,6 @@ public class InfraDeviceService {
             String direction = order.getDirection().name();
 
             String dbColumn = switch (order.getProperty()) {
-                case "id" -> "pc.[Идентификатор]";
                 case "name" -> "pc.[Название]";
                 case "inventoryNumber" -> "pc.[Инвентарный номер]";
                 case "dateReceived" -> "a.[DateReceived]";

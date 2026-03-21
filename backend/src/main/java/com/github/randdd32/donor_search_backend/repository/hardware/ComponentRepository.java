@@ -9,7 +9,6 @@ import java.util.Optional;
 
 @Repository
 public interface ComponentRepository extends HardwareRepository<ComponentEntity> {
-    @Override
     @Query(value = "SELECT * FROM component ORDER BY search_name <-> :searchToken ASC LIMIT 1",
             nativeQuery = true)
     Optional<ComponentEntity> findMostSimilar(@Param("searchToken") String searchToken);

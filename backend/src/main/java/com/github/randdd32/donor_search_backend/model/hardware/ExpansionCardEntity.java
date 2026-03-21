@@ -43,6 +43,10 @@ public class ExpansionCardEntity extends ComponentEntity {
     @JoinColumn(name = "audio_chipset_id")
     private AudioChipsetEntity audioChipset;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "protocol_id")
+    private WirelessProtocolEntity protocol;
+
     @Column(name = "channels")
     private Double channels;
 
@@ -51,8 +55,4 @@ public class ExpansionCardEntity extends ComponentEntity {
 
     @Column(name = "sample_rate_khz")
     private Double sampleRateKhz;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "protocol_id")
-    private WirelessProtocolEntity protocol;
 }

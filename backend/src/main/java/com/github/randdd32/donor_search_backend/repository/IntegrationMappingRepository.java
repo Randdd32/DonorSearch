@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,4 +19,7 @@ public interface IntegrationMappingRepository extends JpaRepository<IntegrationM
      */
     @Query("SELECT m.externalName, m.internalComponent.id FROM IntegrationMappingEntity m WHERE LOWER(m.externalName) IN :names")
     List<Object[]> findMappedIdsByNames(@Param("names") List<String> lowerNames);
+
+    @Query("SELECT m FROM IntegrationMappingEntity m JOIN FETCH m.internalComponent WHERE LOWER(m.externalName) IN :names")
+    List<IntegrationMappingEntity> findMappingsByNamesWithComponents(@Param("names") Collection<String> names);
 }

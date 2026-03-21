@@ -1,13 +1,11 @@
 package com.github.randdd32.donor_search_backend.service;
 
-import com.github.randdd32.donor_search_backend.core.error.NotFoundException;
 import com.github.randdd32.donor_search_backend.core.util.QueryUtils;
 import com.github.randdd32.donor_search_backend.model.IntegrationMappingEntity;
 import com.github.randdd32.donor_search_backend.model.enums.ComponentType;
 import com.github.randdd32.donor_search_backend.model.enums.MappingConfidence;
 import com.github.randdd32.donor_search_backend.model.hardware.ComponentEntity;
 import com.github.randdd32.donor_search_backend.repository.IntegrationMappingRepository;
-import com.github.randdd32.donor_search_backend.repository.hardware.ComponentRepository;
 import com.github.randdd32.donor_search_backend.repository.hardware.ComponentScoreProjection;
 import com.github.randdd32.donor_search_backend.repository.specification.IntegrationMappingSpecification;
 import com.github.randdd32.donor_search_backend.service.hardware.ComponentService;
@@ -19,9 +17,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -115,6 +115,45 @@ public class IntegrationMappingService extends AbstractCrudService<IntegrationMa
         mapping.setConfidence(confidence);
 
         return repository.save(mapping);
+    }
+
+    @Transactional
+    public Map<String, IntegrationMappingEntity> resolveAndSaveBatch(Set<String> externalNames, ComponentType expectedType) {
+        Map<String, IntegrationMappingEntity> result = new HashMap<>();
+        if (CollectionUtils.isEmpty(externalNames)) {
+            return result;
+        }
+
+        List<String> lowerNames = externalNames.stream().map(String::toLowerCase).toList();
+
+        List<IntegrationMappingEntity> existing = repository.findMappingsByNamesWithComponents(lowerNames);
+        for (IntegrationMappingEntity m : existing) {
+            result.put(m.getExternalName().toLowerCase().trim(), m);
+        }
+
+        for (String originalName : externalNames) {
+            String lowerName = originalName.toLowerCase().trim();
+
+            if (!result.containsKey(lowerName)) {
+                Optional<ComponentScoreProjection> matchOpt = componentService.findBestMatchWithScore(lowerName, expectedType);
+
+                if (matchOpt.isPresent()) {
+                    double score = matchOpt.get().getScore();
+                    MappingConfidence confidence = (score >= 0.90) ? MappingConfidence.AUTO :
+                            (score >= 0.60) ? MappingConfidence.NEEDS_REVIEW : MappingConfidence.BAD_MATCH;
+
+                    IntegrationMappingEntity newMapping = new IntegrationMappingEntity();
+                    newMapping.setExternalName(originalName.trim());
+                    newMapping.setInternalComponent(componentService.getById(matchOpt.get().getId()));
+                    newMapping.setConfidence(confidence);
+
+                    repository.save(newMapping);
+                    result.put(lowerName, newMapping);
+                }
+            }
+        }
+
+        return result;
     }
 
     @Override

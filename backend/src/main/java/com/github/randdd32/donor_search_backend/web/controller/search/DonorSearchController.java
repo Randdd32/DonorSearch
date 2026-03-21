@@ -2,7 +2,6 @@ package com.github.randdd32.donor_search_backend.web.controller.search;
 
 import com.github.randdd32.donor_search_backend.core.configuration.Constants;
 import com.github.randdd32.donor_search_backend.service.search.DonorSearchService;
-import com.github.randdd32.donor_search_backend.web.dto.integration.enums.ExternalDeviceState;
 import com.github.randdd32.donor_search_backend.web.dto.pagination.PageDto;
 import com.github.randdd32.donor_search_backend.web.dto.search.DonorResultDto;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +34,7 @@ public class DonorSearchController {
     public PageDto<DonorResultDto> getResults(
             @PathVariable String sessionId,
             @RequestParam(required = false) String search,
-            @RequestParam(required = false) List<ExternalDeviceState> states,
+            @RequestParam(required = false) List<Long> stateIds,
             @RequestParam(required = false) List<Long> departmentIds,
             @RequestParam(required = false) List<Long> buildingIds,
             @RequestParam(required = false) List<Long> floorIds,
@@ -51,7 +50,7 @@ public class DonorSearchController {
             @PageableDefault(size = Constants.DEFAULT_PAGE_SIZE, sort = "totalPenalty") Pageable pageable) {
 
         return searchService.getResults(
-                sessionId, search, states, departmentIds, buildingIds, floorIds, roomIds,
+                sessionId, search, stateIds, departmentIds, buildingIds, floorIds, roomIds,
                 deviceManufacturerIds, typeIds, modelIds, dateReceivedFrom, dateReceivedTo,
                 isWorking, componentManufacturerIds, maxTotalPenalty, pageable
         );

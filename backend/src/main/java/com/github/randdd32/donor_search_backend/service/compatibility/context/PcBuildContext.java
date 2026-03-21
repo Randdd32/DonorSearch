@@ -1,4 +1,4 @@
-package com.github.randdd32.donor_search_backend.web.dto.compatibility;
+package com.github.randdd32.donor_search_backend.service.compatibility.context;
 
 import com.github.randdd32.donor_search_backend.model.hardware.CaseEntity;
 import com.github.randdd32.donor_search_backend.model.hardware.CaseFanEntity;
@@ -13,12 +13,14 @@ import com.github.randdd32.donor_search_backend.model.hardware.OpticalDriveEntit
 import com.github.randdd32.donor_search_backend.model.hardware.PowerSupplyEntity;
 import com.github.randdd32.donor_search_backend.model.hardware.StorageEntity;
 import com.github.randdd32.donor_search_backend.model.hardware.VideoCardEntity;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 public class PcBuildContext {
     private CaseEntity pcCase;
     private MotherboardEntity motherboard;
@@ -51,17 +53,30 @@ public class PcBuildContext {
     }
 
     public void putComponent(ComponentEntity component) {
-        if (component instanceof CaseEntity c) this.pcCase = c;
-        if (component instanceof MotherboardEntity m) this.motherboard = m;
-        if (component instanceof PowerSupplyEntity p) this.psus.add(p);
-        if (component instanceof CpuEntity c) this.cpus.add(c);
-        if (component instanceof CpuCoolerEntity c) this.coolers.add(c);
-        if (component instanceof VideoCardEntity v) this.gpus.add(v);
-        if (component instanceof MemoryEntity m) this.memories.add(m);
-        if (component instanceof StorageEntity s) this.storages.add(s);
-        if (component instanceof ExpansionCardEntity e) this.expansionCards.add(e);
-        if (component instanceof CaseFanEntity c) this.caseFans.add(c);
-        if (component instanceof OpticalDriveEntity o) this.opticalDrives.add(o);
-        if (component instanceof MonitorEntity m) this.monitors.add(m);
+        if (component instanceof CaseEntity c) {
+            this.pcCase = c;
+        } else if (component instanceof MotherboardEntity m) {
+            this.motherboard = m;
+        } else if (component instanceof PowerSupplyEntity p) {
+            this.psus.add(p);
+        } else if (component instanceof CpuEntity c) {
+            this.cpus.add(c);
+        } else if (component instanceof CpuCoolerEntity c) {
+            this.coolers.add(c);
+        } else if (component instanceof VideoCardEntity v) {
+            this.gpus.add(v);
+        } else if (component instanceof MemoryEntity m) {
+            this.memories.add(m);
+        } else if (component instanceof StorageEntity s) {
+            this.storages.add(s);
+        } else if (component instanceof ExpansionCardEntity e) {
+            this.expansionCards.add(e);
+        } else if (component instanceof CaseFanEntity c) {
+            this.caseFans.add(c);
+        } else if (component instanceof OpticalDriveEntity o) {
+            this.opticalDrives.add(o);
+        } else if (component instanceof MonitorEntity m) {
+            this.monitors.add(m);
+        }
     }
 }
