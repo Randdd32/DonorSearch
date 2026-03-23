@@ -43,7 +43,6 @@ public class CompatibilityEngineService {
         StandardEvaluationContext context = new StandardEvaluationContext();
         context.setVariable("ctx", buildContext);
 
-
         for (CompatibilityRuleEntity rule : rules) {
             try {
                 Expression exp = expressionCache.computeIfAbsent(
@@ -92,9 +91,15 @@ public class CompatibilityEngineService {
      */
     private boolean isMissingDataError(SpelMessage messageCode) {
         return messageCode == SpelMessage.PROPERTY_OR_FIELD_NOT_READABLE_ON_NULL ||
+                messageCode == SpelMessage.METHOD_CALL_ON_NULL_OBJECT_NOT_ALLOWED ||
+                messageCode == SpelMessage.CANNOT_INDEX_INTO_NULL_VALUE ||
                 messageCode == SpelMessage.COLLECTION_INDEX_OUT_OF_BOUNDS ||
                 messageCode == SpelMessage.ARRAY_INDEX_OUT_OF_BOUNDS ||
-                messageCode == SpelMessage.CANNOT_INDEX_INTO_NULL_VALUE ||
-                messageCode == SpelMessage.METHOD_CALL_ON_NULL_OBJECT_NOT_ALLOWED;
+                messageCode == SpelMessage.EXCEPTION_DURING_INDEX_READ ||
+                messageCode == SpelMessage.TYPE_CONVERSION_ERROR ||
+                messageCode == SpelMessage.NOT_COMPARABLE ||
+                messageCode == SpelMessage.OPERATOR_NOT_SUPPORTED_BETWEEN_TYPES ||
+                messageCode == SpelMessage.EXCEPTION_DURING_PROPERTY_READ ||
+                messageCode == SpelMessage.EXCEPTION_DURING_METHOD_INVOCATION;
     }
 }

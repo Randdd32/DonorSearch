@@ -18,4 +18,9 @@ public abstract class AbstractReadService<T, R extends JpaRepository<T, Long>> {
         return repository.findById(id)
                 .orElseThrow(() -> new NotFoundException(entityClass, id));
     }
+
+    @Transactional(readOnly = true)
+    public long count() {
+        return repository.count();
+    }
 }

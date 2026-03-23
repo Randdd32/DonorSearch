@@ -18,6 +18,7 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.ToIntFunction;
 
 @Getter
 @Setter
@@ -78,5 +79,103 @@ public class PcBuildContext {
         } else if (component instanceof MonitorEntity m) {
             this.monitors.add(m);
         }
+    }
+
+    public Integer getTotalTdpW() {
+        if (cpus.isEmpty()) return null;
+
+        int cpuTdp = cpus.stream().mapToInt(CpuEntity::getTdpW).sum();
+        int gpuTdp = gpus.stream().mapToInt(VideoCardEntity::getTdpW).sum();
+        return cpuTdp + gpuTdp;
+    }
+
+    public Integer getTotalPsuWattage() {
+        if (psus.isEmpty()) return null;
+        return psus.stream().mapToInt(PowerSupplyEntity::getWattageW).sum();
+    }
+
+    public Integer getTotalRamCapacityGb() {
+        if (memories.isEmpty()) return null;
+        return memories.stream().mapToInt(m -> m.getModulesCount() * m.getModulesSizeGb()).sum();
+    }
+
+    public Integer getTotalRamModules() {
+        if (memories.isEmpty()) return null;
+        return memories.stream().mapToInt(MemoryEntity::getModulesCount).sum();
+    }
+
+    public Integer getStorageCountByFormFactor(String ffName) {
+        if (storages.isEmpty()) return null;
+        return (int) storages.stream()
+                .filter(s -> s.getFormFactor() != null && s.getFormFactor().getName().contains(ffName))
+                .count();
+    }
+
+    public Integer getSataDevicesCount() {
+        if (storages.isEmpty() && opticalDrives.isEmpty()) return null;
+
+        long sataDisks = storages.stream()
+                .filter(s -> s.getInterfaces() != null && s.getInterfaces().stream().anyMatch(i -> i.getName().toLowerCase().contains("sata")))
+                .count();
+
+        long sataOpticalDrives = opticalDrives.stream()
+                .filter(o -> o.getStorageInterface() != null && o.getStorageInterface().getName().toLowerCase().contains("sata"))
+                .count();
+
+        return (int) (sataDisks + sataOpticalDrives);
+    }
+
+    public Integer getTotalGpuSlotWidth() {
+        if (gpus.isEmpty()) return hasVideoCapability() ? 0 : null;
+        return gpus.stream().mapToInt(VideoCardEntity::getSlotWidth).sum();
+    }
+
+    public Boolean isEccSupported() {
+        if (motherboard == null) return null;
+        if (Boolean.FALSE.equals(motherboard.getEccSupport())) {
+            return false;
+        }
+        if (cpus.isEmpty()) return null;
+        return cpus.stream()
+                .allMatch(cpu -> Boolean.TRUE.equals(cpu.getEccSupport()));
+    }
+
+    public Integer getReqPcie8Pin() {
+        return sumGpuPowerPins(VideoCardEntity::getPower8pinCount);
+    }
+
+    public Integer getReqPcie6Pin() {
+        return sumGpuPowerPins(VideoCardEntity::getPower6pinCount);
+    }
+
+    public Integer getReqPcie12vhpwr() {
+        return sumGpuPowerPins(VideoCardEntity::getPower12vhpwrCount);
+    }
+
+    public Integer getAvailPcie8Pin() {
+        return sumPsuPowerPins(PowerSupplyEntity::getPcie8PinConnectors);
+    }
+
+    public Integer getAvailPcie6Pin() {
+        return sumPsuPowerPins(PowerSupplyEntity::getPcie6PinConnectors);
+    }
+
+    public Integer getAvailPcie12vhpwr() {
+        return sumPsuPowerPins(PowerSupplyEntity::getPcie12vhpwrConnectors);
+    }
+
+    private boolean hasVideoCapability() {
+        if (!gpus.isEmpty()) return true;
+        return cpus.stream().anyMatch(c -> c.getGraphics() != null);
+    }
+
+    private Integer sumGpuPowerPins(ToIntFunction<VideoCardEntity> mapper) {
+        if (gpus.isEmpty()) return hasVideoCapability() ? 0 : null;
+        return gpus.stream().mapToInt(mapper).sum();
+    }
+
+    private Integer sumPsuPowerPins(ToIntFunction<PowerSupplyEntity> mapper) {
+        if (psus.isEmpty()) return null;
+        return psus.stream().mapToInt(mapper).sum();
     }
 }
