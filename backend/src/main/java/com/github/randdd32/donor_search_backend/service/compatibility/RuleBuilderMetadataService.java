@@ -57,9 +57,9 @@ public class RuleBuilderMetadataService {
     private Map<String, List<FieldMetadataDto>> getComponentFields() {
         return Map.ofEntries(
                 Map.entry("CPU", List.of(
-                        new FieldMetadataDto("socket.id", "Long", "ID Сокета", true),
-                        new FieldMetadataDto("microarchitecture.id", "Long", "ID Микроархитектуры", true),
-                        new FieldMetadataDto("graphics.id", "Long", "ID Встроенной графики", true),
+                        new FieldMetadataDto("socket.id", "Long", "ID cокета", true),
+                        new FieldMetadataDto("microarchitecture.id", "Long", "ID микроархитектуры", true),
+                        new FieldMetadataDto("graphics.id", "Long", "ID встроенной графики", true),
                         new FieldMetadataDto("coreCount", "Integer", "Количество ядер", false),
                         new FieldMetadataDto("coreClockGhz", "Double", "Базовая частота (ГГц)", false),
                         new FieldMetadataDto("tdpW", "Integer", "Тепловыделение (Вт)", false),
@@ -67,9 +67,9 @@ public class RuleBuilderMetadataService {
                         new FieldMetadataDto("eccSupport", "Boolean", "Поддержка ECC", false)
                 )),
                 Map.entry("MOTHERBOARD", List.of(
-                        new FieldMetadataDto("socket.id", "Long", "ID Сокета", true),
-                        new FieldMetadataDto("formFactor.id", "Long", "ID Форм-фактора", true),
-                        new FieldMetadataDto("memoryType.id", "Long", "ID Поколения памяти (DDR)", true),
+                        new FieldMetadataDto("socket.id", "Long", "ID сокета", true),
+                        new FieldMetadataDto("formFactor.id", "Long", "ID форм-фактора", true),
+                        new FieldMetadataDto("memoryType.id", "Long", "ID поколения памяти (DDR)", true),
                         new FieldMetadataDto("maxMemoryGb", "Integer", "Макс. объем ОЗУ (ГБ)", false),
                         new FieldMetadataDto("memorySlots", "Integer", "Количество слотов ОЗУ", false),
                         new FieldMetadataDto("memorySpeedMaxMhz", "Integer", "Макс. частота памяти (МГц)", false),
@@ -90,10 +90,10 @@ public class RuleBuilderMetadataService {
                         new FieldMetadataDto("headerUsb32Gen2x2", "Integer", "Колодки USB 3.2 Gen 2x2", false),
                         new FieldMetadataDto("headerUsb20SinglePort", "Integer", "Колодки USB 2.0 (Single Port)", false)
                 )),
-                Map.entry("GPU", List.of(
-                        new FieldMetadataDto("chipset.id", "Long", "ID Графического чипа", true),
-                        new FieldMetadataDto("memoryType.id", "Long", "ID Типа памяти", true),
-                        new FieldMetadataDto("interfaceType.id", "Long", "ID Интерфейса", true),
+                Map.entry("VIDEO_CARD", List.of(
+                        new FieldMetadataDto("chipset.id", "Long", "ID графического чипа", true),
+                        new FieldMetadataDto("memoryType.id", "Long", "ID типа памяти", true),
+                        new FieldMetadataDto("interfaceType.id", "Long", "ID интерфейса", true),
                         new FieldMetadataDto("lengthMm", "Integer", "Длина (мм)", true),
                         new FieldMetadataDto("tdpW", "Integer", "Энергопотребление / TDP (Вт)", false),
                         new FieldMetadataDto("slotWidth", "Integer", "Толщина (в слотах)", false),
@@ -108,7 +108,7 @@ public class RuleBuilderMetadataService {
                         new FieldMetadataDto("videoOutputs", "Map<String, Integer>", "Видеовыходы (Пример: {'hdmi': 1, 'dp': 2}. В SpEL: videoOutputs['hdmi'] >= 1)", false)
                 )),
                 Map.entry("CASE", List.of(
-                        new FieldMetadataDto("caseType.id", "Long", "ID Форм-фактора корпуса", true),
+                        new FieldMetadataDto("caseType.id", "Long", "ID форм-фактора корпуса", true),
                         new FieldMetadataDto("maxGpuLenMm", "Integer", "Макс. длина видеокарты (мм)", true),
                         new FieldMetadataDto("maxCpuCoolerHeightMm", "Integer", "Макс. высота кулера (мм)", true),
                         new FieldMetadataDto("lengthMm", "Integer", "Длина корпуса (мм)", true),
@@ -126,17 +126,17 @@ public class RuleBuilderMetadataService {
                         new FieldMetadataDto("moboFormFactors", "Set", "Поддерживаемые форм-факторы мат. плат", false),
                         new FieldMetadataDto("frontPanelUsbTypes", "Set", "Разъемы USB на передней панели", false)
                 )),
-                Map.entry("RAM", List.of(
-                        new FieldMetadataDto("formFactor.id", "Long", "ID Форм-фактора", true),
-                        new FieldMetadataDto("memoryType.id", "Long", "ID Поколения памяти (DDR)", true),
+                Map.entry("MEMORY", List.of(
+                        new FieldMetadataDto("formFactor.id", "Long", "ID форм-фактора", true),
+                        new FieldMetadataDto("memoryType.id", "Long", "ID поколения памяти (DDR)", true),
                         new FieldMetadataDto("modulesCount", "Integer", "Количество модулей в комплекте", false),
                         new FieldMetadataDto("modulesSizeGb", "Integer", "Объем одного модуля (ГБ)", false),
                         new FieldMetadataDto("isEcc", "Boolean", "Поддержка ECC", false),
                         new FieldMetadataDto("isRegistered", "Boolean", "Является ли память буферизованной (Registered)", false)
                 )),
                 Map.entry("POWER_SUPPLY", List.of(
-                        new FieldMetadataDto("type.id", "Long", "ID Форм-фактора БП", true),
-                        new FieldMetadataDto("modular.id", "Long", "ID Типа модульности", true),
+                        new FieldMetadataDto("type.id", "Long", "ID форм-фактора БП", true),
+                        new FieldMetadataDto("modular.id", "Long", "ID типа модульности", true),
                         new FieldMetadataDto("wattageW", "Integer", "Мощность (Вт)", false),
                         new FieldMetadataDto("lengthMm", "Integer", "Длина (мм)", true),
                         new FieldMetadataDto("atx4PinConnectors", "Integer", "Доступно 4-pin ATX (Мат. плата)", false),
@@ -147,21 +147,21 @@ public class RuleBuilderMetadataService {
                         new FieldMetadataDto("pcie8PinConnectors", "Integer", "Доступно 8-pin PCIe", false),
                         new FieldMetadataDto("pcie12vhpwrConnectors", "Integer", "Доступно 12VHPWR", false),
                         new FieldMetadataDto("sataConnectors", "Integer", "Доступно SATA коннекторов", false),
-                        new FieldMetadataDto("molex4PinConnectors", "Integer", "Доступно Molex (4-pin)", false)
+                        new FieldMetadataDto("molex4PinConnectors", "Integer", "Доступно Molex разъемов (4-pin)", false)
                 )),
                 Map.entry("CPU_COOLER", List.of(
-                        new FieldMetadataDto("isWaterCooled", "Boolean", "Является ли СЖО (водянкой)", false),
+                        new FieldMetadataDto("isWaterCooled", "Boolean", "Является ли СЖО (водяное охлаждение)", false),
                         new FieldMetadataDto("heightMm", "Integer", "Высота башни (мм)", true),
                         new FieldMetadataDto("waterCooledSizeMm", "Integer", "Размер радиатора СЖО (мм)", true),
                         new FieldMetadataDto("sockets", "Set", "Поддерживаемые сокеты", false)
                 )),
                 Map.entry("OPTICAL_DRIVE", List.of(
-                        new FieldMetadataDto("formFactor.id", "Long", "ID Форм-фактора", true),
-                        new FieldMetadataDto("storageInterface.id", "Long", "ID Интерфейса", true)
+                        new FieldMetadataDto("formFactor.id", "Long", "ID форм-фактора", true),
+                        new FieldMetadataDto("storageInterface.id", "Long", "ID интерфейса", true)
                 )),
                 Map.entry("STORAGE", List.of(
-                        new FieldMetadataDto("type.id", "Long", "ID Типа накопителя (HDD/SSD)", true),
-                        new FieldMetadataDto("formFactor.id", "Long", "ID Форм-фактора", true),
+                        new FieldMetadataDto("type.id", "Long", "ID типа накопителя (HDD/SSD)", true),
+                        new FieldMetadataDto("formFactor.id", "Long", "ID форм-фактора", true),
                         new FieldMetadataDto("isExternal", "Boolean", "Является ли внешним накопителем", false),
                         new FieldMetadataDto("capacityGb", "Integer", "Емкость (ГБ)", false)
                 )),
@@ -185,8 +185,8 @@ public class RuleBuilderMetadataService {
                         new FieldMetadataDto("inputVirtualLink", "Integer", "Порты VirtualLink", false)
                 )),
                 Map.entry("EXPANSION_CARD", List.of(
-                        new FieldMetadataDto("cardType", "String", "Тип карты расширения", false),
-                        new FieldMetadataDto("interfaceType.id", "Long", "ID Интерфейса", true)
+                        new FieldMetadataDto("cardType", "Enum", "Тип карты расширения (SOUND, WIRED_NETWORK, WIRELESS_NETWORK)", false),
+                        new FieldMetadataDto("interfaceType.id", "Long", "ID интерфейса", true)
                 ))
         );
     }
