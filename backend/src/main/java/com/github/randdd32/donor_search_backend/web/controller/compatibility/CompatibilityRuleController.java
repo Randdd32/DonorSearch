@@ -4,9 +4,11 @@ import com.github.randdd32.donor_search_backend.core.configuration.Constants;
 import com.github.randdd32.donor_search_backend.model.compatibility.CompatibilityRuleEntity;
 import com.github.randdd32.donor_search_backend.model.enums.ComponentType;
 import com.github.randdd32.donor_search_backend.service.compatibility.CompatibilityRuleService;
+import com.github.randdd32.donor_search_backend.service.compatibility.RuleBuilderMetadataService;
 import com.github.randdd32.donor_search_backend.web.controller.AbstractCrudController;
 import com.github.randdd32.donor_search_backend.web.dto.compatibility.CompatibilityRuleDto;
 import com.github.randdd32.donor_search_backend.web.dto.compatibility.ExpressionValidationRequestDto;
+import com.github.randdd32.donor_search_backend.web.dto.compatibility.RuleBuilderMetadataDto;
 import com.github.randdd32.donor_search_backend.web.dto.pagination.PageDto;
 import com.github.randdd32.donor_search_backend.web.mapper.compatibility.CompatibilityRuleMapper;
 import com.github.randdd32.donor_search_backend.web.mapper.pagination.PageDtoMapper;
@@ -30,8 +32,13 @@ import java.util.List;
 @RequestMapping(Constants.API_URL + "/compatibility-rules")
 public class CompatibilityRuleController extends AbstractCrudController<CompatibilityRuleEntity, CompatibilityRuleDto,
         CompatibilityRuleService> {
-    public CompatibilityRuleController(CompatibilityRuleService service, CompatibilityRuleMapper mapper) {
+    private final RuleBuilderMetadataService metadataService;
+
+    public CompatibilityRuleController(CompatibilityRuleService service,
+                                       CompatibilityRuleMapper mapper,
+                                       RuleBuilderMetadataService metadataService) {
         super(service, mapper::toDto, mapper::toEntity);
+        this.metadataService = metadataService;
     }
 
     @GetMapping
@@ -50,6 +57,11 @@ public class CompatibilityRuleController extends AbstractCrudController<Compatib
                         createdAfter, createdBefore, updatedAfter, updatedBefore, pageable),
                 toDtoMapper
         );
+    }
+
+    @GetMapping("/builder-metadata")
+    public RuleBuilderMetadataDto getBuilderMetadata() {
+        return metadataService.getMetadata();
     }
 
     @PostMapping("/validate-expression")

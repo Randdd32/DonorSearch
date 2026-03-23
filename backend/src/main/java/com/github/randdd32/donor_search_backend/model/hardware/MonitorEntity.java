@@ -68,7 +68,8 @@ public class MonitorEntity extends ComponentEntity {
     @Column(name = "input_mini_dp", nullable = false)
     private Integer inputMiniDp;
 
-    @Column(name = "input_bnc", nullable = false) private Integer inputBnc;
+    @Column(name = "input_bnc", nullable = false)
+    private Integer inputBnc;
 
     @Column(name = "input_component", nullable = false)
     private Integer inputComponent;
