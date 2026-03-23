@@ -6,15 +6,21 @@ import com.github.randdd32.donor_search_backend.model.enums.ComponentType;
 import com.github.randdd32.donor_search_backend.service.compatibility.CompatibilityRuleService;
 import com.github.randdd32.donor_search_backend.web.controller.AbstractCrudController;
 import com.github.randdd32.donor_search_backend.web.dto.compatibility.CompatibilityRuleDto;
+import com.github.randdd32.donor_search_backend.web.dto.compatibility.ExpressionValidationRequestDto;
 import com.github.randdd32.donor_search_backend.web.dto.pagination.PageDto;
 import com.github.randdd32.donor_search_backend.web.mapper.compatibility.CompatibilityRuleMapper;
 import com.github.randdd32.donor_search_backend.web.mapper.pagination.PageDtoMapper;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Instant;
@@ -44,5 +50,11 @@ public class CompatibilityRuleController extends AbstractCrudController<Compatib
                         createdAfter, createdBefore, updatedAfter, updatedBefore, pageable),
                 toDtoMapper
         );
+    }
+
+    @PostMapping("/validate-expression")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void validateExpression(@RequestBody @Valid ExpressionValidationRequestDto request) {
+        service.validateExpressionSyntax(request.expression());
     }
 }

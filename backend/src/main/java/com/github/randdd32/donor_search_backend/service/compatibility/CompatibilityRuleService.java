@@ -9,6 +9,9 @@ import com.github.randdd32.donor_search_backend.service.AbstractCrudService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.spel.SpelParseException;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -19,6 +22,8 @@ import java.util.Optional;
 
 @Service
 public class CompatibilityRuleService extends AbstractCrudService<CompatibilityRuleEntity, CompatibilityRuleRepository> {
+    private final ExpressionParser syntaxParser = new SpelExpressionParser();
+
     public CompatibilityRuleService(CompatibilityRuleRepository repository) {
         super(repository, CompatibilityRuleEntity.class);
     }
@@ -57,12 +62,23 @@ public class CompatibilityRuleService extends AbstractCrudService<CompatibilityR
         existing.getTargetComponentTypes().addAll(updated.getTargetComponentTypes());
     }
 
+    public void validateExpressionSyntax(String expression) {
+        if (expression == null || expression.isBlank()) {
+            throw new IllegalArgumentException("Expression cannot be empty");
+        }
+        try {
+            syntaxParser.parseExpression(expression);
+        } catch (SpelParseException e) {
+            throw new IllegalArgumentException("Syntax error in the rule: " + e.getMessage());
+        }
+    }
+
     @Override
     protected void validate(CompatibilityRuleEntity entity, Long id) {
         if (entity == null) throw new IllegalArgumentException("CompatibilityRule entity is null");
 
         validateStringField(entity.getRuleCode(), "Rule code");
-        validateStringField(entity.getExpression(), "Expression (SpEL)");
+        validateExpressionSyntax(entity.getExpression());
         validateStringField(entity.getErrorMessage(), "Error message");
         if (CollectionUtils.isEmpty(entity.getTargetComponentTypes())) {
             throw new IllegalArgumentException("Target component types must not be empty");
