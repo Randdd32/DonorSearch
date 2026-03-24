@@ -143,8 +143,8 @@ INSERT INTO dbo.[Adapter] VALUES
 (205, 2, N'Corsair RM850e', N'PSU-002', 6);
 
 INSERT INTO dbo.[Adapter] VALUES 
-(3103, 31, N'ROG Astral OC X3 OC Asus', N'GPU-RIG-1', 2),
-(3103, 31, N'Asus Dual GeForce RTX 3060 V2 OC Edition', N'GPU-RIG-1', 2);
+(3101, 31, N'ROG Astral OC X3 OC Asus', N'GPU-RIG-1', 2),
+(3102, 31, N'Asus Dual GeForce RTX 3060 V2 OC Edition', N'GPU-RIG-1', 2);
 
 -- Заполним еще пару ПК случайными деталями для массовки
 INSERT INTO dbo.[Adapter] VALUES 
