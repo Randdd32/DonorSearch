@@ -9,7 +9,7 @@ import org.mapstruct.MappingConstants;
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING, uses = BaseHardwareMapper.class)
 public interface PowerSupplyMapper {
     @Mapping(target = "manufacturerName", source = "manufacturer.name")
-    @Mapping(target = "typeName", source = "type.name")
+    @Mapping(target = "typeName", source = "powerSupplyType.name")
     @Mapping(target = "efficiencyName", source = "efficiency.name")
     @Mapping(target = "modularName", source = "modular.name")
     @Mapping(target = "colorName", source = "color.name")

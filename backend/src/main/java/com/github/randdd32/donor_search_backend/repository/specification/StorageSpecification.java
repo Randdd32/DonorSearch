@@ -22,7 +22,7 @@ public final class StorageSpecification {
         return (root, query, cb) -> {
             if (query != null && Long.class != query.getResultType() && long.class != query.getResultType()) {
                 root.fetch("manufacturer", JoinType.LEFT);
-                root.fetch("type", JoinType.LEFT);
+                root.fetch("storageType", JoinType.LEFT);
                 root.fetch("formFactor", JoinType.LEFT);
                 root.fetch("color", JoinType.LEFT);
             }
@@ -31,7 +31,7 @@ public final class StorageSpecification {
 
             CommonSpecificationUtils.addSearchNamePredicate(predicates, root, cb, search);
             CommonSpecificationUtils.addDictionaryFilter(predicates, root, "manufacturer", manufacturerIds);
-            CommonSpecificationUtils.addDictionaryFilter(predicates, root, "type", typeIds);
+            CommonSpecificationUtils.addDictionaryFilter(predicates, root, "storageType", typeIds);
             CommonSpecificationUtils.addDictionaryFilter(predicates, root, "formFactor", formFactorIds);
             CommonSpecificationUtils.addDictionaryFilter(predicates, root, "color", colorIds);
             CommonSpecificationUtils.addManyToManyFilter(predicates, root, "interfaces", interfaceIds);

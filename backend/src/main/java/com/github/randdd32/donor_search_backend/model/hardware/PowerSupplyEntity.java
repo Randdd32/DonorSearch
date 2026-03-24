@@ -26,7 +26,7 @@ import lombok.Setter;
 public class PowerSupplyEntity extends ComponentEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "type_id")
-    private PowerSupplyTypeEntity type;
+    private PowerSupplyTypeEntity powerSupplyType;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "efficiency_id")

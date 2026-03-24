@@ -20,7 +20,7 @@ public final class PowerSupplySpecification {
         return (root, query, cb) -> {
             if (query != null && Long.class != query.getResultType() && long.class != query.getResultType()) {
                 root.fetch("manufacturer", JoinType.LEFT);
-                root.fetch("type", JoinType.LEFT);
+                root.fetch("powerSupplyType", JoinType.LEFT);
                 root.fetch("efficiency", JoinType.LEFT);
                 root.fetch("modular", JoinType.LEFT);
                 root.fetch("color", JoinType.LEFT);
@@ -30,7 +30,7 @@ public final class PowerSupplySpecification {
 
             CommonSpecificationUtils.addSearchNamePredicate(predicates, root, cb, search);
             CommonSpecificationUtils.addDictionaryFilter(predicates, root, "manufacturer", manufacturerIds);
-            CommonSpecificationUtils.addDictionaryFilter(predicates, root, "type", typeIds);
+            CommonSpecificationUtils.addDictionaryFilter(predicates, root, "powerSupplyType", typeIds);
             CommonSpecificationUtils.addDictionaryFilter(predicates, root, "efficiency", efficiencyIds);
             CommonSpecificationUtils.addDictionaryFilter(predicates, root, "modular", modularIds);
             CommonSpecificationUtils.addDictionaryFilter(predicates, root, "color", colorIds);

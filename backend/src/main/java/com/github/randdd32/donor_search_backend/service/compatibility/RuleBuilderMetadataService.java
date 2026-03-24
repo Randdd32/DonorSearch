@@ -135,7 +135,7 @@ public class RuleBuilderMetadataService {
                         new FieldMetadataDto("isRegistered", "Boolean", "Является ли память буферизованной (Registered)", false)
                 )),
                 Map.entry("POWER_SUPPLY", List.of(
-                        new FieldMetadataDto("type.id", "Long", "ID форм-фактора БП", true),
+                        new FieldMetadataDto("powerSupplyType.id", "Long", "ID форм-фактора БП", true),
                         new FieldMetadataDto("modular.id", "Long", "ID типа модульности", true),
                         new FieldMetadataDto("wattageW", "Integer", "Мощность (Вт)", false),
                         new FieldMetadataDto("lengthMm", "Integer", "Длина (мм)", true),
@@ -160,7 +160,7 @@ public class RuleBuilderMetadataService {
                         new FieldMetadataDto("storageInterface.id", "Long", "ID интерфейса", true)
                 )),
                 Map.entry("STORAGE", List.of(
-                        new FieldMetadataDto("type.id", "Long", "ID типа накопителя (HDD/SSD)", true),
+                        new FieldMetadataDto("storageType.id", "Long", "ID типа накопителя (HDD/SSD)", true),
                         new FieldMetadataDto("formFactor.id", "Long", "ID форм-фактора", true),
                         new FieldMetadataDto("isExternal", "Boolean", "Является ли внешним накопителем", false),
                         new FieldMetadataDto("capacityGb", "Integer", "Емкость (ГБ)", false)

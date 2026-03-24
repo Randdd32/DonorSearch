@@ -31,7 +31,7 @@ import java.util.Set;
 public class StorageEntity extends ComponentEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "type_id")
-    private StorageTypeEntity type;
+    private StorageTypeEntity storageType;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "form_factor_id")

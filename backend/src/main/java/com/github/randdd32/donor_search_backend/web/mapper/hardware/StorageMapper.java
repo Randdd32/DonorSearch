@@ -13,7 +13,7 @@ import org.mapstruct.MappingConstants;
 })
 public interface StorageMapper {
     @Mapping(target = "manufacturerName", source = "manufacturer.name")
-    @Mapping(target = "typeName", source = "type.name")
+    @Mapping(target = "typeName", source = "storageType.name")
     @Mapping(target = "formFactorName", source = "formFactor.name")
     @Mapping(target = "colorName", source = "color.name")
     StorageDto toDto(StorageEntity entity);
