@@ -50,7 +50,7 @@ public class DonorSearchService {
     private final ComponentDtoMapperFacade componentDtoMapper;
     private final Cache<@NonNull  String, List<DonorResultDto>> searchCache;
 
-    @Transactional(readOnly = true)
+    @Transactional
     public String runSearch(Long targetDeviceId, Long targetAdapterId) {
         ExternalDeviceDto targetDevice = infraDeviceService.getDeviceDetails(targetDeviceId);
         ExternalComponentDto targetComponent = targetDevice.components().stream()
