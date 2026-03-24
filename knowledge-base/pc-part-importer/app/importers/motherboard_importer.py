@@ -1,11 +1,12 @@
+import re
 import pandas as pd
 from app.models.dictionaries import Manufacturer, CpuSocket, MotherboardFormFactor, MemoryType, Color
 from app.models.motherboard import Motherboard
 from app.importers.base_importer import BaseImporter
-from app.utils.parsing_utils import safe_int, safe_bool
+from app.utils.parsing_utils import safe_int, safe_bool, parse_separated_string
 
 class MotherboardImporter(BaseImporter):
-    def _parse_m2_slots(raw_m2_string: str) -> list[dict]:
+    def _parse_m2_slots(self, raw_m2_string: str) -> list[dict]:
         slots = parse_separated_string(raw_m2_string)
         parsed =[]
         for slot in slots:

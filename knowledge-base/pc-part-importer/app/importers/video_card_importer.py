@@ -2,7 +2,7 @@ import pandas as pd
 from app.models.dictionaries import GpuChipset, MemoryType, ExpansionInterface, Color
 from app.models.video_card import VideoCard
 from app.importers.base_importer import BaseImporter
-from app.utils.parsing_utils import safe_int
+from app.utils.parsing_utils import safe_int, parse_separated_string
 
 class VideoCardImporter(BaseImporter):
     def import_data(self, csv_path: str):
