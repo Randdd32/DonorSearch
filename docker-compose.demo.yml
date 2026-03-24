@@ -6,19 +6,46 @@ services:
     container_name: hardware_db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-hardware_db}
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - internal
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-hardware_db}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 10s
+
+  infra-db:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: hardware_infra_db
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${INFRA_MANAGER_DB_PASSWORD}
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S infra-db -U sa -P '${INFRA_MANAGER_DB_PASSWORD}' -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  infra-init:
+    image: mcr.microsoft.com/mssql-tools
+    container_name: hardware_infra_init
+    depends_on:
+      infra-db:
+        condition: service_healthy
+    volumes:
+      - ./demo/init.sql:/init.sql:ro
+    networks:
+      - internal
+    command: /bin/bash -c "/opt/mssql-tools/bin/sqlcmd -S infra-db -U sa -P '${INFRA_MANAGER_DB_PASSWORD}' -i /init.sql -C"
 
   backend:
     image: donor-backend:latest
@@ -27,14 +54,14 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      infra-init:
+        condition: service_completed_successfully
     environment:
       SPRING_PROFILES_ACTIVE: prod 
-      SPRING_JPA_HIBERNATE_DDL_AUTO: ${DDL_AUTO:-validate} 
-
-      PRIMARY_DB_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-hardware_db}
-      PRIMARY_DB_USERNAME: ${POSTGRES_USER:-postgres}
-      PRIMARY_DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-      
+      SPRING_JPA_HIBERNATE_DDL_AUTO: ${DDL_AUTO} 
+      PRIMARY_DB_URL: jdbc:postgresql://db:5432/${POSTGRES_DB}
+      PRIMARY_DB_USERNAME: ${POSTGRES_USER}
+      PRIMARY_DB_PASSWORD: ${POSTGRES_PASSWORD}
       SECONDARY_DB_URL: ${INFRA_MANAGER_DB_URL}
       SECONDARY_DB_USERNAME: ${INFRA_MANAGER_DB_USERNAME}
       SECONDARY_DB_PASSWORD: ${INFRA_MANAGER_DB_PASSWORD}
@@ -89,7 +116,7 @@ services:
       db:
         condition: service_healthy
     environment:
-      DB_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-hardware_db}
+      DB_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
     volumes:
       - ./data:/app/data
     networks:
