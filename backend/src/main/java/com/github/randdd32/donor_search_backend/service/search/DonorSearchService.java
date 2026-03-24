@@ -20,12 +20,14 @@ import com.github.randdd32.donor_search_backend.web.dto.search.CompatibleCompone
 import com.github.randdd32.donor_search_backend.web.dto.search.DonorResultDto;
 import com.github.randdd32.donor_search_backend.web.dto.search.DonorWarningDto;
 import com.github.randdd32.donor_search_backend.web.dto.search.enums.WarningSeverity;
+import com.github.randdd32.donor_search_backend.web.mapper.hardware.ComponentDtoMapperFacade;
 import com.github.randdd32.donor_search_backend.web.mapper.pagination.PageDtoMapper;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.time.Instant;
@@ -45,8 +47,10 @@ public class DonorSearchService {
     private final InfraDeviceService infraDeviceService;
     private final IntegrationMappingService mappingService;
     private final CompatibilityEngineService compatibilityEngine;
+    private final ComponentDtoMapperFacade componentDtoMapper;
     private final Cache<@NonNull  String, List<DonorResultDto>> searchCache;
 
+    @Transactional(readOnly = true)
     public String runSearch(Long targetDeviceId, Long targetAdapterId) {
         ExternalDeviceDto targetDevice = infraDeviceService.getDeviceDetails(targetDeviceId);
         ExternalComponentDto targetComponent = targetDevice.components().stream()
@@ -81,7 +85,7 @@ public class DonorSearchService {
 
         Map<String, IntegrationMappingEntity> bulkMappings = mappingService.resolveAndSaveBatch(uniqueDonorExternalNames, targetType);
 
-        List<DonorResultDto> finalResults = candidateDevices.parallelStream()
+        List<DonorResultDto> finalResults = candidateDevices.stream()
                 .map(device -> evaluateDevice(device, targetType, targetContext, bulkMappings))
                 .filter(Objects::nonNull)
                 .toList();
@@ -236,7 +240,8 @@ public class DonorSearchService {
                 }
             }
 
-            validComponents.add(new CompatibleComponentDto(rawDonorComp, internalDonor, compPenalty, compWarnings));
+            Object internalDonorDto = componentDtoMapper.toDto(internalDonor);
+            validComponents.add(new CompatibleComponentDto(rawDonorComp, internalDonorDto, compPenalty, compWarnings));
         }
 
         if (validComponents.isEmpty()) {
