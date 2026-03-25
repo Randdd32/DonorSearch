@@ -1,0 +1,35 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.default {
+  background-color: var(--bg-hover);
+  color: var(--text-secondary);
+}
+
+.info {
+  background-color: color-mix(in srgb, var(--status-info) 15%, transparent);
+  color: var(--status-info);
+}
+
+.success {
+  background-color: color-mix(in srgb, var(--status-low) 15%, transparent);
+  color: var(--status-low);
+}
+
+.warning {
+  background-color: color-mix(in srgb, var(--status-medium) 15%, transparent);
+  color: var(--status-medium);
+}
+
+.danger {
+  background-color: color-mix(in srgb, var(--status-critical) 15%, transparent);
+  color: var(--status-critical);
+}
