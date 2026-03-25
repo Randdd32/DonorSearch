@@ -56,6 +56,8 @@ public class CompatibilityEngineService {
                     log.debug("Hard reject by rule [{}]: {}", rule.getRuleCode(), rule.getErrorMessage());
                     throw new HardRejectException(rule.getErrorMessage());
                 }
+            } catch (HardRejectException e) {
+                throw e;
             } catch (SpelEvaluationException e) {
                 SpelMessage msgCode = e.getMessageCode();
 
