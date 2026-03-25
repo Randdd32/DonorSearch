@@ -40,7 +40,7 @@ export const DashboardLayout = () => {
             className={clsx(styles.navItem, { [styles.active]: location.pathname === '/mappings' })}
           >
             <Settings size={20} />
-            {isSidebarOpen && <span>Таблица сопоставления оборудования</span>}
+            {isSidebarOpen && <span>Таблица сопоставления</span>}
           </Link>
         </nav>
       </aside>
