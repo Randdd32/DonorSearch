@@ -1,35 +1,56 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Toaster } from 'react-hot-toast';
+import { DashboardLayout } from './layouts/DashboardLayout/DashboardLayout';
+import { useUiStore } from './store/uiStore';
+import { DevicesPage } from './pages/DevicesPage/DevicesPage';
+import { DeviceDetailsPage } from './pages/DeviceDetailsPage/DeviceDetailsPage';
+import { SearchResultsPage } from './pages/SearchResultsPage/SearchResultsPage';
+import './styles/globals.css';
 
-function App() {
-  const [count, setCount] = useState(0)
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1
+    },
+  },
+});
+
+export const App = () => {
+  const theme = useUiStore((state) => state.theme);
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<DashboardLayout />}>
+            <Route index element={<DevicesPage />} />
+            <Route path="devices/:id" element={<DeviceDetailsPage />} /> 
+            <Route path="search/results/:sessionId" element={<SearchResultsPage />} />
+            <Route path="compatibility" element={<div>Правила совместимости</div>} />
+            <Route path="mappings" element={<div>Нераспознанное оборудование</div>} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+      
+      <Toaster 
+        position="top-center" 
+        toastOptions={{
+          style: {
+            background: 'var(--bg-surface)',
+            color: 'var(--text-primary)',
+            border: '1px solid var(--border-color)',
+          }
+        }}
+      />
+    </QueryClientProvider>
+  );
+};
 
-export default App
+export default App;
