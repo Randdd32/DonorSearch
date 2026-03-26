@@ -17,7 +17,7 @@ import styles from './DeviceDetailsPage.module.css';
 
 const categoryConfig: Record<string, { label: string; icon: React.ElementType }> = {
   CPU: { label: 'Процессоры', icon: Cpu },
-  СPU_COOLER: { label: 'Кулеры для процессоров', icon: Snowflake },
+  CPU_COOLER: { label: 'Кулеры для процессоров', icon: Snowflake },
   MOTHERBOARD: { label: 'Материнские платы', icon: CircuitBoard },
   MEMORY: { label: 'Оперативная память', icon: MemoryStick },
   STORAGE: { label: 'Накопители', icon: HardDrive },
@@ -126,7 +126,7 @@ export const DeviceDetailsPage = () => {
       <div className={styles.componentsLayout}>
         {ALL_CATEGORIES.map(category => {
           const components = groupedComponents[category] || [];
-          const config = categoryConfig[category];
+          const config = categoryConfig[category] || categoryConfig['UNKNOWN'];
           const Icon = config.icon;
 
           return (
