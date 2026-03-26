@@ -1,6 +1,8 @@
 package com.github.randdd32.donor_search_backend.service.compatibility;
 
 import com.github.randdd32.donor_search_backend.core.error.HardRejectException;
+import com.github.randdd32.donor_search_backend.core.error.MissingContextDataException;
+import com.github.randdd32.donor_search_backend.core.util.StringUtils;
 import com.github.randdd32.donor_search_backend.model.compatibility.CompatibilityRuleEntity;
 import com.github.randdd32.donor_search_backend.model.enums.ComponentType;
 import com.github.randdd32.donor_search_backend.service.compatibility.context.PcBuildContext;
@@ -9,6 +11,7 @@ import com.github.randdd32.donor_search_backend.web.dto.search.enums.WarningSeve
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.expression.Expression;
+import org.springframework.expression.ExpressionInvocationTargetException;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.SpelCompilerMode;
 import org.springframework.expression.spel.SpelEvaluationException;
@@ -58,6 +61,26 @@ public class CompatibilityEngineService {
                 }
             } catch (HardRejectException e) {
                 throw e;
+            } catch (MissingContextDataException e) {
+                log.debug("Missing context data for rule [{}]: {}", rule.getRuleCode(), e.getMessage());
+                warnings.add(new DonorWarningDto(
+                        String.format("Не удалось проверить правило [%s]: %s", rule.getRuleCode(), StringUtils.decapitalize(e.getMessage())),
+                        WarningSeverity.HIGH
+                ));
+            } catch (ExpressionInvocationTargetException e) {
+                if (e.getCause() instanceof MissingContextDataException missingDataEx) {
+                    log.debug("Missing context data (via SpEL) for rule [{}]: {}", rule.getRuleCode(), missingDataEx.getMessage());
+                    warnings.add(new DonorWarningDto(
+                            String.format("Не удалось проверить правило [%s]: %s", rule.getRuleCode(), StringUtils.decapitalize(missingDataEx.getMessage())),
+                            WarningSeverity.HIGH
+                    ));
+                } else {
+                    log.error("Method execution failed in rule [{}]: {}", rule.getRuleCode(), e.getMessage());
+                    warnings.add(new DonorWarningDto(
+                            String.format("Внутренний системный сбой при проверке правила [%s].", rule.getRuleCode()),
+                            WarningSeverity.CRITICAL
+                    ));
+                }
             } catch (SpelEvaluationException e) {
                 SpelMessage msgCode = e.getMessageCode();
 
