@@ -15,8 +15,38 @@
 
 .deviceInfo {
   display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex: 1;
+}
+
+.deviceMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.deviceHeaderRow {
+  display: flex;
   align-items: center;
   gap: 12px;
+  flex-wrap: wrap;
+}
+
+.deviceSubGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  row-gap: 6px;
+}
+
+.subItem {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  white-space: nowrap;
 }
 
 .iconWrapper {
@@ -155,7 +185,10 @@
   }
   .scoreSection {
     align-items: flex-start;
-    margin-top: 8px;
+    margin-top: 12px;
+    width: 100%;
+    padding-top: 12px;
+    border-top: 1px dashed var(--border-color);
   }
   .compHeader {
     flex-direction: column;

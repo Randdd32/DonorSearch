@@ -1,12 +1,32 @@
-import { Outlet, Link, useLocation } from 'react-router-dom';
+import { useState, useRef, useEffect } from 'react';
+import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { clsx } from 'clsx';
-import { Server, ListChecks, Link as LinkIcon, LogOut, Sun, Moon, Menu, Monitor } from 'lucide-react';
+import { Server, ListChecks, Link as LinkIcon, LogOut, Sun, Moon, Menu, Monitor, ChevronDown, User } from 'lucide-react';
 import { useUiStore } from '../../store/uiStore';
 import styles from './DashboardLayout.module.css';
 
 export const DashboardLayout = () => {
   const { theme, toggleTheme, isSidebarOpen, toggleSidebar } = useUiStore();
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const profileRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
+        setIsProfileOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  },[]);
+
+  const handleLogout = () => {
+    setIsProfileOpen(false);
+    navigate('/');
+  };
 
   return (
     <div className={styles.layout}>
@@ -59,15 +79,29 @@ export const DashboardLayout = () => {
               {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
             </button>
             
-            <div className={styles.userProfile}>
-              <div className={styles.avatar}>A</div>
-              <div className={styles.userInfo}>
-                <span className={styles.userName}>Admin</span>
-                <span className={styles.userRole}>Суперадминистратор</span>
+            <div className={styles.profileWrapper} ref={profileRef}>
+              <div className={styles.userProfile} onClick={() => setIsProfileOpen(!isProfileOpen)}>
+                <div className={styles.avatar}>A</div>
+                <div className={styles.userInfo}>
+                  <span className={styles.userName}>Admin</span>
+                  <span className={styles.userRole}>Суперадминистратор</span>
+                </div>
+                <ChevronDown size={16} className={clsx(styles.chevron, { [styles.rotated]: isProfileOpen })} />
               </div>
-              <button className={styles.iconButton} title="Выйти">
-                <LogOut size={18} />
-              </button>
+              
+              {isProfileOpen && (
+                <div className={styles.dropdownMenu}>
+                  <Link to="/profile" className={styles.dropdownItem} onClick={() => setIsProfileOpen(false)}>
+                    <User size={16} />
+                    Мой профиль
+                  </Link>
+                  <div className={styles.dropdownDivider} />
+                  <button className={clsx(styles.dropdownItem, styles.logoutBtn)} onClick={handleLogout}>
+                    <LogOut size={16} />
+                    Выйти из системы
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </header>

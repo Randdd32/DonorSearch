@@ -1,22 +1,15 @@
 import { Link } from 'react-router-dom';
-import { Server, Monitor, Laptop, Box, MapPin, User, Hash, Building } from 'lucide-react';
+import { MapPin, User, Hash, Building } from 'lucide-react';
 import type { ExternalDeviceDto } from '../../../../types/integration';
+import { getStateConfig } from '../../../../utils/formatters';
 import { Card } from '../../../../components/ui/Card/Card';
 import { Badge } from '../../../../components/ui/Badge/Badge';
-import { getStateConfig } from '../../../../utils/formatters';
+import { DeviceIcon } from '../DeviceIcon/DeviceIcon';
 import styles from './DeviceCard.module.css';
 
 interface DeviceCardProps {
   device: ExternalDeviceDto;
 }
-
-const renderDeviceIcon = (typeName: string) => {
-  const lower = typeName?.toLowerCase() || '';
-  if (lower.includes('ноутбук')) return <Laptop size={24} />;
-  if (lower.includes('монитор')) return <Monitor size={24} />;
-  if (lower.includes('сервер') || lower.includes('системный блок') || lower.includes('пк')) return <Server size={24} />;
-  return <Box size={24} />;
-};
 
 export const DeviceCard = ({ device }: DeviceCardProps) => {
   const stateConfig = getStateConfig(device.lifeCycleState);
@@ -26,7 +19,7 @@ export const DeviceCard = ({ device }: DeviceCardProps) => {
       <Card isHoverable className={styles.cardContent}>
         <div className={styles.header}>
           <div className={styles.iconWrapper}>
-            {renderDeviceIcon(device.typeName)}
+            <DeviceIcon typeName={device.typeName} size={24} />
           </div>
           <div className={styles.titleInfo}>
             <h3 className={styles.name}>{device.name || 'Без названия'}</h3>

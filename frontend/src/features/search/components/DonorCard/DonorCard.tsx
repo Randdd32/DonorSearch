@@ -1,8 +1,10 @@
-import { AlertTriangle, Server, Monitor, Info, CheckCircle } from 'lucide-react';
+import { AlertTriangle, Info, CheckCircle, Hash, User, Building, MapPin } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import type { DonorResultDto, WarningSeverity } from '../../../../types/search';
+import { getStateConfig } from '../../../../utils/formatters';
 import { Card } from '../../../../components/ui/Card/Card';
 import { Badge } from '../../../../components/ui/Badge/Badge';
-import { Link } from 'react-router-dom';
+import { DeviceIcon } from '../../../devices/components/DeviceIcon/DeviceIcon';
 import styles from './DonorCard.module.css';
 
 interface DonorCardProps {
@@ -19,20 +21,28 @@ const severityConfig: Record<WarningSeverity, { color: string; label: string }> 
 
 export const DonorCard = ({ result }: DonorCardProps) => {
   const device = result.donorDevice;
-  const isServer = device.typeName?.toLowerCase().includes('сервер');
-  const Icon = isServer ? Server : Monitor;
+  const stateConfig = getStateConfig(device.lifeCycleState);
 
   return (
     <Card className={styles.card}>
       <div className={styles.header}>
         <div className={styles.deviceInfo}>
-          <div className={styles.iconWrapper}><Icon size={24} /></div>
-          <div>
-            <Link to={`/devices/${device.externalId}`} className={styles.deviceName} target="_blank">
-              {device.name || 'Без названия'}
-            </Link>
-            <div className={styles.deviceSub}>
-              Инв. №: {device.inventoryNumber || 'Н/Д'} • {device.locationPath}
+          <div className={styles.iconWrapper}>
+            <DeviceIcon typeName={device.typeName} size={24} />
+          </div>
+          <div className={styles.deviceMeta}>
+            <div className={styles.deviceHeaderRow}>
+              <Link to={`/devices/${device.externalId}`} className={styles.deviceName} target="_blank">
+                {device.name || 'Без названия'}
+              </Link>
+              <Badge variant={stateConfig.variant}>{stateConfig.label}</Badge>
+            </div>
+            
+            <div className={styles.deviceSubGrid}>
+              <div className={styles.subItem}><Hash size={14} /> {device.inventoryNumber || 'Н/Д'}</div>
+              <div className={styles.subItem}><User size={14} /> {device.ownerFullName || 'Неизвестно'}</div>
+              <div className={styles.subItem}><Building size={14} /> {device.departmentName || 'Отдел не указан'}</div>
+              <div className={styles.subItem}><MapPin size={14} /> {device.locationPath}</div>
             </div>
           </div>
         </div>
