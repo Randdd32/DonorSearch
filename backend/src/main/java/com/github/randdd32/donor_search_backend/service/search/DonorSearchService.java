@@ -20,7 +20,6 @@ import com.github.randdd32.donor_search_backend.web.dto.search.CompatibleCompone
 import com.github.randdd32.donor_search_backend.web.dto.search.DonorResultDto;
 import com.github.randdd32.donor_search_backend.web.dto.search.DonorWarningDto;
 import com.github.randdd32.donor_search_backend.web.dto.search.enums.WarningSeverity;
-import com.github.randdd32.donor_search_backend.web.mapper.hardware.ComponentDtoMapperFacade;
 import com.github.randdd32.donor_search_backend.web.mapper.pagination.PageDtoMapper;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -47,7 +46,6 @@ public class DonorSearchService {
     private final InfraDeviceService infraDeviceService;
     private final IntegrationMappingService mappingService;
     private final CompatibilityEngineService compatibilityEngine;
-    private final ComponentDtoMapperFacade componentDtoMapper;
     private final Cache<@NonNull  String, List<DonorResultDto>> searchCache;
 
     @Transactional
@@ -95,7 +93,7 @@ public class DonorSearchService {
 
         Map<String, IntegrationMappingEntity> bulkMappings = mappingService.resolveAndSaveBatch(uniqueDonorExternalNames, targetType);
 
-        List<DonorResultDto> finalResults = candidateDevices.stream()
+        List<DonorResultDto> finalResults = candidateDevices.parallelStream()
                 .map(device -> evaluateDevice(device, targetType, targetContext, bulkMappings))
                 .filter(Objects::nonNull)
                 .toList();
@@ -250,8 +248,7 @@ public class DonorSearchService {
                 }
             }
 
-            Object internalDonorDto = componentDtoMapper.toDto(internalDonor);
-            validComponents.add(new CompatibleComponentDto(rawDonorComp, internalDonorDto, compPenalty, compWarnings));
+            validComponents.add(new CompatibleComponentDto(rawDonorComp, compPenalty, compWarnings));
         }
 
         if (validComponents.isEmpty()) {

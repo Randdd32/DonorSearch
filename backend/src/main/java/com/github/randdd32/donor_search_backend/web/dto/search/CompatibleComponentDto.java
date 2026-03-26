@@ -6,7 +6,6 @@ import java.util.List;
 
 public record CompatibleComponentDto(
         ExternalComponentDto externalInfo,
-        Object internalComponent,
         int componentPenalty,
         List<DonorWarningDto> componentWarnings
 ) {}
