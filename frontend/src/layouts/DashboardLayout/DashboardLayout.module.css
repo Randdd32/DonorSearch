@@ -160,3 +160,27 @@
   padding: 24px;
   overflow-y: auto;
 }
+
+@media (max-width: 830px) {
+  .userRole, .userName {
+    display: none;
+  }
+}
+
+@media (max-width: 630px) {
+  .sidebar {
+    position: fixed;
+    height: 100vh;
+    left: 0;
+    top: 0;
+    transform: translateX(0);
+    box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+  }
+  .sidebar.closed {
+    transform: translateX(-100%);
+    width: 280px; 
+  }
+  .header {
+    padding: 0 12px;
+  }
+}

@@ -10,7 +10,7 @@ interface RunSearchParams {
 
 export const useRunSearch = () => {
   return useMutation({
-    mutationFn: ({ deviceId, adapterId }: RunSearchParams) => 
-      searchService.runSearch(deviceId, adapterId),
+    mutationFn: ({ deviceId, adapterId, category }: RunSearchParams) => 
+      searchService.runSearch(deviceId, adapterId, category)
   });
 };
