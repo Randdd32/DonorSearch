@@ -197,11 +197,15 @@ public class PcBuildContext {
     }
 
     public Integer getAvailPcie8Pin() {
-        return sumPsuPowerPins(PowerSupplyEntity::getPcie8PinConnectors);
+        return sumPsuPowerPins(psu ->
+                psu.getPcie8PinConnectors() + psu.getPcie6Plus2PinConnectors()
+        );
     }
 
     public Integer getAvailPcie6Pin() {
-        return sumPsuPowerPins(PowerSupplyEntity::getPcie6PinConnectors);
+        return sumPsuPowerPins(psu ->
+                psu.getPcie6PinConnectors() + psu.getPcie6Plus2PinConnectors()
+        );
     }
 
     public Integer getAvailPcie12vhpwr() {
