@@ -81,38 +81,75 @@ public class PcBuildContext {
         }
     }
 
-    public Integer getTotalTdpW() {
-        if (cpus.isEmpty()) return null;
+    public List<MemoryEntity> requireMemories() {
+        if (memories.isEmpty()) {
+            throw new IllegalStateException("Нет данных об оперативной памяти");
+        }
+        return memories;
+    }
 
+    public List<CpuEntity> requireCpus() {
+        if (cpus.isEmpty()) {
+            throw new IllegalStateException("Нет данных о процессорах");
+        }
+        return cpus;
+    }
+
+    public List<VideoCardEntity> requireGpus() {
+        requireVideoCapability();
+        return gpus;
+    }
+
+    public List<CpuCoolerEntity> requireCoolers() {
+        if (coolers.isEmpty()) {
+            throw new IllegalStateException("Нет данных о кулерах");
+        }
+        return coolers;
+    }
+
+    public Integer getTotalTdpW() {
+        if (cpus.isEmpty()) {
+            throw new IllegalStateException("В сборке отсутствует информация о процессорах");
+        }
         int cpuTdp = cpus.stream().mapToInt(CpuEntity::getTdpW).sum();
         int gpuTdp = gpus.stream().mapToInt(VideoCardEntity::getTdpW).sum();
         return cpuTdp + gpuTdp;
     }
 
     public Integer getTotalPsuWattage() {
-        if (psus.isEmpty()) return null;
+        if (psus.isEmpty()) {
+            throw new IllegalStateException("В сборке отсутствует информация о блоках питания");
+        }
         return psus.stream().mapToInt(PowerSupplyEntity::getWattageW).sum();
     }
 
     public Integer getTotalRamCapacityGb() {
-        if (memories.isEmpty()) return null;
+        if (memories.isEmpty()) {
+            throw new IllegalStateException("В сборке отсутствует информация об оперативной памяти");
+        }
         return memories.stream().mapToInt(m -> m.getModulesCount() * m.getModulesSizeGb()).sum();
     }
 
     public Integer getTotalRamModules() {
-        if (memories.isEmpty()) return null;
+        if (memories.isEmpty()) {
+            throw new IllegalStateException("В сборке отсутствует информация об оперативной памяти");
+        }
         return memories.stream().mapToInt(MemoryEntity::getModulesCount).sum();
     }
 
     public Integer getStorageCountByFormFactor(String ffName) {
-        if (storages.isEmpty()) return null;
+        if (storages.isEmpty()) {
+            throw new IllegalStateException("В сборке отсутствует информация об накопителях");
+        }
         return (int) storages.stream()
                 .filter(s -> s.getFormFactor() != null && s.getFormFactor().getName().contains(ffName))
                 .count();
     }
 
     public Integer getSataDevicesCount() {
-        if (storages.isEmpty() && opticalDrives.isEmpty()) return null;
+        if (storages.isEmpty()) {
+            throw new IllegalStateException("В сборке отсутствует информация об накопителях");
+        }
 
         long sataDisks = storages.stream()
                 .filter(s -> s.getInterfaces() != null && s.getInterfaces().stream().anyMatch(i -> i.getName().toLowerCase().contains("sata")))
@@ -126,16 +163,23 @@ public class PcBuildContext {
     }
 
     public Integer getTotalGpuSlotWidth() {
-        if (gpus.isEmpty()) return hasVideoCapability() ? 0 : null;
+        if (gpus.isEmpty()) {
+            requireVideoCapability();
+            return 0;
+        }
         return gpus.stream().mapToInt(VideoCardEntity::getSlotWidth).sum();
     }
 
     public Boolean isEccSupported() {
-        if (motherboard == null) return null;
+        if (motherboard == null) {
+            throw new IllegalStateException("В сборке отсутствует информация о материнской плате");
+        }
         if (Boolean.FALSE.equals(motherboard.getEccSupport())) {
             return false;
         }
-        if (cpus.isEmpty()) return null;
+        if (cpus.isEmpty()) {
+            throw new IllegalStateException("В сборке отсутствует информация о процессорах");
+        }
         return cpus.stream()
                 .allMatch(cpu -> Boolean.TRUE.equals(cpu.getEccSupport()));
     }
@@ -164,18 +208,29 @@ public class PcBuildContext {
         return sumPsuPowerPins(PowerSupplyEntity::getPcie12vhpwrConnectors);
     }
 
-    private boolean hasVideoCapability() {
-        if (!gpus.isEmpty()) return true;
-        return cpus.stream().anyMatch(c -> c.getGraphics() != null);
+    private void requireVideoCapability() {
+        if (gpus.isEmpty()) {
+            if (cpus.isEmpty()) {
+                throw new IllegalStateException("В сборке отсутствует информация о процессорах и видеокартах");
+            }
+            if (cpus.stream().noneMatch(c -> c.getGraphics() != null)) {
+                throw new IllegalStateException("В сборке нет дискретной видеокарты и процессора со встроенным видеоядром");
+            }
+        }
     }
 
     private Integer sumGpuPowerPins(ToIntFunction<VideoCardEntity> mapper) {
-        if (gpus.isEmpty()) return hasVideoCapability() ? 0 : null;
+        if (gpus.isEmpty()) {
+            requireVideoCapability();
+            return 0;
+        }
         return gpus.stream().mapToInt(mapper).sum();
     }
 
     private Integer sumPsuPowerPins(ToIntFunction<PowerSupplyEntity> mapper) {
-        if (psus.isEmpty()) return null;
+        if (psus.isEmpty()) {
+            throw new IllegalStateException("В сборке отсутствует информация о блоках питания");
+        }
         return psus.stream().mapToInt(mapper).sum();
     }
 }

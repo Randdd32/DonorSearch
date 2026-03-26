@@ -29,19 +29,19 @@ public class DatabaseInitializer implements CommandLineRunner {
 
     private void initializeRules() {
         createRule("CPU_SOCKET_MATCH",
-                "#ctx.cpus.?[socket.id != #ctx.motherboard.socket.id].isEmpty()",
+                "#ctx.requireCpus().?[socket.id != #ctx.motherboard.socket.id].isEmpty()",
                 "Сокет процессора не поддерживается материнской платой",
                 "Сверяет сокеты всех установленных процессоров с сокетом материнской платы.",
                 Set.of(ComponentType.CPU, ComponentType.MOTHERBOARD));
 
         createRule("COOLER_SOCKET_MATCH",
-                "#ctx.coolers.?[!sockets.contains(#ctx.motherboard.socket)].isEmpty()",
+                "#ctx.requireCoolers().?[!sockets.contains(#ctx.motherboard.socket)].isEmpty()",
                 "Крепление кулера не подходит к сокету материнской платы",
                 "Крепление всех кулеров должно поддерживать текущий сокет материнской платы.",
                 Set.of(ComponentType.CPU_COOLER, ComponentType.MOTHERBOARD));
 
         createRule("RAM_TYPE_MATCH",
-                "#ctx.memories.?[memoryType.id != #ctx.motherboard.memoryType.id].isEmpty()",
+                "#ctx.requireMemories().?[memoryType.id != #ctx.motherboard.memoryType.id].isEmpty()",
                 "Поколение оперативной памяти (DDR) не поддерживается материнской платой",
                 "Поколение всех модулей ОЗУ должно совпадать со слотами на плате.",
                 Set.of(ComponentType.MEMORY, ComponentType.MOTHERBOARD));
@@ -59,25 +59,25 @@ public class DatabaseInitializer implements CommandLineRunner {
                 Set.of(ComponentType.MEMORY, ComponentType.MOTHERBOARD));
 
         createRule("RAM_ECC_SUPPORT_MATCH",
-                "#ctx.memories.?[isEcc && !#ctx.isEccSupported()].isEmpty()",
+                "#ctx.requireMemories().?[isEcc && !#ctx.isEccSupported()].isEmpty()",
                 "Материнская плата или один из процессоров не поддерживают ECC-память",
                 "Серверная память с коррекцией ошибок (ECC) требует поддержки от материнской платы и всех установленных процессоров.",
                 Set.of(ComponentType.MEMORY, ComponentType.MOTHERBOARD, ComponentType.CPU));
 
         createRule("GPU_LENGTH_LIMIT",
-                "#ctx.gpus.?[lengthMm > #ctx.pcCase.maxGpuLenMm].isEmpty()",
+                "#ctx.requireGpus().?[lengthMm > #ctx.pcCase.maxGpuLenMm].isEmpty()",
                 "Видеокарта слишком длинная и не поместится в корпус",
                 "Длина каждой установленной видеокарты проверяется относительно корпуса.",
                 Set.of(ComponentType.VIDEO_CARD, ComponentType.CASE));
 
         createRule("COOLER_HEIGHT_LIMIT",
-                "#ctx.coolers.?[!isWaterCooled && heightMm > #ctx.pcCase.maxCpuCoolerHeightMm].isEmpty()",
+                "#ctx.requireCoolers().?[!isWaterCooled && heightMm > #ctx.pcCase.maxCpuCoolerHeightMm].isEmpty()",
                 "Воздушный кулер слишком высокий: боковая крышка корпуса не закроется",
                 "Высота радиаторов воздушных кулеров проверяется относительно ширины корпуса.",
                 Set.of(ComponentType.CPU_COOLER, ComponentType.CASE));
 
         createRule("WATER_COOLER_SIZE_MATCH",
-                "#ctx.coolers.?[isWaterCooled && !#ctx.pcCase.radiatorSizes.contains(waterCooledSizeMm)].isEmpty()",
+                "#ctx.requireCoolers().?[isWaterCooled && !#ctx.pcCase.radiatorSizes.contains(waterCooledSizeMm)].isEmpty()",
                 "Радиатор жидкостного охлаждения данного размера не поддерживается корпусом",
                 "Размер радиатора СЖО (например, 240мм, 360мм) должен входить в список поддерживаемых корпусом.",
                 Set.of(ComponentType.CPU_COOLER, ComponentType.CASE));
@@ -149,7 +149,7 @@ public class DatabaseInitializer implements CommandLineRunner {
                 Set.of(ComponentType.STORAGE, ComponentType.OPTICAL_DRIVE, ComponentType.MOTHERBOARD));
 
         createRule("MOBO_PCIE_X16_LIMIT",
-                "#ctx.gpus.size() <= #ctx.motherboard.pciX16Slots",
+                "#ctx.requireGpus().size() <= #ctx.motherboard.pciX16Slots",
                 "Количество видеокарт превышает количество слотов PCIe x16 на материнской плате",
                 "Невозможно вставить GPU, если нет полноразмерных слотов расширения.",
                 Set.of(ComponentType.VIDEO_CARD, ComponentType.MOTHERBOARD));
