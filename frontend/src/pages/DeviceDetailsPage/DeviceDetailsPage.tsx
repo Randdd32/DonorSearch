@@ -181,7 +181,7 @@ export const DeviceDetailsPage = () => {
                   })
                 ) : (
                   <Card className={styles.missingComponentCard}>
-                    <span className={styles.missingText}>Оборудование не установлено</span>
+                    <span className={styles.missingText}>Нет информации об оборудовании</span>
                     <Button 
                       variant="ghost" 
                       disabled={isSearching}
