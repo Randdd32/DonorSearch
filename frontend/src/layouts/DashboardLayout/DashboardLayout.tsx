@@ -1,6 +1,6 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { clsx } from 'clsx';
-import { LayoutDashboard, Settings, LogOut, Sun, Moon, Menu, Monitor } from 'lucide-react';
+import { Server, ListChecks, Link as LinkIcon, LogOut, Sun, Moon, Menu, Monitor } from 'lucide-react';
 import { useUiStore } from '../../store/uiStore';
 import styles from './DashboardLayout.module.css';
 
@@ -12,10 +12,10 @@ export const DashboardLayout = () => {
     <div className={styles.layout}>
       <aside className={clsx(styles.sidebar, { [styles.closed]: !isSidebarOpen })}>
         <div className={styles.sidebarHeader}>
-          <div className={styles.logo}>
+          <Link to="/" className={styles.logo}>
             <Monitor size={24} className={styles.logoIcon} />
             {isSidebarOpen && <span>DonorSearch</span>}
-          </div>
+          </Link>
         </div>
         
         <nav className={styles.nav}>
@@ -23,7 +23,7 @@ export const DashboardLayout = () => {
             to="/" 
             className={clsx(styles.navItem, { [styles.active]: location.pathname === '/' })}
           >
-            <Monitor size={20} />
+            <Server size={20} className={styles.navIcon} />
             {isSidebarOpen && <span>Учетные единицы</span>}
           </Link>
 
@@ -31,7 +31,7 @@ export const DashboardLayout = () => {
             to="/compatibility" 
             className={clsx(styles.navItem, { [styles.active]: location.pathname === '/compatibility' })}
           >
-            <LayoutDashboard size={20} />
+            <ListChecks size={20} className={styles.navIcon} />
             {isSidebarOpen && <span>Правила совместимости</span>}
           </Link>
 
@@ -39,7 +39,7 @@ export const DashboardLayout = () => {
             to="/mappings" 
             className={clsx(styles.navItem, { [styles.active]: location.pathname === '/mappings' })}
           >
-            <Settings size={20} />
+            <LinkIcon size={20} className={styles.navIcon} />
             {isSidebarOpen && <span>Таблица сопоставления</span>}
           </Link>
         </nav>

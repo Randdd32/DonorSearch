@@ -1,7 +1,8 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   ArrowLeft, Cpu, HardDrive, MemoryStick, Monitor, 
-  Settings, Box, Fan, Volume2, ShieldAlert, CheckCircle2, Search
+  Fan, ShieldAlert, CheckCircle2, Search,
+  CircuitBoard, Zap, Disc3, Blocks, Gpu, PcCase
 } from 'lucide-react';
 import { useDeviceDetails } from '../../features/devices/hooks/useDeviceDetails';
 import { useRunSearch } from '../../features/search/hooks/useRunSearch';
@@ -9,22 +10,23 @@ import { Spinner } from '../../components/ui/Spinner/Spinner';
 import { Card } from '../../components/ui/Card/Card';
 import { Badge } from '../../components/ui/Badge/Badge';
 import { Button } from '../../components/ui/Button/Button';
+import { getStateConfig, formatDateTime } from '../../utils/formatters';
 import type { ExternalComponentDto, ExternalComponentCategory } from '../../types/integration';
 import styles from './DeviceDetailsPage.module.css';
 
 const categoryConfig: Record<string, { label: string; icon: React.ElementType }> = {
   CPU: { label: 'Процессоры', icon: Cpu },
-  MOTHERBOARD: { label: 'Материнские платы', icon: Settings },
+  MOTHERBOARD: { label: 'Материнские платы', icon: CircuitBoard },
   MEMORY: { label: 'Оперативная память', icon: MemoryStick },
   STORAGE: { label: 'Накопители', icon: HardDrive },
-  VIDEO_CARD: { label: 'Видеокарты', icon: Monitor },
-  POWER_SUPPLY: { label: 'Блоки питания', icon: Box },
-  CASE: { label: 'Корпуса', icon: Box },
+  VIDEO_CARD: { label: 'Видеокарты', icon: Gpu },
+  POWER_SUPPLY: { label: 'Блоки питания', icon: Zap },
+  CASE: { label: 'Корпуса', icon: PcCase },
   CASE_FAN: { label: 'Вентиляторы', icon: Fan },
-  OPTICAL_DRIVE: { label: 'Оптические приводы', icon: HardDrive },
-  EXPANSION_CARD: { label: 'Карты расширения', icon: Volume2 },
+  OPTICAL_DRIVE: { label: 'Оптические приводы', icon: Disc3 },
+  EXPANSION_CARD: { label: 'Карты расширения', icon: Blocks },
   MONITOR: { label: 'Мониторы', icon: Monitor },
-  UNKNOWN: { label: 'Неизвестное оборудование', icon: ShieldAlert },
+  UNKNOWN: { label: 'Неизвестное оборудование', icon: ShieldAlert }
 };
 
 export const DeviceDetailsPage = () => {
@@ -36,6 +38,8 @@ export const DeviceDetailsPage = () => {
 
   if (isLoading) return <Spinner fullPage size={40} />;
   if (isError || !device) return <div className={styles.error}>Ошибка загрузки данных устройства.</div>;
+
+  const stateConfig = getStateConfig(device.lifeCycleState);
 
   const groupedComponents = device.components.reduce((acc, comp) => {
     if (!acc[comp.category]) acc[comp.category] = [];
@@ -63,13 +67,18 @@ export const DeviceDetailsPage = () => {
 
       <Card className={styles.headerCard}>
         <div className={styles.headerTop}>
-          <div>
+           <div>
             <h1 className={styles.title}>{device.name}</h1>
-            <p className={styles.subtitle}>{device.typeName} • {device.manufacturerName}</p>
+            <p className={styles.subtitle}>
+              {device.typeName} • {device.manufacturerName} {device.modelName ? `(${device.modelName})` : ''}
+            </p>
           </div>
-          <Badge variant={device.isWorking ? 'success' : 'danger'}>
-            {device.isWorking ? 'Работает' : 'Неисправно'}
-          </Badge>
+          <div className={styles.badgesWrapper}>
+            <Badge variant={stateConfig.variant}>{stateConfig.label}</Badge>
+            <Badge variant={device.isWorking ? 'success' : 'danger'}>
+              {device.isWorking ? 'Исправно' : 'Неисправно'}
+            </Badge>
+          </div>
         </div>
         
         <div className={styles.infoGrid}>
@@ -82,12 +91,20 @@ export const DeviceDetailsPage = () => {
             <span className={styles.infoValue}>{device.serialNumber || 'Н/Д'}</span>
           </div>
           <div className={styles.infoItem}>
+            <span className={styles.infoLabel}>Пользователь</span>
+            <span className={styles.infoValue}>{device.ownerFullName}</span>
+          </div>
+          <div className={styles.infoItem}>
+            <span className={styles.infoLabel}>Отдел</span>
+            <span className={styles.infoValue}>{device.departmentName || 'Н/Д'}</span>
+          </div>
+          <div className={styles.infoItem}>
             <span className={styles.infoLabel}>Расположение</span>
             <span className={styles.infoValue}>{device.locationPath}</span>
           </div>
           <div className={styles.infoItem}>
-            <span className={styles.infoLabel}>Пользователь</span>
-            <span className={styles.infoValue}>{device.ownerFullName}</span>
+            <span className={styles.infoLabel}>Дата поступления</span>
+            <span className={styles.infoValue}>{formatDateTime(device.dateReceived)}</span>
           </div>
         </div>
       </Card>

@@ -148,3 +148,5 @@
   font-size: 14px;
   padding: 20px 0;
 }
+
+.badgesWrapper { display: flex; gap: 8px; }

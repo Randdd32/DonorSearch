@@ -13,15 +13,21 @@ export const DevicesPage = () => {
   const debouncedSearch = useDebounce(searchValue, 500);
   
   const [page, setPage] = useState(0);
+   const [pageSize, setPageSize] = useState(24);
 
   const { data, isLoading, isError } = useDevices({ 
     page: debouncedSearch !== searchValue ? 0 : page,
-    size: 24,
+    size: pageSize,
     search: debouncedSearch || undefined
   });
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValue(e.target.value);
+    setPage(0);
+  };
+
+  const handlePageSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setPageSize(Number(e.target.value));
     setPage(0);
   };
 
@@ -64,32 +70,36 @@ export const DevicesPage = () => {
             ))}
           </div>
           
-          {data && data.totalPages > 1 && (
+          {data && (
             <div className={styles.pagination}>
-              <span className={styles.pageInfo}>
-                Показано {data.items.length} из {data.totalItems}
-              </span>
-              <div className={styles.paginationControls}>
-                <Button 
-                  variant="secondary" 
-                  disabled={data.isFirst} 
-                  onClick={() => setPage((p) => Math.max(0, p - 1))}
+              <div className={styles.pageSizeSelector}>
+                <span>Показывать:</span>
+                <select 
+                  className={styles.select} 
+                  value={pageSize} 
+                  onChange={handlePageSizeChange}
                 >
-                  <ChevronLeft size={18} />
-                  Назад
-                </Button>
-                <span className={styles.pageNumber}>
-                  {data.currentPage + 1} / {data.totalPages}
+                  <option value={6}>6</option>
+                  <option value={12}>12</option>
+                  <option value={24}>24</option>
+                  <option value={48}>48</option>
+                </select>
+                <span className={styles.pageInfo}>
+                  из {data.totalItems} записей
                 </span>
-                <Button 
-                  variant="secondary" 
-                  disabled={data.isLast} 
-                  onClick={() => setPage((p) => p + 1)}
-                >
-                  Вперед
-                  <ChevronRight size={18} />
-                </Button>
               </div>
+
+              {data.totalPages > 1 && (
+                <div className={styles.paginationControls}>
+                  <Button variant="secondary" disabled={data.isFirst} onClick={() => setPage((p) => Math.max(0, p - 1))}>
+                    <ChevronLeft size={18} /> Назад
+                  </Button>
+                  <span className={styles.pageNumber}>{data.currentPage + 1} / {data.totalPages}</span>
+                  <Button variant="secondary" disabled={data.isLast} onClick={() => setPage((p) => p + 1)}>
+                    Вперед <ChevronRight size={18} />
+                  </Button>
+                </div>
+              )}
             </div>
           )}
         </>

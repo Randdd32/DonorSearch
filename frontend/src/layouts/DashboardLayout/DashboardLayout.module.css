@@ -35,6 +35,7 @@
   font-size: 18px;
   color: var(--text-primary);
   white-space: nowrap;
+  text-decoration: none;
 }
 .logoIcon {
   color: var(--primary-color);
@@ -46,6 +47,11 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
+}
+
+.navIcon {
+  flex-shrink: 0;
+  min-width: 20px;
 }
 
 .navItem {
