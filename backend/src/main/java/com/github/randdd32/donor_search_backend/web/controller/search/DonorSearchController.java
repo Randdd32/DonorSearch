@@ -2,6 +2,7 @@ package com.github.randdd32.donor_search_backend.web.controller.search;
 
 import com.github.randdd32.donor_search_backend.core.configuration.Constants;
 import com.github.randdd32.donor_search_backend.service.search.DonorSearchService;
+import com.github.randdd32.donor_search_backend.web.dto.integration.enums.ExternalComponentCategory;
 import com.github.randdd32.donor_search_backend.web.dto.pagination.PageDto;
 import com.github.randdd32.donor_search_backend.web.dto.search.DonorResultDto;
 import lombok.RequiredArgsConstructor;
@@ -25,8 +26,11 @@ public class DonorSearchController {
     private final DonorSearchService searchService;
 
     @PostMapping("/run")
-    public Map<String, String> runSearch(@RequestParam Long targetDeviceId, @RequestParam Long targetAdapterId) {
-        String sessionId = searchService.runSearch(targetDeviceId, targetAdapterId);
+    public Map<String, String> runSearch(
+            @RequestParam Long targetDeviceId,
+            @RequestParam(required = false) Long targetAdapterId,
+            @RequestParam(required = false) ExternalComponentCategory category) {
+        String sessionId = searchService.runSearch(targetDeviceId, targetAdapterId, category);
         return Map.of("sessionId", sessionId);
     }
 

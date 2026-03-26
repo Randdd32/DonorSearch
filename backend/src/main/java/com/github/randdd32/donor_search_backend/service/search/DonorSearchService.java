@@ -51,17 +51,27 @@ public class DonorSearchService {
     private final Cache<@NonNull  String, List<DonorResultDto>> searchCache;
 
     @Transactional
-    public String runSearch(Long targetDeviceId, Long targetAdapterId) {
+    public String runSearch(Long targetDeviceId, Long targetAdapterId, ExternalComponentCategory category) {
         ExternalDeviceDto targetDevice = infraDeviceService.getDeviceDetails(targetDeviceId);
-        ExternalComponentDto targetComponent = targetDevice.components().stream()
-                .filter(c -> c.adapterId().equals(targetAdapterId))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Target adapter not found in device"));
 
-        if (targetComponent.category() == ExternalComponentCategory.UNKNOWN) {
+        ExternalComponentCategory targetCategory;
+        if (targetAdapterId != null) {
+            ExternalComponentDto targetComponent = targetDevice.components().stream()
+                    .filter(c -> c.adapterId().equals(targetAdapterId))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("Target adapter not found in device"));
+            targetCategory = targetComponent.category();
+        } else if (category != null) {
+            targetCategory = category;
+        } else {
+            throw new IllegalArgumentException("Must provide either targetAdapterId or category");
+        }
+
+        if (targetCategory == ExternalComponentCategory.UNKNOWN) {
             throw new IllegalArgumentException("Target component category is UNKNOWN. Cannot proceed");
         }
-        ComponentType targetType = ComponentType.valueOf(targetComponent.category().name());
+
+        ComponentType targetType = ComponentType.valueOf(targetCategory.name());
 
         PcBuildContext targetContext = new PcBuildContext();
         for (ExternalComponentDto comp : targetDevice.components()) {
@@ -74,11 +84,11 @@ public class DonorSearchService {
             }
         }
 
-        List<ExternalDeviceDto> candidateDevices = infraDeviceService.getPotentialDonors(targetDeviceId, targetComponent.category());
+        List<ExternalDeviceDto> candidateDevices = infraDeviceService.getPotentialDonors(targetDeviceId, targetCategory);
 
         Set<String> uniqueDonorExternalNames = candidateDevices.stream()
                 .flatMap(d -> d.components().stream())
-                .filter(c -> c.category() == targetComponent.category())
+                .filter(c -> c.category() == targetCategory)
                 .map(ExternalComponentDto::externalName)
                 .filter(name -> name != null && !name.isBlank())
                 .collect(Collectors.toSet());
