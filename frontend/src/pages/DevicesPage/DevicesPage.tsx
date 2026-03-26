@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import { Search, PackageOpen, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, PackageOpen } from 'lucide-react';
 import { useDevices } from '../../features/devices/hooks/useDevices';
 import { useDebounce } from '../../hooks/useDebounce';
 import { ErrorState } from '../../components/ui/ErrorState/ErrorState';
 import { EmptyState } from '../../components/ui/EmptyState/EmptyState';
 import { Input } from '../../components/ui/Input/Input';
-import { Button } from '../../components/ui/Button/Button';
 import { Spinner } from '../../components/ui/Spinner/Spinner';
 import { DeviceCard } from '../../features/devices/components/DeviceCard/DeviceCard';
+import { Pagination } from '../../components/ui/Pagination/Pagination';
 import styles from './DevicesPage.module.css';
 
 export const DevicesPage = () => {
@@ -15,7 +15,7 @@ export const DevicesPage = () => {
   const debouncedSearch = useDebounce(searchValue, 500);
   
   const [page, setPage] = useState(0);
-   const [pageSize, setPageSize] = useState(24);
+  const [pageSize, setPageSize] = useState(24);
 
   const { data, isLoading, isError } = useDevices({ 
     page: debouncedSearch !== searchValue ? 0 : page,
@@ -25,11 +25,6 @@ export const DevicesPage = () => {
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValue(e.target.value);
-    setPage(0);
-  };
-
-  const handlePageSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setPageSize(Number(e.target.value));
     setPage(0);
   };
 
@@ -77,37 +72,19 @@ export const DevicesPage = () => {
             ))}
           </div>
           
-          {data && (
-            <div className={styles.pagination}>
-              <div className={styles.pageSizeSelector}>
-                <span>Показывать:</span>
-                <select 
-                  className={styles.select} 
-                  value={pageSize} 
-                  onChange={handlePageSizeChange}
-                >
-                  <option value={6}>6</option>
-                  <option value={12}>12</option>
-                  <option value={24}>24</option>
-                  <option value={48}>48</option>
-                </select>
-                <span className={styles.pageInfo}>
-                  из {data.totalItems} записей
-                </span>
-              </div>
-
-              {data.totalPages > 1 && (
-                <div className={styles.paginationControls}>
-                  <Button variant="secondary" disabled={data.isFirst} onClick={() => setPage((p) => Math.max(0, p - 1))}>
-                    <ChevronLeft size={18} /> Назад
-                  </Button>
-                  <span className={styles.pageNumber}>{data.currentPage + 1} / {data.totalPages}</span>
-                  <Button variant="secondary" disabled={data.isLast} onClick={() => setPage((p) => p + 1)}>
-                    Вперед <ChevronRight size={18} />
-                  </Button>
-                </div>
-              )}
-            </div>
+          {data && data.totalItems > 0 && (
+            <Pagination
+              currentPage={data.currentPage}
+              totalPages={data.totalPages}
+              totalItems={data.totalItems}
+              pageSize={data.currentSize}
+              onPageChange={setPage}
+              onPageSizeChange={(size) => {
+                setPageSize(size);
+                setPage(0);
+              }}
+              pageSizeOptions={[6, 12, 24, 48, 96]}
+            />
           )}
         </>
       )}

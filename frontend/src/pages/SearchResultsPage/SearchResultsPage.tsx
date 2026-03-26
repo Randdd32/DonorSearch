@@ -1,22 +1,24 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, SearchX, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowLeft, SearchX } from 'lucide-react';
 import { useSearchResults } from '../../features/search/hooks/useSearchResults';
 import { ErrorState } from '../../components/ui/ErrorState/ErrorState';
 import { EmptyState } from '../../components/ui/EmptyState/EmptyState';
 import { DonorCard } from '../../features/search/components/DonorCard/DonorCard';
 import { Button } from '../../components/ui/Button/Button';
 import { Spinner } from '../../components/ui/Spinner/Spinner';
+import { Pagination } from '../../components/ui/Pagination/Pagination';
 import styles from './SearchResultsPage.module.css';
 
 export const SearchResultsPage = () => {
   const { sessionId } = useParams<{ sessionId: string }>();
   const navigate = useNavigate();
   const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
 
   const { data, isLoading, isError } = useSearchResults(sessionId!, {
     page,
-    size: 10
+    size: pageSize
   });
 
   if (isLoading) return <Spinner fullPage size={40} />;
@@ -57,30 +59,18 @@ export const SearchResultsPage = () => {
             <DonorCard key={`${result.donorDevice.externalId}-${idx}`} result={result} />
           ))}
 
-          {/* Пагинация */}
-          {data && data.totalPages > 1 && (
-            <div className={styles.pagination}>
-              <span className={styles.pageInfo}>
-                Показано {data.items.length} из {data.totalItems} доноров
-              </span>
-              <div className={styles.paginationControls}>
-                <Button 
-                  variant="secondary" 
-                  disabled={data.isFirst} 
-                  onClick={() => setPage((p) => Math.max(0, p - 1))}
-                >
-                  <ChevronLeft size={18} /> Назад
-                </Button>
-                <span className={styles.pageNumber}>{data.currentPage + 1} / {data.totalPages}</span>
-                <Button 
-                  variant="secondary" 
-                  disabled={data.isLast} 
-                  onClick={() => setPage((p) => p + 1)}
-                >
-                  Вперед <ChevronRight size={18} />
-                </Button>
-              </div>
-            </div>
+          {data && data.totalItems > 0 && (
+            <Pagination
+              currentPage={data.currentPage}
+              totalPages={data.totalPages}
+              totalItems={data.totalItems}
+              pageSize={data.currentSize}
+              onPageChange={setPage}
+              onPageSizeChange={(size) => {
+                setPageSize(size);
+                setPage(0);
+              }}
+            />
           )}
         </div>
       )}
