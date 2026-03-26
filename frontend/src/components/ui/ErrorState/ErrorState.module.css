@@ -1,0 +1,34 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-secondary);
+  background-color: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  border: 1px dashed var(--status-critical);
+  margin: 24px 0;
+}
+
+.icon {
+  color: var(--status-critical);
+  margin-bottom: 16px;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.message {
+  font-size: 14px;
+  max-width: 400px;
+}
+
+.actionBtn {
+  margin-top: 20px;
+}

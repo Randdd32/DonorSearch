@@ -42,31 +42,6 @@
   gap: 20px;
 }
 
-.emptyState {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 80px 20px;
-  color: var(--text-secondary);
-  background-color: var(--bg-surface);
-  border-radius: var(--radius-lg);
-  border: 1px dashed var(--border-color);
-}
-
-.emptyIcon {
-  color: var(--text-muted);
-  margin-bottom: 16px;
-}
-
-.emptyState h3 {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 8px;
-}
-
 .pagination {
   display: flex;
   align-items: center;

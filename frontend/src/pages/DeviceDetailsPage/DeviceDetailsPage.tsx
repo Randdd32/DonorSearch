@@ -1,11 +1,12 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   ArrowLeft, Cpu, HardDrive, MemoryStick, Monitor, 
-  Fan, ShieldAlert, CheckCircle2, Search,
-  CircuitBoard, Zap, Disc3, Blocks, Gpu, PcCase
+  Fan, ShieldAlert, CheckCircle2, Search, CircuitBoard, 
+  Zap, Disc3, Blocks, Gpu, PcCase
 } from 'lucide-react';
 import { useDeviceDetails } from '../../features/devices/hooks/useDeviceDetails';
 import { useRunSearch } from '../../features/search/hooks/useRunSearch';
+import { ErrorState } from '../../components/ui/ErrorState/ErrorState';
 import { Spinner } from '../../components/ui/Spinner/Spinner';
 import { Card } from '../../components/ui/Card/Card';
 import { Badge } from '../../components/ui/Badge/Badge';
@@ -37,7 +38,16 @@ export const DeviceDetailsPage = () => {
   const { mutate: runSearch, isPending: isSearching } = useRunSearch();
 
   if (isLoading) return <Spinner fullPage size={40} />;
-  if (isError || !device) return <div className={styles.error}>Ошибка загрузки данных устройства.</div>;
+  if (isError || !device) {
+    return (
+      <ErrorState 
+        title="Ошибка загрузки данных"
+        message="Не удалось получить информацию об устройстве. Возможно, оно было удалено или сервер недоступен."
+        onAction={() => navigate(-1)}
+        actionLabel="Вернуться назад"
+      />
+    );
+  }
 
   const stateConfig = getStateConfig(device.lifeCycleState);
 

@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Search, PackageOpen, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useDevices } from '../../features/devices/hooks/useDevices';
 import { useDebounce } from '../../hooks/useDebounce';
+import { ErrorState } from '../../components/ui/ErrorState/ErrorState';
+import { EmptyState } from '../../components/ui/EmptyState/EmptyState';
 import { Input } from '../../components/ui/Input/Input';
 import { Button } from '../../components/ui/Button/Button';
 import { Spinner } from '../../components/ui/Spinner/Spinner';
@@ -32,7 +34,12 @@ export const DevicesPage = () => {
   };
 
   if (isError) {
-    return <div className={styles.error}>Ошибка при загрузке данных. Проверьте соединение с сервером.</div>;
+    return (
+      <ErrorState 
+        onAction={() => window.location.reload()} 
+        actionLabel="Обновить страницу" 
+      />
+    );
   }
 
   return (
@@ -57,11 +64,11 @@ export const DevicesPage = () => {
       {isLoading ? (
         <Spinner fullPage size={40} />
       ) : data?.items.length === 0 ? (
-        <div className={styles.emptyState}>
-          <PackageOpen size={64} className={styles.emptyIcon} />
-          <h3>Оборудование не найдено</h3>
-          <p>По вашему запросу ничего не нашлось. Попробуйте изменить параметры поиска.</p>
-        </div>
+        <EmptyState 
+          icon={<PackageOpen size={64} />}
+          title="Оборудование не найдено"
+          message="По вашему запросу ничего не нашлось. Попробуйте изменить параметры поиска."
+        />
       ) : (
         <>
           <div className={styles.grid}>

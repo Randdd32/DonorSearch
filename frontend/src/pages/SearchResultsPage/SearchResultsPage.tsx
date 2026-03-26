@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, SearchX, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useSearchResults } from '../../features/search/hooks/useSearchResults';
+import { ErrorState } from '../../components/ui/ErrorState/ErrorState';
+import { EmptyState } from '../../components/ui/EmptyState/EmptyState';
 import { DonorCard } from '../../features/search/components/DonorCard/DonorCard';
 import { Button } from '../../components/ui/Button/Button';
 import { Spinner } from '../../components/ui/Spinner/Spinner';
@@ -21,12 +23,12 @@ export const SearchResultsPage = () => {
 
   if (isError) {
     return (
-      <div className={styles.emptyState}>
-        <SearchX size={48} className={styles.emptyIcon} />
-        <h3>Сессия истекла или не найдена</h3>
-        <p>Пожалуйста, вернитесь к устройству и запустите поиск заново.</p>
-        <Button onClick={() => navigate('/')} className={styles.goHomeBtn}>На главную</Button>
-      </div>
+      <ErrorState 
+        title="Сессия истекла или не найдена"
+        message="Пожалуйста, вернитесь к устройству и запустите поиск заново."
+        onAction={() => navigate('/')}
+        actionLabel="На главную"
+      />
     );
   }
 
@@ -44,11 +46,11 @@ export const SearchResultsPage = () => {
       </div>
 
       {data?.items.length === 0 ? (
-        <div className={styles.emptyState}>
-          <SearchX size={48} className={styles.emptyIcon} />
-          <h3>Доноров не найдено</h3>
-          <p>В базе нет устройств с подходящими совместимыми деталями для вашего оборудования.</p>
-        </div>
+        <EmptyState 
+          icon={<SearchX size={48} />}
+          title="Доноров не найдено"
+          message="В базе нет устройств с подходящими совместимыми деталями для вашего оборудования."
+        />
       ) : (
         <div className={styles.resultsList}>
           {data?.items.map((result, idx) => (
