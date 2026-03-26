@@ -9,7 +9,6 @@ export interface DonorWarningDto {
 
 export interface CompatibleComponentDto {
   externalInfo: ExternalComponentDto;
-  internalComponent: Record<string, unknown> | null;
   componentPenalty: number;
   componentWarnings: DonorWarningDto[];
 }
