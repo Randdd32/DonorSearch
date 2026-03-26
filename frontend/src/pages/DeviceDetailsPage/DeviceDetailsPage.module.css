@@ -143,10 +143,20 @@
   gap: 12px;
 }
 
-.emptyComponents {
-  color: var(--text-secondary);
+.missingComponentCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background-color: color-mix(in srgb, var(--bg-hover) 50%, transparent);
+  border: 1px dashed var(--border-color);
+  box-shadow: none;
+}
+
+.missingText {
   font-size: 14px;
-  padding: 20px 0;
+  color: var(--text-muted);
+  font-style: italic;
 }
 
 .badgesWrapper { display: flex; gap: 8px; }

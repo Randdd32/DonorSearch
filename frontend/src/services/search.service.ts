@@ -1,4 +1,5 @@
 import { apiClient } from '../config/api';
+import type { ExternalComponentCategory } from '../types/integration';
 import type { PageDto } from '../types/pagination';
 import type { DonorResultDto } from '../types/search';
 
@@ -10,9 +11,9 @@ export interface GetSearchResultsParams {
 }
 
 export const searchService = {
-  async runSearch(targetDeviceId: number, targetAdapterId: number): Promise<{ sessionId: string }> {
+  async runSearch(targetDeviceId: number, targetAdapterId?: number, category?: ExternalComponentCategory): Promise<{ sessionId: string }> {
     const { data } = await apiClient.post<{ sessionId: string }>('/search/run', null, {
-      params: { targetDeviceId, targetAdapterId }
+      params: { targetDeviceId, targetAdapterId, category }
     });
     return data;
   },

@@ -2,7 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { 
   ArrowLeft, Cpu, HardDrive, MemoryStick, Monitor, 
   Fan, ShieldAlert, CheckCircle2, Search, CircuitBoard, 
-  Zap, Disc3, Blocks, Gpu, PcCase
+  Zap, Disc3, Blocks, Gpu, PcCase, Snowflake
 } from 'lucide-react';
 import { useDeviceDetails } from '../../features/devices/hooks/useDeviceDetails';
 import { useRunSearch } from '../../features/search/hooks/useRunSearch';
@@ -17,6 +17,7 @@ import styles from './DeviceDetailsPage.module.css';
 
 const categoryConfig: Record<string, { label: string; icon: React.ElementType }> = {
   CPU: { label: 'Процессоры', icon: Cpu },
+  СPU_COOLER: { label: 'Кулеры для процессоров', icon: Snowflake },
   MOTHERBOARD: { label: 'Материнские платы', icon: CircuitBoard },
   MEMORY: { label: 'Оперативная память', icon: MemoryStick },
   STORAGE: { label: 'Накопители', icon: HardDrive },
@@ -29,6 +30,11 @@ const categoryConfig: Record<string, { label: string; icon: React.ElementType }>
   MONITOR: { label: 'Мониторы', icon: Monitor },
   UNKNOWN: { label: 'Неизвестное оборудование', icon: ShieldAlert }
 };
+
+const ALL_CATEGORIES: ExternalComponentCategory[] =[
+  'CPU', 'MOTHERBOARD', 'MEMORY', 'VIDEO_CARD', 'STORAGE', 'POWER_SUPPLY',
+  'CASE', 'CASE_FAN', 'CPU_COOLER', 'OPTICAL_DRIVE', 'EXPANSION_CARD', 'MONITOR'
+];
 
 export const DeviceDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -57,14 +63,10 @@ export const DeviceDetailsPage = () => {
     return acc;
   }, {} as Record<ExternalComponentCategory, ExternalComponentDto[]>);
 
-  const handleSearchDonor = (adapterId: number) => {
+  const handleSearchDonor = (adapterId?: number, category?: ExternalComponentCategory) => {
     runSearch(
-      { deviceId: device.externalId, adapterId },
-      {
-        onSuccess: (data) => {
-          navigate(`/search/results/${data.sessionId}`);
-        }
-      }
+      { deviceId: device.externalId, adapterId, category },
+      { onSuccess: (data) => navigate(`/search/results/${data.sessionId}`) }
     );
   };
 
@@ -122,8 +124,9 @@ export const DeviceDetailsPage = () => {
       <h2 className={styles.sectionTitle}>Компонентный состав</h2>
 
       <div className={styles.componentsLayout}>
-        {Object.entries(groupedComponents).map(([category, components]) => {
-          const config = categoryConfig[category] || categoryConfig['UNKNOWN'];
+        {ALL_CATEGORIES.map(category => {
+          const components = groupedComponents[category] || [];
+          const config = categoryConfig[category];
           const Icon = config.icon;
 
           return (
@@ -134,59 +137,66 @@ export const DeviceDetailsPage = () => {
               </h3>
               
               <div className={styles.componentList}>
-                {components.map(comp => {
-                  const isMapped = comp.mappedComponentId !== null;
-
-                  return (
-                    <Card key={comp.adapterId} className={styles.componentCard}>
-                      <div className={styles.compInfo}>
-                        <div className={styles.compNameRow}>
-                          <span className={styles.compName}>{comp.externalName || 'Без названия'}</span>
-                          {isMapped ? (
-                            <span title="Деталь распознана">
-                              <CheckCircle2 size={16} className={styles.iconSuccess} />
-                            </span>
-                          ) : (
-                            <span title="Деталь не распознана в базе">
-                              <ShieldAlert size={16} className={styles.iconWarning} />
-                            </span>
-                          )}
+                {components.length > 0 ? (
+                  components.map(comp => {
+                    const isMapped = comp.mappedComponentId !== null;
+                    return (
+                      <Card key={comp.adapterId} className={styles.componentCard}>
+                        <div className={styles.compInfo}>
+                          <div className={styles.compNameRow}>
+                            <span className={styles.compName}>{comp.externalName || 'Без названия'}</span>
+                            {isMapped ? (
+                              <span title="Деталь распознана">
+                                <CheckCircle2 size={16} className={styles.iconSuccess} />
+                              </span>
+                            ) : (
+                              <span title="Деталь не распознана в базе">
+                                <ShieldAlert size={16} className={styles.iconWarning} />
+                              </span>
+                            )}
+                          </div>
+                          <span className={styles.compSub}>
+                            SN: {comp.serialNumber || 'Н/Д'} • {comp.manufacturerName || 'Неизвестный производитель'}
+                          </span>
                         </div>
-                        <span className={styles.compSub}>
-                          SN: {comp.serialNumber || 'Н/Д'} • {comp.manufacturerName || 'Неизвестный производитель'}
-                        </span>
-                      </div>
 
-                      <div className={styles.compActions}>
-                        {!isMapped && (
+                        <div className={styles.compActions}>
+                          {!isMapped && (
+                            <Button variant="secondary" onClick={() => navigate('/mappings')}>
+                              Сопоставить
+                            </Button>
+                          )}
                           <Button 
-                            variant="secondary" 
-                            onClick={() => navigate('/mappings')}
+                            variant="primary" 
+                            disabled={isSearching}
+                            isLoading={isSearching}
+                            onClick={() => handleSearchDonor(comp.adapterId)}
                           >
-                            Сопоставить
+                            <Search size={16} />
+                            Подобрать замену
                           </Button>
-                        )}
-                        
-                        <Button 
-                          variant="primary" 
-                          disabled={isSearching}
-                          isLoading={isSearching}
-                          onClick={() => handleSearchDonor(comp.adapterId)}
-                        >
-                          <Search size={16} />
-                          Подобрать донора
-                        </Button>
-                      </div>
-                    </Card>
-                  );
-                })}
+                        </div>
+                      </Card>
+                    );
+                  })
+                ) : (
+                  <Card className={styles.missingComponentCard}>
+                    <span className={styles.missingText}>Оборудование не установлено</span>
+                    <Button 
+                      variant="ghost" 
+                      disabled={isSearching}
+                      isLoading={isSearching}
+                      onClick={() => handleSearchDonor(undefined, category)}
+                    >
+                      <Search size={16} />
+                      Подобрать
+                    </Button>
+                  </Card>
+                )}
               </div>
             </div>
           );
         })}
-        {Object.keys(groupedComponents).length === 0 && (
-          <div className={styles.emptyComponents}>В этом устройстве нет зарегистрированных деталей.</div>
-        )}
       </div>
     </div>
   );
