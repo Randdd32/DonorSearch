@@ -33,7 +33,7 @@ public class CompatibilityEngineService {
     private final CompatibilityRuleService ruleService;
 
     private final ExpressionParser parser = new SpelExpressionParser(
-            new SpelParserConfiguration(SpelCompilerMode.IMMEDIATE, this.getClass().getClassLoader())
+            new SpelParserConfiguration(SpelCompilerMode.MIXED, this.getClass().getClassLoader())
     );
 
     private final Map<String, Expression> expressionCache = new ConcurrentHashMap<>();
@@ -87,7 +87,7 @@ public class CompatibilityEngineService {
                 if (isMissingDataError(msgCode)) {
                     log.debug("Missing data for rule [{}]: {}", rule.getRuleCode(), e.getMessage());
                     warnings.add(new DonorWarningDto(
-                            String.format("Не удалось проверить правило [%s] из-за отсутствия информации о характеристиках оборудования. %s",
+                            String.format("Не удалось проверить правило [%s]: нет данных о характеристиках оборудования. %s",
                                     rule.getRuleCode(), rule.getDescription() != null ? rule.getDescription() : ""),
                             WarningSeverity.HIGH
                     ));

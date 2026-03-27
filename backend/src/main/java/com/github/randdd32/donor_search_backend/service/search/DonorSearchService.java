@@ -23,6 +23,7 @@ import com.github.randdd32.donor_search_backend.web.dto.search.enums.WarningSeve
 import com.github.randdd32.donor_search_backend.web.mapper.pagination.PageDtoMapper;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -78,7 +79,8 @@ public class DonorSearchService {
             }
             ComponentEntity internalEntity = resolveTargetComponent(comp.externalName(), ComponentType.valueOf(comp.category().name()));
             if (internalEntity != null) {
-                targetContext.putComponent(internalEntity);
+                ComponentEntity realEntity = (ComponentEntity) Hibernate.unproxy(internalEntity);
+                targetContext.putComponent(realEntity);
             }
         }
 
@@ -93,7 +95,7 @@ public class DonorSearchService {
 
         Map<String, IntegrationMappingEntity> bulkMappings = mappingService.resolveAndSaveBatch(uniqueDonorExternalNames, targetType);
 
-        List<DonorResultDto> finalResults = candidateDevices.parallelStream()
+        List<DonorResultDto> finalResults = candidateDevices.stream()
                 .map(device -> evaluateDevice(device, targetType, targetContext, bulkMappings))
                 .filter(Objects::nonNull)
                 .toList();
@@ -218,7 +220,7 @@ public class DonorSearchService {
                         WarningSeverity.CRITICAL
                 ));
             } else {
-                internalDonor = mapping.getInternalComponent();
+                internalDonor = (ComponentEntity) Hibernate.unproxy(mapping.getInternalComponent());
                 MappingConfidence confidence = mapping.getConfidence();
 
                 if (confidence == MappingConfidence.AUTO) {

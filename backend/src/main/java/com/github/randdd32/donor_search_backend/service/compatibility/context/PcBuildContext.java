@@ -16,11 +16,13 @@ import com.github.randdd32.donor_search_backend.model.hardware.StorageEntity;
 import com.github.randdd32.donor_search_backend.model.hardware.VideoCardEntity;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.ToIntFunction;
 
+@Slf4j
 @Getter
 @Setter
 public class PcBuildContext {
@@ -55,45 +57,52 @@ public class PcBuildContext {
     }
 
     public void putComponent(ComponentEntity component) {
+        log.debug("here");
         if (component instanceof CaseEntity c) {
+            log.debug("here case");
             this.pcCase = c;
         } else if (component instanceof MotherboardEntity m) {
+            log.debug("here motherboard");
             this.motherboard = m;
         } else if (component instanceof PowerSupplyEntity p) {
+            log.debug("here power supply");
             this.psus.add(p);
         } else if (component instanceof CpuEntity c) {
+            log.debug("here cpu");
             this.cpus.add(c);
         } else if (component instanceof CpuCoolerEntity c) {
+            log.debug("here cpu cooler");
             this.coolers.add(c);
         } else if (component instanceof VideoCardEntity v) {
+            log.debug("here video card");
             this.gpus.add(v);
         } else if (component instanceof MemoryEntity m) {
+            log.debug("here  memory");
             this.memories.add(m);
         } else if (component instanceof StorageEntity s) {
+            log.debug("here storage");
             this.storages.add(s);
         } else if (component instanceof ExpansionCardEntity e) {
+            log.debug("here expansion card");
             this.expansionCards.add(e);
         } else if (component instanceof CaseFanEntity c) {
+            log.debug("here casefan");
             this.caseFans.add(c);
         } else if (component instanceof OpticalDriveEntity o) {
+            log.debug("here opticaldrive");
             this.opticalDrives.add(o);
         } else if (component instanceof MonitorEntity m) {
+            log.debug("here monitor");
             this.monitors.add(m);
         }
     }
 
     public List<MemoryEntity> requireMemories() {
-        if (memories.isEmpty()) {
-            throw new MissingContextDataException("Нет данных об оперативной памяти");
-        }
-        return memories;
+        return require(memories, "Нет данных об оперативной памяти.");
     }
 
     public List<CpuEntity> requireCpus() {
-        if (cpus.isEmpty()) {
-            throw new MissingContextDataException("Нет данных о процессорах");
-        }
-        return cpus;
+        return require(cpus, "Нет данных о процессорах.");
     }
 
     public List<VideoCardEntity> requireGpus() {
@@ -102,15 +111,12 @@ public class PcBuildContext {
     }
 
     public List<CpuCoolerEntity> requireCoolers() {
-        if (coolers.isEmpty()) {
-            throw new MissingContextDataException("Нет данных о кулерах");
-        }
-        return coolers;
+        return require(coolers, "Нет данных о кулерах.");
     }
 
     public Integer getTotalTdpW() {
         if (cpus.isEmpty()) {
-            throw new MissingContextDataException("Нет данных о процессорах");
+            throw new MissingContextDataException("Нет данных о процессорах.");
         }
         int cpuTdp = cpus.stream().mapToInt(CpuEntity::getTdpW).sum();
         int gpuTdp = gpus.stream().mapToInt(VideoCardEntity::getTdpW).sum();
@@ -119,28 +125,28 @@ public class PcBuildContext {
 
     public Integer getTotalPsuWattage() {
         if (psus.isEmpty()) {
-            throw new MissingContextDataException("Нет данных о блоках питания");
+            throw new MissingContextDataException("Нет данных о блоках питания.");
         }
         return psus.stream().mapToInt(PowerSupplyEntity::getWattageW).sum();
     }
 
     public Integer getTotalRamCapacityGb() {
         if (memories.isEmpty()) {
-            throw new MissingContextDataException("Нет данных об оперативной памяти");
+            throw new MissingContextDataException("Нет данных об оперативной памяти.");
         }
         return memories.stream().mapToInt(m -> m.getModulesCount() * m.getModulesSizeGb()).sum();
     }
 
     public Integer getTotalRamModules() {
         if (memories.isEmpty()) {
-            throw new MissingContextDataException("Нет данных об оперативной памяти");
+            throw new MissingContextDataException("Нет данных об оперативной памяти.");
         }
         return memories.stream().mapToInt(MemoryEntity::getModulesCount).sum();
     }
 
     public Integer getStorageCountByFormFactor(String ffName) {
         if (storages.isEmpty()) {
-            throw new MissingContextDataException("Нет данных об накопителях");
+            throw new MissingContextDataException("Нет данных об накопителях.");
         }
         return (int) storages.stream()
                 .filter(s -> s.getFormFactor() != null && s.getFormFactor().getName().contains(ffName))
@@ -149,7 +155,7 @@ public class PcBuildContext {
 
     public Integer getSataDevicesCount() {
         if (storages.isEmpty()) {
-            throw new MissingContextDataException("Нет данных об накопителях");
+            throw new MissingContextDataException("Нет данных об накопителях.");
         }
 
         long sataDisks = storages.stream()
@@ -173,13 +179,13 @@ public class PcBuildContext {
 
     public Boolean isEccSupported() {
         if (motherboard == null) {
-            throw new MissingContextDataException("Нет данных о материнской плате");
+            throw new MissingContextDataException("Нет данных о материнской плате.");
         }
         if (Boolean.FALSE.equals(motherboard.getEccSupport())) {
             return false;
         }
         if (cpus.isEmpty()) {
-            throw new MissingContextDataException("Нет данных о процессорах");
+            throw new MissingContextDataException("Нет данных о процессорах.");
         }
         return cpus.stream()
                 .allMatch(cpu -> Boolean.TRUE.equals(cpu.getEccSupport()));
@@ -216,10 +222,10 @@ public class PcBuildContext {
     private void requireVideoCapability() {
         if (gpus.isEmpty()) {
             if (cpus.isEmpty()) {
-                throw new MissingContextDataException("Нет данных о процессорах и видеокартах");
+                throw new MissingContextDataException("Нет данных о процессорах и видеокартах.");
             }
             if (cpus.stream().noneMatch(c -> c.getGraphics() != null)) {
-                throw new MissingContextDataException("В сборке нет дискретной видеокарты и процессора со встроенным видеоядром");
+                throw new MissingContextDataException("В сборке нет дискретной видеокарты и процессора со встроенным видеоядром.");
             }
         }
     }
@@ -234,8 +240,15 @@ public class PcBuildContext {
 
     private Integer sumPsuPowerPins(ToIntFunction<PowerSupplyEntity> mapper) {
         if (psus.isEmpty()) {
-            throw new MissingContextDataException("Нет данных о блоках питания");
+            throw new MissingContextDataException("Нет данных о блоках питания.");
         }
         return psus.stream().mapToInt(mapper).sum();
+    }
+
+    private <T> List<T> require(List<T> list, String message) {
+        if (list == null || list.isEmpty()) {
+            throw new MissingContextDataException(message);
+        }
+        return list;
     }
 }
