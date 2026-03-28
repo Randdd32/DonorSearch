@@ -13,6 +13,19 @@
   gap: 16px;
 }
 
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.searchBar {
+  flex: 1;
+  min-width: 250px;
+}
+
 .backButton {
   padding-left: 0;
 }
@@ -37,4 +50,14 @@
 
 .goHomeBtn {
   margin-top: 20px;
+}
+
+@media (max-width: 600px) {
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .filterBtnText {
+    display: none;
+  }
 }
