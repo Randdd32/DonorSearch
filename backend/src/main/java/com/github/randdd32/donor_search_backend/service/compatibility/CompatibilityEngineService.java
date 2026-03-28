@@ -63,21 +63,15 @@ public class CompatibilityEngineService {
                 throw e;
             } catch (MissingContextDataException e) {
                 log.debug("Missing context data for rule [{}]: {}", rule.getRuleCode(), e.getMessage());
-                warnings.add(new DonorWarningDto(
-                        String.format("Не удалось проверить правило [%s]: %s", rule.getRuleCode(), StringUtils.decapitalize(e.getMessage())),
-                        WarningSeverity.HIGH
-                ));
+                warnings.add(buildMissingDataWarning(rule, StringUtils.decapitalize(e.getMessage())));
             } catch (ExpressionInvocationTargetException e) {
                 if (e.getCause() instanceof MissingContextDataException missingDataEx) {
                     log.debug("Missing context data (via SpEL) for rule [{}]: {}", rule.getRuleCode(), missingDataEx.getMessage());
-                    warnings.add(new DonorWarningDto(
-                            String.format("Не удалось проверить правило [%s]: %s", rule.getRuleCode(), StringUtils.decapitalize(missingDataEx.getMessage())),
-                            WarningSeverity.HIGH
-                    ));
+                    warnings.add(buildMissingDataWarning(rule, StringUtils.decapitalize(missingDataEx.getMessage())));
                 } else {
                     log.error("Method execution failed in rule [{}]: {}", rule.getRuleCode(), e.getMessage());
                     warnings.add(new DonorWarningDto(
-                            String.format("Внутренний системный сбой при проверке правила [%s].", rule.getRuleCode()),
+                            String.format("Внутренний системный сбой при проверке правила «%s».", rule.getRuleName()),
                             WarningSeverity.CRITICAL
                     ));
                 }
@@ -86,28 +80,35 @@ public class CompatibilityEngineService {
 
                 if (isMissingDataError(msgCode)) {
                     log.debug("Missing data for rule [{}]: {}", rule.getRuleCode(), e.getMessage());
-                    warnings.add(new DonorWarningDto(
-                            String.format("Не удалось проверить правило [%s]: нет данных о характеристиках оборудования. %s",
-                                    rule.getRuleCode(), rule.getDescription() != null ? rule.getDescription() : ""),
-                            WarningSeverity.HIGH
-                    ));
+                    warnings.add(buildMissingDataWarning(rule, "нет данных о характеристиках оборудования"));
                 } else {
                     log.error("CRITICAL CONFIGURATION ERROR in rule [{}]: {}", rule.getRuleCode(), e.getMessage());
                     warnings.add(new DonorWarningDto(
-                            String.format("Синтаксическая или логическая ошибка в формуле правила [%s]. Обратитесь к администратору.",
-                                    rule.getRuleCode()),
+                            String.format("Синтаксическая или логическая ошибка в формуле правила «%s». Обратитесь к администратору.",
+                                    rule.getRuleName()),
                             WarningSeverity.CRITICAL
                     ));
                 }
             } catch (Exception e) {
                 log.error("Unexpected internal error while evaluating rule [{}]: {}", rule.getRuleCode(), e.getMessage(), e);
                 warnings.add(new DonorWarningDto(
-                        String.format("Внутренний системный сбой при проверке правила [%s].", rule.getRuleCode()),
+                        String.format("Внутренний системный сбой при проверке правила «%s».", rule.getRuleName()),
                         WarningSeverity.CRITICAL
                 ));
             }
         }
         return warnings;
+    }
+
+    private DonorWarningDto buildMissingDataWarning(CompatibilityRuleEntity rule, String reason) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("Не удалось проверить правило «%s»: %s.", rule.getRuleName(), reason));
+
+        if (rule.getDescription() != null && !rule.getDescription().isBlank()) {
+            sb.append(" ").append(rule.getDescription());
+        }
+
+        return new DonorWarningDto(sb.toString(), WarningSeverity.HIGH);
     }
 
     /**

@@ -34,6 +34,9 @@ public class CompatibilityRuleEntity extends BaseEntity {
     @Column(name = "rule_code", nullable = false, unique = true, length = 100)
     private String ruleCode;
 
+    @Column(name = "rule_name", nullable = false, length = 200)
+    private String ruleName;
+
     @Column(nullable = false, columnDefinition = "text")
     private String expression;
 

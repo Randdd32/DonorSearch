@@ -53,6 +53,7 @@ public class CompatibilityRuleService extends AbstractCrudService<CompatibilityR
     @Override
     protected void updateFields(CompatibilityRuleEntity existing, CompatibilityRuleEntity updated) {
         existing.setRuleCode(updated.getRuleCode());
+        existing.setRuleName(updated.getRuleName());
         existing.setExpression(updated.getExpression());
         existing.setErrorMessage(updated.getErrorMessage());
         existing.setIsActive(updated.getIsActive());
@@ -78,6 +79,7 @@ public class CompatibilityRuleService extends AbstractCrudService<CompatibilityR
         if (entity == null) throw new IllegalArgumentException("CompatibilityRule entity is null");
 
         validateStringField(entity.getRuleCode(), "Rule code");
+        validateStringField(entity.getRuleName(), "Rule name");
         validateExpressionSyntax(entity.getExpression());
         validateStringField(entity.getErrorMessage(), "Error message");
         if (CollectionUtils.isEmpty(entity.getTargetComponentTypes())) {

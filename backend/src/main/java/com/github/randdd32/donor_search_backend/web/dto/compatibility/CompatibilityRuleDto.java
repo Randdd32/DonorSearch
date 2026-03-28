@@ -19,6 +19,10 @@ public record CompatibilityRuleDto(
         String ruleCode,
 
         @NotBlank
+        @Size(min = 1, max = 200)
+        String ruleName,
+
+        @NotBlank
         String expression,
 
         @NotBlank
