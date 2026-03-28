@@ -24,16 +24,19 @@
   margin-top: 4px;
 }
 
-.filters {
+.filtersWrapper {
   display: flex;
   align-items: center;
   gap: 12px;
+  flex-wrap: wrap;
   width: 100%;
-  max-width: 400px;
+  max-width: 600px;
+  justify-content: flex-end;
 }
 
-.searchInput {
-  width: 100%;
+.searchBar {
+  flex: 1;
+  min-width: 250px;
 }
 
 .grid {
@@ -42,12 +45,19 @@
   gap: 20px;
 }
 
+@media (max-width: 800px) {
+  .filtersWrapper {
+    max-width: 100%;
+    justify-content: stretch;
+  }
+}
+
 @media (max-width: 600px) {
   .header {
     flex-direction: column;
     align-items: stretch;
   }
-  .filters {
-    max-width: 100%;
+  .filterBtnText {
+    display: none;
   }
 }

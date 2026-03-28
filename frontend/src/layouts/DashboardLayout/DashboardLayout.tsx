@@ -30,6 +30,10 @@ export const DashboardLayout = () => {
 
   return (
     <div className={styles.layout}>
+       <div 
+        className={clsx(styles.sidebarBackdrop, { [styles.open]: isSidebarOpen })} 
+        onClick={toggleSidebar} 
+      />
       <aside className={clsx(styles.sidebar, { [styles.closed]: !isSidebarOpen })}>
         <div className={styles.sidebarHeader}>
           <Link to="/" className={styles.logo}>
@@ -39,29 +43,24 @@ export const DashboardLayout = () => {
         </div>
         
         <nav className={styles.nav}>
-          <Link 
-            to="/" 
-            className={clsx(styles.navItem, { [styles.active]: location.pathname === '/' })}
-          >
-            <Server size={20} className={styles.navIcon} />
-            {isSidebarOpen && <span>Учетные единицы</span>}
-          </Link>
-
-          <Link 
-            to="/compatibility" 
-            className={clsx(styles.navItem, { [styles.active]: location.pathname === '/compatibility' })}
-          >
-            <ListChecks size={20} className={styles.navIcon} />
-            {isSidebarOpen && <span>Правила совместимости</span>}
-          </Link>
-
-          <Link 
-            to="/mappings" 
-            className={clsx(styles.navItem, { [styles.active]: location.pathname === '/mappings' })}
-          >
-            <LinkIcon size={20} className={styles.navIcon} />
-            {isSidebarOpen && <span>Таблица сопоставления</span>}
-          </Link>
+          {[
+            { path: '/', label: 'Учетные единицы', icon: Server },
+            { path: '/compatibility', label: 'Правила совместимости', icon: ListChecks },
+            { path: '/mappings', label: 'Таблица сопоставления', icon: LinkIcon }
+          ].map((item) => {
+            const Icon = item.icon;
+            return (
+              <Link 
+                key={item.path}
+                to={item.path} 
+                className={clsx(styles.navItem, { [styles.active]: location.pathname === item.path })}
+                onClick={() => window.innerWidth <= 630 && toggleSidebar()}
+              >
+                <Icon size={20} className={styles.navIcon} />
+                {isSidebarOpen && <span>{item.label}</span>}
+              </Link>
+            );
+          })}
         </nav>
       </aside>
 

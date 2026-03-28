@@ -1,40 +1,35 @@
 import { useState } from 'react';
-import { Search, PackageOpen } from 'lucide-react';
+import { Filter, Search, PackageOpen } from 'lucide-react';
 import { useDevices } from '../../features/devices/hooks/useDevices';
 import { useDebounce } from '../../hooks/useDebounce';
+import { useUrlFilters } from '../../hooks/useUrlFilters';
 import { ErrorState } from '../../components/ui/ErrorState/ErrorState';
 import { EmptyState } from '../../components/ui/EmptyState/EmptyState';
 import { Input } from '../../components/ui/Input/Input';
 import { Spinner } from '../../components/ui/Spinner/Spinner';
 import { DeviceCard } from '../../features/devices/components/DeviceCard/DeviceCard';
+import { SortSelect } from '../../components/ui/SortSelect/SortSelect';
+import { DeviceFilters } from '../../features/filters/components/DeviceFilters/DeviceFilters';
 import { Pagination } from '../../components/ui/Pagination/Pagination';
+import { Button } from '../../components/ui/Button/Button';
 import styles from './DevicesPage.module.css';
 
 export const DevicesPage = () => {
-  const [searchValue, setSearchValue] = useState('');
-  const debouncedSearch = useDebounce(searchValue, 500);
-  
-  const [page, setPage] = useState(0);
-  const [pageSize, setPageSize] = useState(24);
+  const { filters, updateFilters, resetFilters } = useUrlFilters();
+  const debouncedSearch = useDebounce(filters.search as string, 500);
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
   const { data, isLoading, isError } = useDevices({ 
-    page: debouncedSearch !== searchValue ? 0 : page,
-    size: pageSize,
+    ...filters,
     search: debouncedSearch || undefined
   });
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchValue(e.target.value);
-    setPage(0);
+    updateFilters({ search: e.target.value });
   };
 
   if (isError) {
-    return (
-      <ErrorState 
-        onAction={() => window.location.reload()} 
-        actionLabel="Обновить страницу" 
-      />
-    );
+    return <ErrorState onAction={() => window.location.reload()} actionLabel="Обновить страницу" />;
   }
 
   return (
@@ -45,14 +40,31 @@ export const DevicesPage = () => {
           <p className={styles.subtitle}>База компьютерной техники и оборудования</p>
         </div>
         
-        <div className={styles.filters}>
-          <Input 
-            icon={<Search size={18} />} 
-            placeholder="Поиск по названию, инв. номеру или SN..." 
-            value={searchValue}
-            onChange={handleSearchChange}
-            className={styles.searchInput}
+        <div className={styles.filtersWrapper}>
+          <div className={styles.searchBar}>
+            <Input 
+              icon={<Search size={18} />} 
+              placeholder="Поиск по названию, инв. номеру или SN..." 
+              value={filters.search as string}
+              onChange={handleSearchChange}
+            />
+          </div>
+
+          <SortSelect 
+            value={filters.sort as string} 
+            onChange={(val) => updateFilters({ sort: val })} 
+            options={[
+              { value: 'dateReceived,desc', label: 'Сначала новые' },
+              { value: 'dateReceived,asc', label: 'Сначала старые' },
+              { value: 'name,asc', label: 'По названию (А-Я)' },
+              { value: 'inventoryNumber,asc', label: 'По инвентарному номеру' }
+            ]}
           />
+
+          <Button variant="secondary" onClick={() => setIsFiltersOpen(true)} className={styles.filterBtn}>
+            <Filter size={18} />
+            <span className={styles.filterBtnText}>Фильтры</span>
+          </Button>
         </div>
       </div>
 
@@ -78,16 +90,21 @@ export const DevicesPage = () => {
               totalPages={data.totalPages}
               totalItems={data.totalItems}
               pageSize={data.currentSize}
-              onPageChange={setPage}
-              onPageSizeChange={(size) => {
-                setPageSize(size);
-                setPage(0);
-              }}
+              onPageChange={(p) => updateFilters({ page: p }, false)}
+              onPageSizeChange={(s) => updateFilters({ size: s, page: 0 }, false)}
               pageSizeOptions={[6, 12, 24, 48, 96]}
             />
           )}
         </>
       )}
+
+      <DeviceFilters 
+        isOpen={isFiltersOpen} 
+        onClose={() => setIsFiltersOpen(false)} 
+        filters={filters}
+        updateFilters={updateFilters}
+        resetFilters={resetFilters}
+      />
     </div>
   );
 };

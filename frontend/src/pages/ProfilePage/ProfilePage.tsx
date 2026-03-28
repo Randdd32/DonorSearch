@@ -8,7 +8,7 @@ export const ProfilePage = () => {
     <div className={styles.container}>
       <div>
         <h1 className={styles.title}>Профиль пользователя</h1>
-        <p className={styles.subtitle}>Управление вашим аккаунтом</p>
+        <p className={styles.subtitle}>Данные вашей учетной записи</p>
       </div>
 
       <Card className={styles.profileCard}>

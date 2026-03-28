@@ -227,6 +227,10 @@
   overflow-y: auto;
 }
 
+.sidebarBackdrop {
+  display: none;
+}
+
 @media (max-width: 830px) {
   .userRole, .userName {
     display: none;
@@ -234,6 +238,21 @@
 }
 
 @media (max-width: 630px) {
+  .sidebarBackdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background-color: rgba(15, 23, 42, 0.4);
+    z-index: 9;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--transition);
+  }
+  .sidebarBackdrop.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
   .sidebar {
     position: fixed;
     height: 100vh;
@@ -241,6 +260,7 @@
     top: 0;
     transform: translateX(0);
     box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+    z-index: 10;
   }
   .sidebar.closed {
     transform: translateX(-100%);
