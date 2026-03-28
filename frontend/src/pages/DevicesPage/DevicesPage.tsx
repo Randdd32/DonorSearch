@@ -9,7 +9,7 @@ import { Input } from '../../components/ui/Input/Input';
 import { Spinner } from '../../components/ui/Spinner/Spinner';
 import { DeviceCard } from '../../features/devices/components/DeviceCard/DeviceCard';
 import { SortSelect } from '../../components/ui/SortSelect/SortSelect';
-import { DeviceFilters } from '../../features/filters/components/DeviceFilters/DeviceFilters';
+import { DeviceFilters } from '../../features/devices/components/DeviceFilters/DeviceFilters';
 import { Pagination } from '../../components/ui/Pagination/Pagination';
 import { Button } from '../../components/ui/Button/Button';
 import styles from './DevicesPage.module.css';
