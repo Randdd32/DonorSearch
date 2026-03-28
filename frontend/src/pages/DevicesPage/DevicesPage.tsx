@@ -15,7 +15,7 @@ import { Button } from '../../components/ui/Button/Button';
 import styles from './DevicesPage.module.css';
 
 export const DevicesPage = () => {
-  const { filters, updateFilters, resetFilters } = useUrlFilters();
+  const { filters, updateFilters, resetFilters } = useUrlFilters('dateReceived,desc');
   const debouncedSearch = useDebounce(filters.search as string, 500);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
@@ -40,7 +40,7 @@ export const DevicesPage = () => {
           <p className={styles.subtitle}>База компьютерной техники и оборудования</p>
         </div>
         
-        <div className={styles.filtersWrapper}>
+        <div className={styles.toolbar}>
           <div className={styles.searchBar}>
             <Input 
               icon={<Search size={18} />} 

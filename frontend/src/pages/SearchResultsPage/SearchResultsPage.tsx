@@ -19,7 +19,7 @@ export const SearchResultsPage = () => {
   const { sessionId } = useParams<{ sessionId: string }>();
   const navigate = useNavigate();
   
-  const { filters, updateFilters, resetFilters } = useUrlFilters();
+  const { filters, updateFilters, resetFilters } = useUrlFilters('totalPenalty,asc');
   const debouncedSearch = useDebounce(filters.search as string, 500);
   const[isFiltersOpen, setIsFiltersOpen] = useState(false);
 
@@ -72,10 +72,12 @@ export const SearchResultsPage = () => {
           value={filters.sort as string} 
           onChange={(val) => updateFilters({ sort: val })} 
           options={[
-            { value: 'totalPenalty,asc', label: 'По релевантности (Идеальные)' },
-            { value: 'totalPenalty,desc', label: 'По релевантности (Худшие)' },
+            { value: 'totalPenalty,asc', label: 'По релевантности (лучшие)' },
+            { value: 'totalPenalty,desc', label: 'По релевантности (худшие)' },
             { value: 'dateReceived,desc', label: 'Сначала новые ПК' },
             { value: 'dateReceived,asc', label: 'Сначала старые ПК' },
+            { value: 'name,asc', label: 'По названию (А-Я)' },
+            { value: 'inventoryNumber,asc', label: 'По инвентарному номеру' }
           ]}
         />
 

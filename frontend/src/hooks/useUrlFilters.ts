@@ -7,14 +7,14 @@ const getNumberArray = (searchParams: URLSearchParams, key: string): number[] =>
 
 export type FilterValue = string | number | boolean | (string | number)[] | null | undefined;
 
-export const useUrlFilters = () => {
+export const useUrlFilters = (defaultSort: string = 'id,desc') => {
   const[searchParams, setSearchParams] = useSearchParams();
 
   const filters = {
     page: Number(searchParams.get('page')) || 0,
     size: Number(searchParams.get('size')) || 12,
     search: searchParams.get('search') || '',
-    sort: searchParams.get('sort') || 'id,desc',
+    sort: searchParams.get('sort') || defaultSort,
     
     stateIds: getNumberArray(searchParams, 'stateIds'),
     departmentIds: getNumberArray(searchParams, 'departmentIds'),
