@@ -1,5 +1,6 @@
 import { ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react';
 import { clsx } from 'clsx';
+import { Select } from '../Select/Select';
 import styles from './Pagination.module.css';
 
 interface PaginationProps {
@@ -83,15 +84,12 @@ export const Pagination = ({
       <div className={styles.infoRow}>
         {onPageSizeChange ? (
           <div className={styles.sizeSelector}>
-            <select
+            <Select
               value={pageSize}
-              onChange={(e) => onPageSizeChange(Number(e.target.value))}
-              className={styles.select}
-            >
-              {pageSizeOptions.map(opt => (
-                <option key={opt} value={opt}>{opt}</option>
-              ))}
-            </select>
+              onChange={onPageSizeChange}
+              options={pageSizeOptions.map(opt => ({ value: opt, label: `Показать ${opt}` }))}
+              isSearchable={false}
+            />
           </div>
         ) : <div />}
 

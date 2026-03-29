@@ -23,3 +23,17 @@ export const getStateConfig = (state: ExternalDeviceState) => {
     default: return { label: 'Неизвестно', variant: 'default' as const };
   }
 };
+
+export const formatPluralPoints = (value: number): string => {
+  const n = Math.abs(value);
+  const n10 = n % 10;
+  const n100 = n % 100;
+  
+  if (n10 === 1 && n100 !== 11) {
+    return `${value} очко`;
+  }
+  if (n10 >= 2 && n10 <= 4 && !(n100 >= 12 && n100 <= 14)) {
+    return `${value} очка`;
+  }
+  return `${value} очков`;
+};

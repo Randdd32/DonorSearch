@@ -1,7 +1,7 @@
 import { AlertTriangle, Info, CheckCircle, Hash, User, Building, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { DonorResultDto, WarningSeverity } from '../../../../types/search';
-import { getStateConfig } from '../../../../utils/formatters';
+import { getStateConfig, formatPluralPoints } from '../../../../utils/formatters';
 import { Card } from '../../../../components/ui/Card/Card';
 import { Badge } from '../../../../components/ui/Badge/Badge';
 import { DeviceIcon } from '../../../devices/components/DeviceIcon/DeviceIcon';
@@ -49,9 +49,11 @@ export const DonorCard = ({ result }: DonorCardProps) => {
 
         <div className={styles.scoreSection}>
           <div className={styles.scoreLabel}>Штраф совместимости</div>
-          <Badge variant={result.totalPenalty === 0 ? 'success' : result.totalPenalty > 20 ? 'danger' : 'warning'} className={styles.scoreBadge}>
-            {result.totalPenalty === 0 ? 'Идеально (0)' : `${result.totalPenalty} очков`}
-          </Badge>
+          <Badge 
+            variant={result.totalPenalty === 0 ? 'success' : result.totalPenalty > 20 ? 'danger' : 'warning'} 
+            className={styles.scoreBadge}>
+            {result.totalPenalty === 0 ? 'Идеально (0)' : formatPluralPoints(result.totalPenalty)}
+          </Badge> 
         </div>
       </div>
 
