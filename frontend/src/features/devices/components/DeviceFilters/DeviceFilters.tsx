@@ -28,7 +28,7 @@ export const DeviceFilters = ({ isOpen, onClose, filters, updateFilters, resetFi
       <StaticSelectFilter 
         label="Работоспособность" 
         value={isWorkingValue} 
-        onChange={(val: string) => updateFilters({ isWorking: val === '' ? undefined : val === 'true' })} 
+        onChange={(val) => updateFilters({ isWorking: val === '' || val === null ? undefined : val === 'true' })}  
         options={[{ value: '', label: 'Все устройства' }, { value: 'true', label: 'Только исправные' }, { value: 'false', label: 'Только неисправные' }]} 
       />
       <MultiSelectFilter 

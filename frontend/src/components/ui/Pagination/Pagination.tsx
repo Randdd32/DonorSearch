@@ -86,7 +86,7 @@ export const Pagination = ({
           <div className={styles.sizeSelector}>
             <Select
               value={pageSize}
-              onChange={onPageSizeChange}
+              onChange={(val) => onPageSizeChange(Number(val))} 
               options={pageSizeOptions.map(opt => ({ value: opt, label: `Показать ${opt}` }))}
               isSearchable={false}
             />

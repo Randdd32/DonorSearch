@@ -12,7 +12,7 @@ export const SortSelect = ({ value, onChange, options }: SortSelectProps) => {
     <div className={styles.container}>
       <Select 
         value={value} 
-        onChange={onChange} 
+        onChange={(val) => onChange(val ? String(val) : '')}
         options={options} 
         isSearchable={false}
       />

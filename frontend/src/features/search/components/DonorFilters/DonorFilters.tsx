@@ -49,7 +49,7 @@ export const DonorFilters = ({ isOpen, onClose, filters, updateFilters, resetFil
       <StaticSelectFilter 
         label="Работоспособность ПК-донора" 
         value={isWorkingValue} 
-        onChange={(val: string) => updateFilters({ isWorking: val === '' ? undefined : val === 'true' })} 
+        onChange={(val) => updateFilters({ isWorking: val === '' || val === null ? undefined : val === 'true' })} 
         options={[{ value: '', label: 'Все устройства' }, { value: 'true', label: 'Только исправные' }, { value: 'false', label: 'Только неисправные' }]} 
       />
       <MultiSelectFilter 
