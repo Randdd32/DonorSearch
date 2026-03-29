@@ -32,147 +32,147 @@ public class DatabaseInitializer implements CommandLineRunner {
                 "Совместимость сокета процессора",
                 "#ctx.requireCpus().size() > 0 and #ctx.cpus.?[socket.id != #ctx.motherboard.socket.id].isEmpty()",
                 "Сокет процессора не поддерживается материнской платой",
-                "Сверяет сокеты всех установленных процессоров с сокетом материнской платы",
+                "Проверка того, что сокеты всех установленных процессоров совпадают с сокетом материнской платы.",
                 Set.of(ComponentType.CPU, ComponentType.MOTHERBOARD));
 
         createRule("COOLER_SOCKET_MATCH",
                 "Совместимость крепления кулера",
                 "#ctx.requireCoolers().size() > 0 and #ctx.coolers.?[!sockets.contains(#ctx.motherboard.socket)].isEmpty()",
                 "Крепление кулера не подходит к сокету материнской платы",
-                "Крепление всех кулеров должно поддерживать сокет материнской платы",
+                "Проверка того, крепление всех кулеров поддерживает сокет материнской платы.",
                 Set.of(ComponentType.CPU_COOLER, ComponentType.MOTHERBOARD));
 
         createRule("RAM_TYPE_MATCH",
                 "Совместимость типа оперативной памяти",
                 "#ctx.requireMemories().size() > 0 and #ctx.memories.?[memoryType.id != #ctx.motherboard.memoryType.id].isEmpty()",
                 "Поколение оперативной памяти (DDR) не поддерживается материнской платой",
-                "Поколение всех модулей ОЗУ должно совпадать со слотами на плате",
+                "Проверка того, что поколение всех модулей ОЗУ совпадает со слотами на плате.",
                 Set.of(ComponentType.MEMORY, ComponentType.MOTHERBOARD));
 
         createRule("RAM_CAPACITY_LIMIT",
                 "Ограничение объема оперативной памяти",
                 "#ctx.getTotalRamCapacityGb() <= #ctx.motherboard.maxMemoryGb",
                 "Суммарный объем оперативной памяти превышает лимит материнской платы",
-                "Проверка того, что общий объем всех модулей ОЗУ не больше заявленного для материнской платы",
+                "Проверка того, что общий объем всех модулей ОЗУ не больше заявленного для материнской платы.",
                 Set.of(ComponentType.MEMORY, ComponentType.MOTHERBOARD));
 
         createRule("RAM_SLOT_LIMIT",
                 "Ограничение количества слотов оперативной памяти",
                 "#ctx.getTotalRamModules() <= #ctx.motherboard.memorySlots",
                 "Количество модулей оперативной памяти превышает количество слотов на материнской плате",
-                "Проверка того, что общее количество модулей ОЗУ не больше количества слотов, доступных на материнской плате",
+                "Проверка того, что общее количество модулей ОЗУ не больше количества слотов, доступных на материнской плате.",
                 Set.of(ComponentType.MEMORY, ComponentType.MOTHERBOARD));
 
         createRule("RAM_ECC_SUPPORT_MATCH",
                 "Поддержка ECC памяти",
                 "#ctx.requireMemories().size() > 0 and #ctx.memories.?[isEcc && !#ctx.isEccSupported()].isEmpty()",
                 "Материнская плата или один из процессоров не поддерживают ECC-память",
-                "Серверная память с коррекцией ошибок (ECC) требует поддержки от материнской платы и всех установленных процессоров",
+                "Проверка того, что материнская плата и все установленные процессоры поддерживают серверную память с коррекцией ошибок (ECC).",
                 Set.of(ComponentType.MEMORY, ComponentType.MOTHERBOARD, ComponentType.CPU));
 
         createRule("GPU_LENGTH_LIMIT",
                 "Ограничение длины видеокарты",
                 "#ctx.requireGpus().size() > 0 and #ctx.gpus.?[lengthMm > #ctx.pcCase.maxGpuLenMm].isEmpty()",
                 "Видеокарта слишком длинная и не поместится в корпус",
-                "Длина каждой установленной видеокарты проверяется относительно корпуса",
+                "Проверка того, что каждая из видеокарт поместится в корпус.",
                 Set.of(ComponentType.VIDEO_CARD, ComponentType.CASE));
 
         createRule("COOLER_HEIGHT_LIMIT",
                 "Ограничение высоты кулера",
                 "#ctx.requireCoolers().size() > 0 and #ctx.coolers.?[!isWaterCooled && heightMm > #ctx.pcCase.maxCpuCoolerHeightMm].isEmpty()",
                 "Воздушный кулер слишком высокий: боковая крышка корпуса не закроется",
-                "Высота радиаторов воздушных кулеров проверяется относительно ширины корпуса",
+                "Проверка того, что высота радиаторов воздушных кулеров не слишком велика относительно ширины корпуса.",
                 Set.of(ComponentType.CPU_COOLER, ComponentType.CASE));
 
         createRule("WATER_COOLER_SIZE_MATCH",
                 "Поддержка размера радиатора СЖО",
                 "#ctx.requireCoolers().size() > 0 and #ctx.coolers.?[isWaterCooled && !#ctx.pcCase.radiatorSizes.contains(waterCooledSizeMm)].isEmpty()",
                 "Радиатор жидкостного охлаждения данного размера не поддерживается корпусом",
-                "Размер радиатора СЖО (например, 240мм, 360мм) должен входить в список поддерживаемых корпусом",
+                "Проверка того, что размер радиатора СЖО (например, 240мм, 360мм) входит в список поддерживаемых корпусом.",
                 Set.of(ComponentType.CPU_COOLER, ComponentType.CASE));
 
         createRule("MOBO_FORM_FACTOR_MATCH",
                 "Совместимость форм-фактора материнской платы",
                 "#ctx.pcCase.moboFormFactors.contains(#ctx.motherboard.formFactor)",
                 "Форм-фактор материнской платы не поддерживается корпусом",
-                "Например, плата ATX не поместится в корпус Mini-ITX",
+                "Проверка того, что материнская плата поместится в корпус.",
                 Set.of(ComponentType.MOTHERBOARD, ComponentType.CASE));
 
         createRule("PSU_POWER_CHECK",
                 "Достаточность мощности блока питания",
                 "#ctx.getTotalPsuWattage() >= (#ctx.getTotalTdpW() * 1.3)",
                 "Мощности блока/ов питания недостаточно для данной конфигурации (CPU + GPU)",
-                "Проверка расчетного TDP сборки (зависит от процессоров и видеокарт) с запасом 30% против номинала блоков питания",
+                "Проверка того, что номинала блоков питания достаточно для работы устройства. Для этого рассчитывается TDP сборки (зависит от процессоров и видеокарт) с запасом 30%.",
                 Set.of(ComponentType.POWER_SUPPLY, ComponentType.CPU, ComponentType.VIDEO_CARD));
 
         createRule("PSU_GPU_8PIN_CHECK",
                 "Наличие 8-pin коннекторов PCIe",
                 "#ctx.getAvailPcie8Pin() >= #ctx.getReqPcie8Pin()",
                 "У блока питания не хватает кабелей 8-pin PCIe для видеокарты",
-                "Проверка физического наличия необходимых коннекторов у блока питания для подключения питания к видеокарте",
+                "Проверка физического наличия необходимых коннекторов у блока питания для подключения питания к видеокарте.",
                 Set.of(ComponentType.POWER_SUPPLY, ComponentType.VIDEO_CARD));
 
         createRule("PSU_GPU_6PIN_CHECK",
                 "Наличие 6-pin коннекторов PCIe",
                 "#ctx.getAvailPcie6Pin() >= #ctx.getReqPcie6Pin()",
                 "У блока питания не хватает кабелей 6-pin PCIe для видеокарты",
-                "Проверка физического наличия необходимых коннекторов у блока питания для подключения питания к видеокарте",
+                "Проверка физического наличия необходимых коннекторов у блока питания для подключения питания к видеокарте.",
                 Set.of(ComponentType.POWER_SUPPLY, ComponentType.VIDEO_CARD));
 
         createRule("PSU_GPU_12VHPWR_CHECK",
                 "Наличие коннекторов 12VHPWR",
                 "#ctx.getAvailPcie12vhpwr() >= #ctx.getReqPcie12vhpwr()",
                 "У блока питания нет разъема 12VHPWR для современных видеокарт",
-                "Проверка физического наличия необходимых коннекторов у блока питания для подключения питания к видеокарте",
+                "Проверка физического наличия необходимых коннекторов у блока питания для подключения питания к видеокарте.",
                 Set.of(ComponentType.POWER_SUPPLY, ComponentType.VIDEO_CARD));
 
         createRule("CASE_35_BAYS_LIMIT",
                 "Наличие отсеков 3.5\"",
                 "#ctx.getStorageCountByFormFactor('3,5') <= (#ctx.pcCase.int35Bays + #ctx.pcCase.ext35Bays)",
                 "Количество жестких дисков 3.5 превышает количество доступных корзин в корпусе",
-                "Хватит ли в корпусе места для накопителей с форм-фактором 3.5\"",
+                "Проверка того, хватит ли в корпусе места для накопителей с форм-фактором 3.5\".",
                 Set.of(ComponentType.STORAGE, ComponentType.CASE));
 
         createRule("CASE_25_BAYS_LIMIT",
                 "Наличие отсеков 2.5\"",
                 "#ctx.getStorageCountByFormFactor('2,5') <= #ctx.pcCase.int25Bays",
                 "Количество накопителей 2.5 превышает количество отсеков в корпусе",
-                "Хватит ли в корпусе места для накопителей с форм-фактором 2.5\"",
+                "Проверка того, хватит ли в корпусе места для накопителей с форм-фактором 2.5\".",
                 Set.of(ComponentType.STORAGE, ComponentType.CASE));
 
         createRule("CASE_525_BAYS_LIMIT",
                 "Наличие отсеков 5.25\"",
                 "#ctx.opticalDrives.size() <= #ctx.pcCase.ext525Bays",
                 "В корпусе нет отсеков 5.25 для установки оптического привода",
-                "Современные корпуса часто не имеют слотов под оптические приводы",
+                "Проверка того, хватит ли в корпусе слотов под оптические приводы.",
                 Set.of(ComponentType.OPTICAL_DRIVE, ComponentType.CASE));
 
         createRule("CASE_FAN_SIZE_MATCH",
                 "Совместимость размера корпусного вентилятора",
                 "#ctx.caseFans.?[!#ctx.pcCase.fanSizes.contains(sizeMm)].isEmpty()",
                 "Размер корпусного вентилятора не поддерживается корпусом",
-                "Диаметр всех устанавливаемых вентиляторов должен быть в списке размеров, которые поддерживает корпус",
+                "Проверка того, что диаметр всех устанавливаемых вентиляторов входит в список размеров, которые поддерживает корпус.",
                 Set.of(ComponentType.CASE_FAN, ComponentType.CASE));
 
         createRule("CASE_EXPANSION_SLOTS_LIMIT",
                 "Ограничение слотов расширения корпуса",
                 "#ctx.getTotalGpuSlotWidth() <= #ctx.pcCase.expansionSlotsFullHeight",
                 "Толщина видеокарт превышает количество слотов расширения в корпусе",
-                "Суммарная ширина всех видеокарт не должна выходить за рамки PCIe заглушек корпуса",
+                "Проверка того, что суммарная ширина всех видеокарт не выходит за рамки PCIe заглушек корпуса.",
                 Set.of(ComponentType.VIDEO_CARD, ComponentType.CASE));
 
         createRule("MOBO_SATA_LIMIT",
                 "Наличие портов SATA",
                 "#ctx.getSataDevicesCount() <= (#ctx.motherboard.sata3Ports + #ctx.motherboard.sata6Ports)",
                 "Не хватает SATA портов на материнской плате для всех накопителей и приводов",
-                "Общее количество всех SATA устройств не должна превышать сумму портов 3Gb/s и 6Gb/s",
+                "Проверка того, что общее количество всех SATA устройств не превышает сумму портов 3Gb/s и 6Gb/s.",
                 Set.of(ComponentType.STORAGE, ComponentType.OPTICAL_DRIVE, ComponentType.MOTHERBOARD));
 
         createRule("MOBO_PCIE_X16_LIMIT",
                 "Наличие слотов PCIe x16",
                 "#ctx.requireGpus().size() <= #ctx.motherboard.pciX16Slots",
                 "Количество видеокарт превышает количество слотов PCIe x16 на материнской плате",
-                "Невозможно вставить видеокарту, если у материнской платы не хватает полноразмерных слотов расширения",
+                "Проверка того, что у материнской платы хватает полноразмерных слотов расширения для подключения видеокарт.",
                 Set.of(ComponentType.VIDEO_CARD, ComponentType.MOTHERBOARD));
     }
 

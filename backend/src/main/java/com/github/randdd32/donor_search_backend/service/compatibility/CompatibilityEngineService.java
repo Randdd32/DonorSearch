@@ -105,7 +105,7 @@ public class CompatibilityEngineService {
         sb.append(String.format("Не удалось проверить правило «%s»: %s.", rule.getRuleName(), reason));
 
         if (rule.getDescription() != null && !rule.getDescription().isBlank()) {
-            sb.append(" ").append(rule.getDescription());
+            sb.append(" Дополнительная информация о правиле: ").append(StringUtils.decapitalize(rule.getDescription()));
         }
 
         return new DonorWarningDto(sb.toString(), WarningSeverity.HIGH);
