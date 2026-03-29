@@ -68,36 +68,6 @@
   gap: 20px;
 }
 
-.filterGroup {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.label {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.nativeSelect {
-  width: 100%;
-  height: 40px;
-  padding: 8px 12px;
-  background-color: var(--bg-surface);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  color: var(--text-primary);
-  font-size: 14px;
-  outline: none;
-  cursor: pointer;
-}
-.nativeSelect:focus {
-  border-color: var(--primary-color);
-}
-
 .footer {
   padding: 16px 24px;
   border-top: 1px solid var(--border-color);
@@ -111,26 +81,6 @@
 
 .applyBtn {
   flex: 1;
-}
-
-.hierarchyGroup {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding: 16px;
-  background-color: color-mix(in srgb, var(--bg-hover) 40%, transparent);
-  border-radius: var(--radius-md);
-  border-left: 3px solid var(--primary-color);
-  margin: 4px 0;
-}
-
-.hierarchyTitle {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--primary-color);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: -4px;
 }
 
 @media (max-width: 480px) {
