@@ -47,15 +47,13 @@ export const SearchResultsPage = () => {
 
   return (
     <div className={styles.container}>
-       <div className={styles.header}>
+        <div className={styles.header}>
         <div className={styles.titleBlock}>
           <Button variant="ghost" onClick={() => navigate(-1)} className={styles.backButton}>
-            <ArrowLeft size={18} /> Назад
+            <ArrowLeft size={16} /> Назад
           </Button>
-          <div>
-            <h1 className={styles.title}>Результаты подбора доноров</h1>
-            <p className={styles.subtitle}>Список отсортирован по релевантности (меньше штрафов — лучше)</p>
-          </div>
+          <h1 className={styles.title}>Результаты подбора доноров</h1>
+          <p className={styles.subtitle}>Список отсортирован по релевантности (меньше штрафов — лучше)</p>
         </div>
 
         <div className={styles.controlsArea}>
@@ -63,7 +61,7 @@ export const SearchResultsPage = () => {
             <div className={styles.searchBar}>
               <Input 
                 icon={<Search size={18} />} 
-                placeholder="Поиск по названию донора или инв. номеру..." 
+                placeholder="Поиск по названию донора, инв. номеру или SN..." 
                 value={filters.search as string}
                 onChange={handleSearchChange}
               />
@@ -73,8 +71,8 @@ export const SearchResultsPage = () => {
               value={filters.sort as string} 
               onChange={(val) => updateFilters({ sort: val })} 
               options={[
-                { value: 'totalPenalty,asc', label: 'По релевантности (Идеальные)' },
-                { value: 'totalPenalty,desc', label: 'По релевантности (Худшие)' },
+                { value: 'totalPenalty,asc', label: 'По релевантности (лучшие)' },
+                { value: 'totalPenalty,desc', label: 'По релевантности (худшие)' },
                 { value: 'dateReceived,desc', label: 'Сначала новые ПК' },
                 { value: 'dateReceived,asc', label: 'Сначала старые ПК' },
                 { value: 'name,asc', label: 'По названию (А-Я)' },
@@ -97,10 +95,12 @@ export const SearchResultsPage = () => {
           message="С учетом текущих фильтров мы не нашли подходящих доноров. Попробуйте сбросить фильтры."
         />
       ) : (
-        <div className={styles.resultsList}>
-          {data?.items.map((result, idx) => (
-            <DonorCard key={`${result.donorDevice.externalId}-${idx}`} result={result} />
-          ))}
+        <div className={styles.resultsWrapper}>
+          <div className={styles.resultsGrid}>
+            {data?.items.map((result, idx) => (
+              <DonorCard key={`${result.donorDevice.externalId}-${idx}`} result={result} />
+            ))}
+          </div>
 
           {data && data.totalItems > 0 && (
             <Pagination
@@ -110,7 +110,7 @@ export const SearchResultsPage = () => {
               pageSize={data.currentSize}
               onPageChange={(p) => updateFilters({ page: p }, false)}
               onPageSizeChange={(s) => updateFilters({ size: s, page: 0 }, false)}
-              pageSizeOptions={[5, 10, 20, 50]}
+              pageSizeOptions={[6, 12, 24, 48]}
             />
           )}
         </div>

@@ -2,8 +2,6 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
-  max-width: 900px;
-  margin: 0 auto;
 }
 
 .header {
@@ -21,39 +19,26 @@
   gap: 8px;
 }
 
-.toolbar {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-}
-
-.searchBar {
-  flex: 1;
-  min-width: 280px;
-}
-
-.filterBtn {
-  align-self: flex-end;
-}
-
 .backButton {
-  padding-left: 0;
-  height: 24px;
-  margin-bottom: -4px;
+  padding: 0;
+  height: auto;
+  color: var(--text-secondary);
+}
+.backButton:hover {
+  background-color: transparent;
+  color: var(--text-primary);
 }
 
 .title {
   font-size: 24px;
   font-weight: 700;
   color: var(--text-primary);
-  line-height: 1.2;
+  line-height: 1.1;
 }
 
 .subtitle {
   font-size: 14px;
   color: var(--text-secondary);
-  line-height: 1;
 }
 
 .controlsArea {
@@ -61,30 +46,54 @@
   flex-direction: column;
   align-items: flex-end;
   gap: 12px;
-  width: 100%;
-  max-width: 600px;
+  flex: 1; 
+  min-width: 400px;
 }
 
-.resultsList {
+.toolbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.searchBar {
+  flex: 1;
+  min-width: 250px;
+  max-width: 400px;
+}
+
+.filterBtn {
+  align-self: flex-end;
+}
+
+.resultsWrapper {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-.goHomeBtn {
-  margin-top: 20px;
+.resultsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(550px, 1fr));
+  gap: 20px;
 }
 
-@media (max-width: 900px) {
-  .controlsArea {
-    max-width: 100%;
-    align-items: stretch;
+@media (max-width: 1200px) {
+  .resultsGrid {
+    grid-template-columns: 1fr;
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 800px) {
   .header {
     flex-direction: column;
+    align-items: stretch;
+  }
+  .controlsArea {
+    min-width: 100%;
     align-items: stretch;
   }
   .toolbar {
@@ -92,12 +101,12 @@
     align-items: stretch;
   }
   .searchBar {
-    min-width: 100%;
-  }
-  .filterBtnText {
-    display: none;
+    max-width: 100%;
   }
   .filterBtn {
     align-self: stretch;
+  }
+  .filterBtnText {
+    display: none;
   }
 }

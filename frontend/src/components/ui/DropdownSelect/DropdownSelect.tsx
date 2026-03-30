@@ -48,7 +48,7 @@ export const DropdownSelect = ({ value, onChange, options, icon, className }: Dr
           {icon && <span className={styles.icon}>{icon}</span>}
           <span className={styles.selectedText}>{selectedLabel}</span>
         </div>
-        <ChevronDown size={16} className={styles.chevron} />
+        <ChevronDown size={16} className={clsx(styles.chevron, { [styles.rotated]: isOpen })} />
       </button>
 
       {isOpen && (
