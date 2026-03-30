@@ -90,47 +90,12 @@
 }
 
 .sizeSelector {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.nativeSelect {
-  appearance: none;
-  background-color: var(--bg-surface);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  color: var(--text-primary);
-  font-size: 14px;
-  font-weight: 500;
+  width: 80px;
   height: 36px;
-  padding: 0 32px 0 12px;
-  cursor: pointer;
-  outline: none;
-  transition: var(--transition);
 }
 
-.nativeSelect:hover, .nativeSelect:focus {
-  border-color: var(--primary-color);
-}
-
-.option {
-  background-color: var(--bg-surface);
-  color: var(--text-primary);
-  font-size: 14px;
-}
-
-.sizeSelector::after {
-  content: "";
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 0; height: 0;
-  border-left: 4px solid transparent;
-  border-right: 4px solid transparent;
-  border-top: 4px solid var(--text-secondary);
-  pointer-events: none;
+.miniDropdown {
+  height: 100%;
 }
 
 .stats {

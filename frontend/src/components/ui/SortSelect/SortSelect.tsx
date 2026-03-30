@@ -1,4 +1,5 @@
 import { ArrowDownAZ } from 'lucide-react';
+import { DropdownSelect } from '../DropdownSelect/DropdownSelect';
 import styles from './SortSelect.module.css';
 
 interface SortSelectProps {
@@ -10,18 +11,13 @@ interface SortSelectProps {
 export const SortSelect = ({ value, onChange, options }: SortSelectProps) => {
   return (
     <div className={styles.container}>
-      <ArrowDownAZ size={18} className={styles.icon} />
-      <select 
+      <DropdownSelect 
         value={value} 
-        onChange={(e) => onChange(e.target.value)} 
-        className={styles.nativeSelect}
-      >
-        {options.map(opt => (
-          <option key={opt.value} value={opt.value} className={styles.option}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
+        onChange={(val) => onChange(String(val))} 
+        options={options} 
+        icon={<ArrowDownAZ size={18} />}
+        className={styles.dropdown}
+      />
     </div>
   );
 };

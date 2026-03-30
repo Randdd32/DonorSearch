@@ -1,5 +1,6 @@
 import { ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react';
 import { clsx } from 'clsx';
+import { DropdownSelect } from '../DropdownSelect/DropdownSelect';
 import styles from './Pagination.module.css';
 
 interface PaginationProps {
@@ -85,15 +86,15 @@ export const Pagination = ({
           <div className={styles.sizeSelectorWrapper}>
             <span className={styles.sizeLabel}>Показать:</span>
             <div className={styles.sizeSelector}>
-              <select
+              <DropdownSelect
                 value={pageSize}
-                onChange={(e) => onPageSizeChange(Number(e.target.value))}
-                className={styles.nativeSelect}
-              >
-                {pageSizeOptions.map(opt => (
-                  <option key={opt} value={opt} className={styles.option}>{opt}</option> 
-                ))}
-              </select>
+                onChange={(val) => onPageSizeChange(Number(val))}
+                options={pageSizeOptions.map(opt => ({ 
+                  value: opt, 
+                  label: String(opt) 
+                }))}
+                className={styles.miniDropdown}
+              />
             </div>
           </div>
         ) : <div />}
