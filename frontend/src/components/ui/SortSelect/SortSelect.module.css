@@ -1,5 +1,51 @@
-.container { 
-  width: 100%; 
-  min-width: 200px; 
-  z-index: 20; 
+.container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.icon {
+  position: absolute;
+  left: 12px;
+  color: var(--text-secondary);
+  pointer-events: none;
+}
+
+.nativeSelect {
+  appearance: none;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 500;
+  height: 40px;
+  padding: 0 36px 0 38px;
+  cursor: pointer;
+  outline: none;
+  transition: var(--transition);
+}
+
+.nativeSelect:hover, .nativeSelect:focus {
+  border-color: var(--primary-color);
+}
+
+.option {
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+  font-size: 14px;
+  padding: 8px;
+}
+
+.container::after {
+  content: "";
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0; height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid var(--text-secondary);
+  pointer-events: none;
 }

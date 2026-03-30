@@ -47,44 +47,47 @@ export const SearchResultsPage = () => {
 
   return (
     <div className={styles.container}>
-      <div className={styles.header}>
-        <Button variant="ghost" onClick={() => navigate(-1)} className={styles.backButton}>
-          <ArrowLeft size={18} />
-          Назад
-        </Button>
-        <div>
-          <h1 className={styles.title}>Результаты подбора доноров</h1>
-          <p className={styles.subtitle}>Список отсортирован по релевантности (меньше штрафов — лучше)</p>
-        </div>
-      </div>
-
-      <div className={styles.toolbar}>
-        <div className={styles.searchBar}>
-          <Input 
-            icon={<Search size={18} />} 
-            placeholder="Поиск по названию донора, инв. номеру или SN..." 
-            value={filters.search as string}
-            onChange={handleSearchChange}
-          />
+       <div className={styles.header}>
+        <div className={styles.titleBlock}>
+          <Button variant="ghost" onClick={() => navigate(-1)} className={styles.backButton}>
+            <ArrowLeft size={18} /> Назад
+          </Button>
+          <div>
+            <h1 className={styles.title}>Результаты подбора доноров</h1>
+            <p className={styles.subtitle}>Список отсортирован по релевантности (меньше штрафов — лучше)</p>
+          </div>
         </div>
 
-        <SortSelect 
-          value={filters.sort as string} 
-          onChange={(val) => updateFilters({ sort: val })} 
-          options={[
-            { value: 'totalPenalty,asc', label: 'По релевантности (лучшие)' },
-            { value: 'totalPenalty,desc', label: 'По релевантности (худшие)' },
-            { value: 'dateReceived,desc', label: 'Сначала новые ПК' },
-            { value: 'dateReceived,asc', label: 'Сначала старые ПК' },
-            { value: 'name,asc', label: 'По названию (А-Я)' },
-            { value: 'inventoryNumber,asc', label: 'По инвентарному номеру' }
-          ]}
-        />
+        <div className={styles.controlsArea}>
+          <div className={styles.toolbar}>
+            <div className={styles.searchBar}>
+              <Input 
+                icon={<Search size={18} />} 
+                placeholder="Поиск по названию донора или инв. номеру..." 
+                value={filters.search as string}
+                onChange={handleSearchChange}
+              />
+            </div>
 
-        <Button variant="secondary" onClick={() => setIsFiltersOpen(true)} className={styles.filterBtn}>
-          <Filter size={18} />
-          <span className={styles.filterBtnText}>Фильтры</span>
-        </Button>
+            <SortSelect 
+              value={filters.sort as string} 
+              onChange={(val) => updateFilters({ sort: val })} 
+              options={[
+                { value: 'totalPenalty,asc', label: 'По релевантности (Идеальные)' },
+                { value: 'totalPenalty,desc', label: 'По релевантности (Худшие)' },
+                { value: 'dateReceived,desc', label: 'Сначала новые ПК' },
+                { value: 'dateReceived,asc', label: 'Сначала старые ПК' },
+                { value: 'name,asc', label: 'По названию (А-Я)' },
+                { value: 'inventoryNumber,asc', label: 'По инв. номеру' }
+              ]}
+            />
+          </div>
+
+          <Button variant="secondary" onClick={() => setIsFiltersOpen(true)} className={styles.filterBtn}>
+            <Filter size={18} />
+            <span className={styles.filterBtnText}>Фильтры</span>
+          </Button>
+        </div>
       </div>
 
       {data?.items.length === 0 ? (

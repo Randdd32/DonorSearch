@@ -35,31 +35,33 @@ export const DevicesPage = () => {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <div>
+        <div className={styles.titleBlock}>
           <h1 className={styles.title}>Учетные единицы</h1>
           <p className={styles.subtitle}>База компьютерной техники и оборудования</p>
         </div>
-        
-        <div className={styles.toolbar}>
-          <div className={styles.searchBar}>
-            <Input 
-              icon={<Search size={18} />} 
-              placeholder="Поиск по названию, инв. номеру или SN..." 
-              value={filters.search as string}
-              onChange={handleSearchChange}
+
+        <div className={styles.controlsArea}>
+          <div className={styles.toolbar}>
+            <div className={styles.searchBar}>
+              <Input 
+                icon={<Search size={18} />} 
+                placeholder="Поиск по названию, инв. номеру или SN..." 
+                value={filters.search as string}
+                onChange={handleSearchChange}
+              />
+            </div>
+
+            <SortSelect 
+              value={filters.sort as string} 
+              onChange={(val) => updateFilters({ sort: val })} 
+              options={[
+                { value: 'dateReceived,desc', label: 'Сначала новые' },
+                { value: 'dateReceived,asc', label: 'Сначала старые' },
+                { value: 'name,asc', label: 'По названию (А-Я)' },
+                { value: 'inventoryNumber,asc', label: 'По инв. номеру' }
+              ]}
             />
           </div>
-
-          <SortSelect 
-            value={filters.sort as string} 
-            onChange={(val) => updateFilters({ sort: val })} 
-            options={[
-              { value: 'dateReceived,desc', label: 'Сначала новые' },
-              { value: 'dateReceived,asc', label: 'Сначала старые' },
-              { value: 'name,asc', label: 'По названию (А-Я)' },
-              { value: 'inventoryNumber,asc', label: 'По инвентарному номеру' }
-            ]}
-          />
 
           <Button variant="secondary" onClick={() => setIsFiltersOpen(true)} className={styles.filterBtn}>
             <Filter size={18} />

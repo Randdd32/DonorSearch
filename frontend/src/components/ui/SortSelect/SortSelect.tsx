@@ -1,4 +1,4 @@
-import { Select } from '../Select/Select'; // Наш новый компонент
+import { ArrowDownAZ } from 'lucide-react';
 import styles from './SortSelect.module.css';
 
 interface SortSelectProps {
@@ -10,12 +10,18 @@ interface SortSelectProps {
 export const SortSelect = ({ value, onChange, options }: SortSelectProps) => {
   return (
     <div className={styles.container}>
-      <Select 
+      <ArrowDownAZ size={18} className={styles.icon} />
+      <select 
         value={value} 
-        onChange={(val) => onChange(val ? String(val) : '')}
-        options={options} 
-        isSearchable={false}
-      />
+        onChange={(e) => onChange(e.target.value)} 
+        className={styles.nativeSelect}
+      >
+        {options.map(opt => (
+          <option key={opt.value} value={opt.value} className={styles.option}>
+            {opt.label}
+          </option>
+        ))}
+      </select>
     </div>
   );
 };
