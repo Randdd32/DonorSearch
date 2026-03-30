@@ -9,6 +9,7 @@
   position: relative;
   display: flex;
   align-items: center;
+  width: 100%;
 }
 
 .icon {
@@ -36,6 +37,29 @@
 
 .input.withIcon {
   padding-left: 40px;
+}
+
+.input.withClear {
+  padding-right: 36px; 
+}
+
+.clearButton {
+  position: absolute;
+  right: 10px;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 50%;
+  transition: var(--transition);
+}
+.clearButton:hover {
+  background-color: var(--bg-hover);
+  color: var(--text-primary);
 }
 
 .input:focus {

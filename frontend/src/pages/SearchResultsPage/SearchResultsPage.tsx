@@ -67,6 +67,7 @@ export const SearchResultsPage = () => {
                 placeholder="Поиск по названию донора, инв. номеру или SN..." 
                 value={filters.search as string}
                 onChange={handleSearchChange}
+                onClear={() => updateFilters({ search: '' })}
               />
             </div>
 

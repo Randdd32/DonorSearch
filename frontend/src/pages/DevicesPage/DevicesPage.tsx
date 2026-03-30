@@ -51,6 +51,7 @@ export const DevicesPage = () => {
                 placeholder="Поиск по названию, инв. номеру или SN..." 
                 value={filters.search as string}
                 onChange={handleSearchChange}
+                onClear={() => updateFilters({ search: '' })}
               />
             </div>
 
