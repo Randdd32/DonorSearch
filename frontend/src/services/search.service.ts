@@ -7,7 +7,7 @@ export interface GetSearchResultsParams {
   page?: number;
   size?: number;
   search?: string;
-  sort?: string;
+  sort?: string[];
   stateIds?: number[];
   departmentIds?: number[];
   deviceManufacturerIds?: number[];
@@ -31,7 +31,7 @@ export const searchService = {
   },
 
   async getSearchResults(sessionId: string, params: GetSearchResultsParams): Promise<PageDto<DonorResultDto>> {
-    const queryParams: Record<string, string | number | boolean | undefined> = {
+    const queryParams: Record<string, string | string[] | number | boolean | undefined> = {
       page: params.page || 0,
       size: params.size || 10,
       search: params.search,

@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Filter, Search, PackageOpen } from 'lucide-react';
+import { parseDeviceFilters } from './devicesParser';
+import { useUrlFilters } from '../../hooks/useUrlFilters';
 import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 import { useDevices } from '../../features/devices/hooks/useDevices';
 import { useDebounce } from '../../hooks/useDebounce';
-import { useUrlFilters } from '../../hooks/useUrlFilters';
 import { ErrorState } from '../../components/ui/ErrorState/ErrorState';
 import { EmptyState } from '../../components/ui/EmptyState/EmptyState';
 import { Input } from '../../components/ui/Input/Input';
@@ -18,7 +19,7 @@ import styles from './DevicesPage.module.css';
 export const DevicesPage = () => {
   useDocumentTitle('Учетные единицы');
   
-  const { filters, updateFilters, resetFilters } = useUrlFilters('dateReceived,desc');
+   const { filters, updateFilters, resetFilters } = useUrlFilters('dateReceived,desc', parseDeviceFilters);
   const debouncedSearch = useDebounce(filters.search as string, 500);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
@@ -56,8 +57,8 @@ export const DevicesPage = () => {
             </div>
 
             <SortSelect 
-              value={filters.sort as string} 
-              onChange={(val) => updateFilters({ sort: val })} 
+              value={filters.sort[0] || ''} 
+              onChange={(val) => updateFilters({ sort: [val] })} 
               options={[
                 { value: 'dateReceived,desc', label: 'Сначала новые' },
                 { value: 'dateReceived,asc', label: 'Сначала старые' },

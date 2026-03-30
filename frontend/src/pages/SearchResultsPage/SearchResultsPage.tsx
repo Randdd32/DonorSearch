@@ -13,6 +13,7 @@ import { Input } from '../../components/ui/Input/Input';
 import { SortSelect } from '../../components/ui/SortSelect/SortSelect';
 import { useUrlFilters } from '../../hooks/useUrlFilters';
 import { useDebounce } from '../../hooks/useDebounce';
+import { parseDonorFilters } from './donorParser';
 import { DonorFilters } from '../../features/search/components/DonorFilters/DonorFilters';
 import styles from './SearchResultsPage.module.css';
 
@@ -22,7 +23,7 @@ export const SearchResultsPage = () => {
   const { sessionId } = useParams<{ sessionId: string }>();
   const navigate = useNavigate();
   
-  const { filters, updateFilters, resetFilters } = useUrlFilters('totalPenalty,asc');
+  const { filters, updateFilters, resetFilters } = useUrlFilters('totalPenalty,asc', parseDonorFilters);
   const debouncedSearch = useDebounce(filters.search as string, 500);
   const[isFiltersOpen, setIsFiltersOpen] = useState(false);
 
@@ -72,8 +73,8 @@ export const SearchResultsPage = () => {
             </div>
 
             <SortSelect 
-              value={filters.sort as string} 
-              onChange={(val) => updateFilters({ sort: val })} 
+              value={filters.sort[0] || ''}  
+              onChange={(val) => updateFilters({ sort: [val] })}
               options={[
                 { value: 'totalPenalty,asc', label: 'По релевантности (лучшие)' },
                 { value: 'totalPenalty,desc', label: 'По релевантности (худшие)' },

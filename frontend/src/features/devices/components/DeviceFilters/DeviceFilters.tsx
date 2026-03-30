@@ -1,14 +1,16 @@
+
+import type { CommonFilters } from '../../../../hooks/useUrlFilters';
+import type { DeviceFiltersType } from '../../../../pages/DevicesPage/devicesParser';
 import { FilterSidebar } from '../../../../components/ui/FilterSidebar/FilterSidebar';
 import { useDictionaryFetchers } from '../../../filters/hooks/useDictionaryFetchers';
 import { MultiSelectFilter, ManufacturerModelFilters, LocationFilters, StaticSelectFilter, DateRangeFilters } from '../../../filters/components/FilterBlocks/FilterBlocks';
 import { dictionaryService } from '../../../../services/dictionary.service';
-import type { FilterValue } from '../../../../hooks/useUrlFilters';
 
 interface DeviceFiltersProps {
   isOpen: boolean; 
   onClose: () => void; 
-  filters: Record<string, FilterValue>;
-  updateFilters: (u: Record<string, FilterValue>) => void; 
+  filters: CommonFilters & DeviceFiltersType;
+  updateFilters: (updates: Partial<CommonFilters & DeviceFiltersType>) => void; 
   resetFilters: () => void;
 }
 

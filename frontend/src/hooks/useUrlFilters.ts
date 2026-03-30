@@ -1,61 +1,68 @@
 import { useSearchParams } from 'react-router-dom';
 
-const getNumberArray = (searchParams: URLSearchParams, key: string): number[] => {
+export type FilterValue = string | number | boolean | (string | number)[] | null | undefined;
+
+export const getNumberArray = (searchParams: URLSearchParams, key: string): number[] => {
   const val = searchParams.get(key);
   return val ? val.split(',').map(Number).filter(n => !isNaN(n)) :[];
 };
 
-export type FilterValue = string | number | boolean | (string | number)[] | null | undefined;
+export const getBoolean = (searchParams: URLSearchParams, key: string): boolean | undefined => {
+  const val = searchParams.get(key);
+  return val === 'true' ? true : val === 'false' ? false : undefined;
+};
 
-export const useUrlFilters = (defaultSort: string = 'id,desc') => {
-  const[searchParams, setSearchParams] = useSearchParams();
+export const getString = (searchParams: URLSearchParams, key: string): string => {
+  return searchParams.get(key) || '';
+};
 
-  const filters = {
+export interface CommonFilters {
+  [key: string]: FilterValue;
+  page: number;
+  size: number;
+  search: string;
+  sort: string[];
+}
+
+export const useUrlFilters = <T extends Record<string, FilterValue>>(
+  defaultSort: string | string[],
+  parseExtraFilters: (params: URLSearchParams) => T
+) => {
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const commonFilters: CommonFilters = {
     page: Number(searchParams.get('page')) || 0,
     size: Number(searchParams.get('size')) || 12,
     search: searchParams.get('search') || '',
-    sort: searchParams.get('sort') || defaultSort,
-    
-    stateIds: getNumberArray(searchParams, 'stateIds'),
-    departmentIds: getNumberArray(searchParams, 'departmentIds'),
-    manufacturerIds: getNumberArray(searchParams, 'manufacturerIds'),
-    typeIds: getNumberArray(searchParams, 'typeIds'),
-    modelIds: getNumberArray(searchParams, 'modelIds'),
-    buildingIds: getNumberArray(searchParams, 'buildingIds'),
-    floorIds: getNumberArray(searchParams, 'floorIds'),
-    roomIds: getNumberArray(searchParams, 'roomIds'),
-    componentManufacturerIds: getNumberArray(searchParams, 'componentManufacturerIds'),
-    maxTotalPenalty: searchParams.get('maxTotalPenalty') ? Number(searchParams.get('maxTotalPenalty')) : undefined,
-    
-    isWorking: searchParams.get('isWorking') === 'true' ? true : searchParams.get('isWorking') === 'false' ? false : undefined,
-    
-    dateReceivedFrom: searchParams.get('dateReceivedFrom') || '',
-    dateReceivedTo: searchParams.get('dateReceivedTo') || '',
+    sort: searchParams.getAll('sort').length > 0 ? searchParams.getAll('sort') : (Array.isArray(defaultSort) ? defaultSort :[defaultSort]),
   };
 
-  const updateFilters = (updates: Record<string, FilterValue>, resetPage = true) => {
+  const filters = { ...commonFilters, ...parseExtraFilters(searchParams) };
+
+  const updateFilters = (updates: Partial<CommonFilters & T>, resetPage = true) => {
     setSearchParams((prev) => {
       const next = new URLSearchParams(prev);
       
       Object.entries(updates).forEach(([key, value]) => {
+        next.delete(key); 
         if (value === null || value === '' || value === undefined || (Array.isArray(value) && value.length === 0)) {
-          next.delete(key);
+          return; 
+        }
+        if (Array.isArray(value) && key === 'sort') {
+          value.forEach(v => next.append(key, String(v)));
+        } else if (Array.isArray(value)) {
+          next.set(key, value.join(','));
         } else {
-          next.set(key, Array.isArray(value) ? value.join(',') : String(value));
+          next.set(key, String(value));
         }
       });
       
-      if (resetPage && updates.page === undefined) {
-        next.set('page', '0');
-      }
-      
+      if (resetPage && updates.page === undefined) next.set('page', '0');
       return next;
     });
   };
 
-  const resetFilters = () => {
-    setSearchParams(new URLSearchParams());
-  };
+  const resetFilters = () => setSearchParams(new URLSearchParams());
 
   return { filters, updateFilters, resetFilters };
 };

@@ -2,14 +2,15 @@ import { FilterSidebar } from '../../../../components/ui/FilterSidebar/FilterSid
 import { useDictionaryFetchers } from '../../../filters/hooks/useDictionaryFetchers';
 import { MultiSelectFilter, ManufacturerModelFilters, LocationFilters, StaticSelectFilter, DateRangeFilters } from '../../../filters/components/FilterBlocks/FilterBlocks';
 import { dictionaryService } from '../../../../services/dictionary.service';
-import type { FilterValue } from '../../../../hooks/useUrlFilters';
+import type { DonorFiltersType } from '../../../../pages/SearchResultsPage/donorParser';
+import type { CommonFilters } from '../../../../hooks/useUrlFilters';
 import styles from '../../../filters/styles/filterForms.module.css';
 
 interface DonorFiltersProps {
   isOpen: boolean;
   onClose: () => void;
-  filters: Record<string, FilterValue>;
-  updateFilters: (u: Record<string, FilterValue>) => void;
+  filters: CommonFilters & DonorFiltersType;
+  updateFilters: (updates: Partial<CommonFilters & DonorFiltersType>) => void;
   resetFilters: () => void;
 }
 

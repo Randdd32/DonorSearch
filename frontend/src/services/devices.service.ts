@@ -6,7 +6,7 @@ export interface GetDevicesParams {
   page?: number;
   size?: number;
   search?: string;
-  sort?: string;
+  sort?: string[];
   stateIds?: number[];
   departmentIds?: number[];
   manufacturerIds?: number[];
@@ -22,7 +22,7 @@ export interface GetDevicesParams {
 
 export const devicesService = {
   async getDevices(params: GetDevicesParams): Promise<PageDto<ExternalDeviceDto>> {
-    const queryParams: Record<string, string | number | boolean | undefined> = {
+    const queryParams: Record<string, string | string[] | number | boolean | undefined> = {
       page: params.page || 0,
       size: params.size || 24,
       search: params.search,
