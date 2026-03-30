@@ -1,9 +1,12 @@
 import { User, Shield, Calendar, LogOut } from 'lucide-react';
+import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 import { Card } from '../../components/ui/Card/Card';
 import { Button } from '../../components/ui/Button/Button';
 import styles from './ProfilePage.module.css';
 
 export const ProfilePage = () => {
+  useDocumentTitle('Мой профиль');
+  
   return (
     <div className={styles.container}>
       <div>

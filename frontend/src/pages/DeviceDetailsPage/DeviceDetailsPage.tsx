@@ -4,6 +4,7 @@ import {
   Fan, ShieldAlert, CheckCircle2, Search, CircuitBoard, 
   Zap, Disc3, Blocks, Gpu, PcCase, Snowflake
 } from 'lucide-react';
+import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 import { useDeviceDetails } from '../../features/devices/hooks/useDeviceDetails';
 import { useRunSearch } from '../../features/search/hooks/useRunSearch';
 import { ErrorState } from '../../components/ui/ErrorState/ErrorState';
@@ -41,6 +42,9 @@ export const DeviceDetailsPage = () => {
   const navigate = useNavigate();
   
   const { data: device, isLoading, isError } = useDeviceDetails(Number(id));
+  
+  useDocumentTitle(device ? device.name : 'Детали устройства'); 
+
   const { mutate: runSearch, isPending: isSearching } = useRunSearch();
 
   if (isLoading) return <Spinner fullPage size={40} />;

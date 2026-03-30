@@ -14,9 +14,10 @@ interface DropdownSelectProps {
   options: Option[];
   icon?: React.ReactNode;
   className?: string;
+  placement?: 'top' | 'bottom';
 }
 
-export const DropdownSelect = ({ value, onChange, options, icon, className }: DropdownSelectProps) => {
+export const DropdownSelect = ({ value, onChange, options, icon, className, placement = 'bottom' }: DropdownSelectProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -48,11 +49,15 @@ export const DropdownSelect = ({ value, onChange, options, icon, className }: Dr
           {icon && <span className={styles.icon}>{icon}</span>}
           <span className={styles.selectedText}>{selectedLabel}</span>
         </div>
-        <ChevronDown size={16} className={clsx(styles.chevron, { [styles.rotated]: isOpen })} />
+        <ChevronDown size={16} className={clsx(styles.chevron, { 
+          [styles.rotatedUp]: isOpen && placement === 'bottom',
+          [styles.rotatedDown]: isOpen && placement === 'top',
+          [styles.defaultTop]: placement === 'top' && !isOpen 
+        })} />
       </button>
 
       {isOpen && (
-        <div className={styles.menu}>
+        <div className={clsx(styles.menu, styles[placement])}>
           <div className={styles.optionsList}>
             {options.map((opt) => (
               <button

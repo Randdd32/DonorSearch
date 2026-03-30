@@ -50,13 +50,18 @@
   transition: transform 0.2s ease;
 }
 
-.chevron.rotated {
-  transform: rotate(180deg);
+.chevron.rotatedUp { 
+  transform: rotate(180deg); 
+}
+.chevron.defaultTop { 
+  transform: rotate(180deg); 
+}
+.chevron.rotatedDown { 
+  transform: rotate(0deg); 
 }
 
 .menu {
   position: absolute;
-  top: calc(100% + 4px);
   left: 0;
   min-width: 100%;
   background-color: var(--bg-surface);
@@ -65,7 +70,17 @@
   box-shadow: var(--shadow-md);
   padding: 6px;
   z-index: 50;
-  animation: fadeIn 0.15s ease-out;
+}
+
+.bottom {
+  top: calc(100% + 4px);
+  animation: fadeInDown 0.15s ease-out;
+}
+
+.top {
+  bottom: calc(100% + 4px);
+  top: auto;
+  animation: fadeInUp 0.15s ease-out;
 }
 
 .optionsList {
@@ -98,7 +113,12 @@
   font-weight: 600;
 }
 
-@keyframes fadeIn {
+@keyframes fadeInDown {
   from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: translateY(0); }
 }

@@ -93,6 +93,7 @@ export const Pagination = ({
                   value: opt, 
                   label: String(opt) 
                 }))}
+                placement="top"
                 className={styles.miniDropdown}
               />
             </div>

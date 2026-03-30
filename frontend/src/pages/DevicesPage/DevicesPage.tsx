@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Filter, Search, PackageOpen } from 'lucide-react';
+import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 import { useDevices } from '../../features/devices/hooks/useDevices';
 import { useDebounce } from '../../hooks/useDebounce';
 import { useUrlFilters } from '../../hooks/useUrlFilters';
@@ -15,6 +16,8 @@ import { Button } from '../../components/ui/Button/Button';
 import styles from './DevicesPage.module.css';
 
 export const DevicesPage = () => {
+  useDocumentTitle('Учетные единицы');
+  
   const { filters, updateFilters, resetFilters } = useUrlFilters('dateReceived,desc');
   const debouncedSearch = useDebounce(filters.search as string, 500);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);

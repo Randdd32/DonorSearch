@@ -20,9 +20,10 @@
 }
 
 .backButton {
-  padding: 0;
+  padding-left: 0;
   height: auto;
   color: var(--text-secondary);
+  margin-bottom: 12px;
 }
 .backButton:hover {
   background-color: transparent;

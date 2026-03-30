@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, SearchX, Filter, Search } from 'lucide-react';
+import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 import { useSearchResults } from '../../features/search/hooks/useSearchResults';
 import { DonorCard } from '../../features/search/components/DonorCard/DonorCard';
 import { Button } from '../../components/ui/Button/Button';
@@ -16,6 +17,8 @@ import { DonorFilters } from '../../features/search/components/DonorFilters/Dono
 import styles from './SearchResultsPage.module.css';
 
 export const SearchResultsPage = () => {
+  useDocumentTitle('Результаты подбора');
+  
   const { sessionId } = useParams<{ sessionId: string }>();
   const navigate = useNavigate();
   
