@@ -37,3 +37,28 @@ export interface ExternalDeviceDto {
   isWorking: boolean;
   components: ExternalComponentDto[];
 }
+
+export type MappingConfidence = 'AUTO' | 'NEEDS_REVIEW' | 'BAD_MATCH' | 'CONFIRMED';
+
+export interface IntegrationMappingDto {
+  id: number;
+  externalName: string;
+  internalComponentId: number;
+  internalComponentName: string;
+  internalComponentType: ExternalComponentCategory;
+  internalComponentSearchName: string;
+  confidence: MappingConfidence;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateMappingDto {
+  externalName: string;
+  internalComponentId: number;
+  confidence: MappingConfidence;
+}
+
+export interface UpdateMappingDto {
+  internalComponentId: number;
+  confidence: MappingConfidence;
+}

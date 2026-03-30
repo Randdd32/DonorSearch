@@ -8,6 +8,7 @@ import { DevicesPage } from './pages/DevicesPage/DevicesPage';
 import { DeviceDetailsPage } from './pages/DeviceDetailsPage/DeviceDetailsPage';
 import { ProfilePage } from './pages/ProfilePage/ProfilePage';
 import { SearchResultsPage } from './pages/SearchResultsPage/SearchResultsPage';
+import { MappingsPage } from './pages/MappingsPage/MappingsPage';
 import './styles/globals.css';
 
 const queryClient = new QueryClient({
@@ -36,7 +37,7 @@ export const App = () => {
             <Route path="search/results/:sessionId" element={<SearchResultsPage />} />
             <Route path="profile" element={<ProfilePage />} />
             <Route path="compatibility" element={<div>Правила совместимости</div>} />
-            <Route path="mappings" element={<div>Нераспознанное оборудование</div>} />
+            <Route path="mappings" element={<MappingsPage />} />
           </Route>
         </Routes>
       </BrowserRouter>

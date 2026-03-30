@@ -1,0 +1,64 @@
+.tableCard {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.table th {
+  padding: 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border-color);
+  white-space: nowrap;
+}
+
+.sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s;
+}
+.sortable:hover {
+  background-color: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.table th svg {
+  vertical-align: middle;
+  margin-left: 4px;
+  margin-bottom: 2px;
+}
+
+.sortIconIdle { color: var(--border-color); }
+.sortIconActive { color: var(--primary-color); }
+
+.table td {
+  padding: 16px;
+  font-size: 14px;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-color);
+  vertical-align: middle;
+}
+
+.row:hover {
+  background-color: color-mix(in srgb, var(--bg-hover) 40%, transparent);
+}
+.row:last-child td {
+  border-bottom: none;
+}

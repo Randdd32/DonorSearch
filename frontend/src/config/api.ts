@@ -7,6 +7,21 @@ export const apiClient = axios.create({
     'Content-Type': 'application/json',
   },
   timeout: 30000,
+  paramsSerializer: (params) => {
+    const searchParams = new URLSearchParams();
+    
+    Object.entries(params).forEach(([key, value]) => {
+      if (value === undefined || value === null || value === '') return;
+
+      if (Array.isArray(value)) {
+        value.forEach((v) => searchParams.append(key, String(v)));
+      } else {
+        searchParams.append(key, String(value));
+      }
+    });
+    
+    return searchParams.toString();
+  }
 });
 
 apiClient.interceptors.response.use(
