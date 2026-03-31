@@ -82,5 +82,20 @@ export const DynamicFilterField = ({ filterDef, value, onChange }: DynamicFilter
     );
   }
 
+  if (filterDef.type === 'number') {
+    return (
+      <div className={styles.filterGroup}>
+        <label className={styles.filterLabel}>{filterDef.label}</label>
+        <input 
+          type="number" 
+          className={styles.nativeInput}
+          placeholder="Точное значение"
+          value={(value as number) || ''} 
+          onChange={(e) => onChange(filterDef.exactKey, e.target.value ? Number(e.target.value) : undefined)} 
+        />
+      </div>
+    );
+  }
+
   return null;
 };
