@@ -19,7 +19,7 @@ import styles from './DevicesPage.module.css';
 export const DevicesPage = () => {
   useDocumentTitle('Учетные единицы');
   
-   const { filters, updateFilters, resetFilters } = useUrlFilters('dateReceived,desc', parseDeviceFilters);
+  const { filters, updateFilters, resetFilters } = useUrlFilters('dateReceived,desc', parseDeviceFilters);
   const debouncedSearch = useDebounce(filters.search as string, 500);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
