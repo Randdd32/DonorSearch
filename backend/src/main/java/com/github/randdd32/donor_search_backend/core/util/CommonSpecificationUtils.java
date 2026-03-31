@@ -11,7 +11,14 @@ import java.util.List;
 public final class CommonSpecificationUtils {
     public static void addSearchNamePredicate(List<Predicate> predicates, Root<?> root, CriteriaBuilder cb, String search) {
         if (search != null) {
-            predicates.add(cb.like(cb.lower(root.get("searchName")), "%" + search + "%"));
+            Predicate namePredicate = cb.like(cb.lower(root.get("searchName")), "%" + search + "%");
+            try {
+                long idValue = Long.parseLong(search.trim());
+                Predicate idPredicate = cb.equal(root.get("id"), idValue);
+                predicates.add(cb.or(namePredicate, idPredicate));
+            } catch (NumberFormatException e) {
+                predicates.add(namePredicate);
+            }
         }
     }
 
