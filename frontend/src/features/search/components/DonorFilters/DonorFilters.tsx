@@ -37,7 +37,7 @@ export const DonorFilters = ({ isOpen, onClose, filters, updateFilters, resetFil
           value={filters.componentManufacturerIds} 
           onChange={(v) => updateFilters({ componentManufacturerIds: v })} 
           fetchOptions={fetchers.fetchManufacturers} 
-          fetchByIds={(ids) => dictionaryService.manufacturers.fetchByIds(ids)} 
+          fetchByIds={(ids) => dictionaryService.infraManufacturers.fetchByIds(ids)} 
         />
       </div>
       <MultiSelectFilter 
