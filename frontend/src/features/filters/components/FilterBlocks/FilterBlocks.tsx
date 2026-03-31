@@ -53,7 +53,7 @@ export const ManufacturerModelFilters = ({
         value={manufacturers}
         onChange={(val) => updateFilters({ [manufacturerKey]: val || [], modelIds: [] })}
         fetchOptions={fetchers.fetchManufacturers}
-        fetchByIds={(ids) => dictionaryService.manufacturers.fetchByIds(ids)}
+        fetchByIds={(ids) => dictionaryService.infraManufacturers.fetchByIds(ids)}
       />
       <div className={styles.filterGroup}>
         <label className={styles.label}>Модель</label>
