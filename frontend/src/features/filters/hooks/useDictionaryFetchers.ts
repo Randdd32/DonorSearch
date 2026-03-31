@@ -6,8 +6,8 @@ export const useDictionaryFetchers = (filters: Record<string, FilterValue>) => {
     fetchStates: (s?: string) => dictionaryService.states.fetchOptions(s),
     fetchDeviceTypes: (s?: string) => dictionaryService.deviceTypes.fetchOptions(s),
     fetchDepartments: (s?: string) => dictionaryService.departments.fetchOptions(s),
-    fetchManufacturers: (s?: string) => dictionaryService.manufacturers.fetchOptions(s),
-    fetchComponentManufacturers: (s?: string) => dictionaryService.manufacturers.fetchOptions(s),
+    fetchManufacturers: (s?: string) => dictionaryService.infraManufacturers.fetchOptions(s),
+    fetchComponentManufacturers: (s?: string) => dictionaryService.infraManufacturers.fetchOptions(s),
     fetchModels: (s?: string) => {
       const parentId = (filters.manufacturerIds || filters.deviceManufacturerIds) as number[];
       return dictionaryService.deviceModels.fetchOptions(s, parentId);

@@ -16,6 +16,7 @@ interface MappingFiltersProps {
 
 const COMPONENT_TYPE_OPTIONS =[
   { value: 'CPU', label: 'Процессор' },
+  { value: 'CPU_COOLER', label: 'Кулер процессора' },
   { value: 'MOTHERBOARD', label: 'Материнская плата' },
   { value: 'MEMORY', label: 'Оперативная память' },
   { value: 'VIDEO_CARD', label: 'Видеокарта' },
@@ -23,7 +24,7 @@ const COMPONENT_TYPE_OPTIONS =[
   { value: 'POWER_SUPPLY', label: 'Блок питания' },
   { value: 'CASE', label: 'Корпус' },
   { value: 'CASE_FAN', label: 'Вентилятор' },
-  { value: 'OPTICAL_DRIVE', label: 'Привод' },
+  { value: 'OPTICAL_DRIVE', label: 'Оптический привод' },
   { value: 'EXPANSION_CARD', label: 'Карта расширения' },
   { value: 'MONITOR', label: 'Монитор' },
 ];

@@ -12,6 +12,7 @@ interface PaginationProps {
   onPageSizeChange?: (size: number) => void;
   pageSizeOptions?: number[];
   className?: string;
+  placement?: 'top' | 'bottom';
 }
 
 export const Pagination = ({
@@ -21,8 +22,9 @@ export const Pagination = ({
   pageSize,
   onPageChange,
   onPageSizeChange,
-  pageSizeOptions =[10, 20, 50, 100],
+  pageSizeOptions =[6, 12, 24, 48, 96],
   className,
+  placement = 'top'
 }: PaginationProps) => {
   if (totalItems === 0) return null;
 
@@ -93,7 +95,7 @@ export const Pagination = ({
                   value: opt, 
                   label: String(opt) 
                 }))}
-                placement="top"
+                placement={placement}
                 className={styles.miniDropdown}
               />
             </div>
