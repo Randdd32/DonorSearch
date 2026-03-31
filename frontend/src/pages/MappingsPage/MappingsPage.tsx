@@ -4,14 +4,15 @@ import { Search, Plus, CheckCircle, Edit, Trash2, Filter } from 'lucide-react';
 import { useUrlFilters } from '../../hooks/useUrlFilters';
 import { useMappings, useMappingMutations } from '../../features/admin/hooks/useMappings';
 import { parseMappingFilters } from './mappingsParser';
+import { formatDateTime } from '../../utils/formatters';
+import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 import { Input } from '../../components/ui/Input/Input';
 import { Button } from '../../components/ui/Button/Button';
 import { Badge } from '../../components/ui/Badge/Badge';
 import { Pagination } from '../../components/ui/Pagination/Pagination';
 import { TableCard, Table, TableHead, TableRow, TableHeader, TableBody, TableCell } from '../../components/ui/Table/Table';
 import { MappingFilters } from '../../features/admin/components/MappingFilters/MappingFilters';
-import { formatDateTime } from '../../utils/formatters';
-import { useDocumentTitle } from '../../hooks/useDocumentTitle';
+import { ConfirmModal } from '../../components/ui/ConfirmModal/ConfirmModal';
 import type { MappingConfidence } from '../../types/integration';
 import styles from './MappingsPage.module.css';
 
@@ -29,6 +30,8 @@ export const MappingsPage = () => {
   const { filters, updateFilters, resetFilters } = useUrlFilters(['updatedAt,desc'], parseMappingFilters);
   const [searchValue, setSearchValue] = useState(filters.search);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+
+  const [deleteId, setDeleteId] = useState<number | null>(null);
 
   const { data, isLoading } = useMappings(filters);
   const { confirmMutation, deleteMutation } = useMappingMutations();
@@ -71,7 +74,7 @@ export const MappingsPage = () => {
             <div className={styles.searchBar}>
               <Input 
                 icon={<Search size={18} />} 
-                placeholder="Поиск по названию..." 
+                placeholder="Поиск записей..." 
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && updateFilters({ search: searchValue })}
@@ -124,14 +127,25 @@ export const MappingsPage = () => {
                 <TableCell>
                   <div className={styles.actions}>
                     {row.confidence !== 'CONFIRMED' && (
-                      <button className={styles.actionBtn} onClick={() => confirmMutation.mutate({ id: row.id, componentId: row.internalComponentId })} title="Подтвердить">
+                      <button 
+                        className={styles.actionBtn} 
+                        onClick={() => confirmMutation.mutate({ 
+                          id: row.id,
+                          dto: { ...row, confidence: 'CONFIRMED' } 
+                        })}
+                        title="Подтвердить"
+                      >
                         <CheckCircle size={18} className={styles.iconSuccess} />
                       </button>
                     )}
                     <button className={styles.actionBtn} onClick={() => navigate(`/mappings/${row.id}`)} title="Редактировать">
                       <Edit size={18} className={styles.iconEdit} />
                     </button>
-                    <button className={styles.actionBtn} onClick={() => window.confirm('Удалить маппинг?') && deleteMutation.mutate(row.id)} title="Удалить">
+                    <button 
+                      className={styles.actionBtn} 
+                      onClick={() => setDeleteId(row.id)}
+                      title="Удалить"
+                    >
                       <Trash2 size={18} className={styles.iconDanger} />
                     </button>
                   </div>
@@ -147,7 +161,7 @@ export const MappingsPage = () => {
             totalItems={data?.totalItems || 0} pageSize={data?.currentSize || 10}
             onPageChange={(p) => updateFilters({ page: p }, false)}
             onPageSizeChange={(s) => updateFilters({ size: s, page: 0 }, false)}
-            pageSizeOptions={[5, 10, 20, 50]}
+            pageSizeOptions={[6, 12, 24, 48]}
           />
         </div>
       </TableCard>
@@ -158,6 +172,20 @@ export const MappingsPage = () => {
         filters={filters}
         updateFilters={updateFilters}
         resetFilters={resetFilters}
+      />
+
+      <ConfirmModal 
+        isOpen={deleteId !== null}
+        onClose={() => setDeleteId(null)}
+        onConfirm={() => {
+          if (deleteId) deleteMutation.mutate(deleteId);
+          setDeleteId(null);
+        }}
+        title="Удалить сопоставление?"
+        message="Это действие нельзя отменить. Внешнее название снова станет нераспознанным."
+        confirmLabel="Удалить"
+        variant="danger"
+        isLoading={deleteMutation.isPending}
       />
     </div>
   );

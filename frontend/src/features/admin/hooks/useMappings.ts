@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { mappingsService, type GetMappingsParams } from '../../../services/mappings.service';
 import toast from 'react-hot-toast';
+import { mappingsService, type GetMappingsParams } from '../../../services/mappings.service';
+import type { IntegrationMappingDto } from '../../../types/integration';
 
 export const useMappings = (params: GetMappingsParams) => {
   return useQuery({
@@ -16,8 +17,8 @@ export const useMappingMutations = () => {
   const invalidate = () => queryClient.invalidateQueries({ queryKey: ['mappings'] });
 
   const confirmMutation = useMutation({
-    mutationFn: ({ id, componentId }: { id: number, componentId: number }) => 
-      mappingsService.update(id, { internalComponentId: componentId, confidence: 'CONFIRMED' }),
+    mutationFn: ({ id, dto }: { id: number, dto: IntegrationMappingDto }) => 
+      mappingsService.update(id, dto),
     onSuccess: () => {
       toast.success('Связь успешно подтверждена');
       invalidate();

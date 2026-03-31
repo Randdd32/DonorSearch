@@ -156,3 +156,48 @@ export const DateRangeFilters = ({ filters, updateFilters }: { filters: Record<s
     </div>
   </>
 );
+
+interface AuditDateProps {
+  filters: Record<string, FilterValue>;
+  updateFilters: UpdateFiltersFn;
+}
+
+export const AuditDateFilters = ({ filters, updateFilters }: AuditDateProps) => (
+  <>
+    <div className={styles.hierarchyGroup}>
+      <h4 className={styles.hierarchyTitle}>Дата создания</h4>
+      <div className={styles.filterGroup}>
+        <label className={styles.label}>С даты</label>
+        <input type="datetime-local" step="1" className={styles.nativeInput}
+          value={(filters.createdAfter as string) || ''}
+          onChange={(e) => updateFilters({ createdAfter: e.target.value })}
+        />
+      </div>
+      <div className={styles.filterGroup}>
+        <label className={styles.label}>По дату</label>
+        <input type="datetime-local" step="1" className={styles.nativeInput}
+          value={(filters.createdBefore as string) || ''}
+          onChange={(e) => updateFilters({ createdBefore: e.target.value })}
+        />
+      </div>
+    </div>
+
+    <div className={styles.hierarchyGroup}>
+      <h4 className={styles.hierarchyTitle}>Дата обновления</h4>
+      <div className={styles.filterGroup}>
+        <label className={styles.label}>С даты</label>
+        <input type="datetime-local" step="1" className={styles.nativeInput}
+          value={(filters.updatedAfter as string) || ''}
+          onChange={(e) => updateFilters({ updatedAfter: e.target.value })}
+        />
+      </div>
+      <div className={styles.filterGroup}>
+        <label className={styles.label}>По дату</label>
+        <input type="datetime-local" step="1" className={styles.nativeInput}
+          value={(filters.updatedBefore as string) || ''}
+          onChange={(e) => updateFilters({ updatedBefore: e.target.value })}
+        />
+      </div>
+    </div>
+  </>
+);

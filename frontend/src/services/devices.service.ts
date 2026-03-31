@@ -1,12 +1,9 @@
 import { apiClient } from '../config/api';
 import type { PageDto } from '../types/pagination';
 import type { ExternalDeviceDto } from '../types/integration';
+import type { CommonFilters } from '../hooks/useUrlFilters';
 
-export interface GetDevicesParams {
-  page?: number;
-  size?: number;
-  search?: string;
-  sort?: string[];
+export interface GetDevicesParams extends CommonFilters {
   stateIds?: number[];
   departmentIds?: number[];
   manufacturerIds?: number[];

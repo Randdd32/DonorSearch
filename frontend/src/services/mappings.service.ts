@@ -1,6 +1,6 @@
 import { apiClient } from '../config/api';
 import type { PageDto } from '../types/pagination';
-import type { IntegrationMappingDto, CreateMappingDto, UpdateMappingDto, MappingConfidence, ExternalComponentCategory } from '../types/integration';
+import type { IntegrationMappingDto, CreateMappingDto, MappingConfidence, ExternalComponentCategory } from '../types/integration';
 import type { CommonFilters } from '../hooks/useUrlFilters';
 
 export interface GetMappingsParams extends CommonFilters {
@@ -14,19 +14,18 @@ export interface GetMappingsParams extends CommonFilters {
 
 export const mappingsService = {
   async getMappings(params: GetMappingsParams): Promise<PageDto<IntegrationMappingDto>> {
-    const queryParams = new URLSearchParams();
-    
-    queryParams.append('page', String(params.page));
-    queryParams.append('size', String(params.size));
-    if (params.search) queryParams.append('search', params.search);
-    if (params.confidence) queryParams.append('confidence', params.confidence);
-    if (params.componentType) queryParams.append('componentType', params.componentType);
-    if (params.createdAfter) queryParams.append('createdAfter', params.createdAfter);
-    if (params.createdBefore) queryParams.append('createdBefore', params.createdBefore);
-    if (params.updatedAfter) queryParams.append('updatedAfter', params.updatedAfter);
-    if (params.updatedBefore) queryParams.append('updatedBefore', params.updatedBefore);
-    
-    params.sort.forEach(s => queryParams.append('sort', s));
+    const queryParams: Record<string, string | string[] | number | boolean | undefined> = {
+      page: params.page || 0,
+      size: params.size || 10,
+      search: params.search,
+      sort: params.sort,
+      confidence: params.confidence,
+      componentType: params.componentType,
+      createdAfter: params.createdAfter ? new Date(params.createdAfter).toISOString() : undefined,
+      createdBefore: params.createdBefore ? new Date(params.createdBefore).toISOString() : undefined,
+      updatedAfter: params.updatedAfter ? new Date(params.updatedAfter).toISOString() : undefined,
+      updatedBefore: params.updatedBefore ? new Date(params.updatedBefore).toISOString() : undefined,
+    };
 
     const { data } = await apiClient.get<PageDto<IntegrationMappingDto>>('/mappings', { params: queryParams });
     return data;
@@ -42,7 +41,7 @@ export const mappingsService = {
     return data;
   },
 
-  async update(id: number, dto: UpdateMappingDto): Promise<IntegrationMappingDto> {
+  async update(id: number, dto: IntegrationMappingDto): Promise<IntegrationMappingDto> {
     const { data } = await apiClient.put<IntegrationMappingDto>(`/mappings/${id}`, dto);
     return data;
   },

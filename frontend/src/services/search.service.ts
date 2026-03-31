@@ -2,12 +2,9 @@ import { apiClient } from '../config/api';
 import type { PageDto } from '../types/pagination';
 import type { DonorResultDto } from '../types/search';
 import type { ExternalComponentCategory } from '../types/integration';
+import type { CommonFilters } from '../hooks/useUrlFilters';
 
-export interface GetSearchResultsParams {
-  page?: number;
-  size?: number;
-  search?: string;
-  sort?: string[];
+export interface GetSearchResultsParams extends CommonFilters {
   stateIds?: number[];
   departmentIds?: number[];
   deviceManufacturerIds?: number[];

@@ -18,9 +18,9 @@ export const getString = (searchParams: URLSearchParams, key: string): string =>
 
 export interface CommonFilters {
   [key: string]: FilterValue;
-  page: number;
-  size: number;
-  search: string;
+  page?: number;
+  size?: number;
+  search?: string;
   sort: string[];
 }
 

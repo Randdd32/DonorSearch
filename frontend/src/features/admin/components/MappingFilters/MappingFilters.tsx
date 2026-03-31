@@ -1,10 +1,10 @@
 import { FilterSidebar } from '../../../../components/ui/FilterSidebar/FilterSidebar';
-import { DateRangeFilters, StaticSelectFilter } from '../../../filters/components/FilterBlocks/FilterBlocks';
+import { AuditDateFilters, StaticSelectFilter } from '../../../filters/components/FilterBlocks/FilterBlocks';
 import { Select } from '../../../../components/ui/Select/Select';
 import type { CommonFilters } from '../../../../hooks/useUrlFilters';
 import type { MappingFiltersType } from '../../../../pages/MappingsPage/mappingsParser';
 import type { MappingConfidence, ExternalComponentCategory } from '../../../../types/integration';
-import styles from './MappingFilters.module.css';
+import formStyles from '../../../filters/styles/filterForms.module.css';
 
 interface MappingFiltersProps {
   isOpen: boolean;
@@ -14,7 +14,7 @@ interface MappingFiltersProps {
   resetFilters: () => void;
 }
 
-const COMPONENT_TYPE_OPTIONS: { value: ExternalComponentCategory; label: string }[] = [
+const COMPONENT_TYPE_OPTIONS =[
   { value: 'CPU', label: 'Процессор' },
   { value: 'MOTHERBOARD', label: 'Материнская плата' },
   { value: 'MEMORY', label: 'Оперативная память' },
@@ -25,12 +25,12 @@ const COMPONENT_TYPE_OPTIONS: { value: ExternalComponentCategory; label: string 
   { value: 'CASE_FAN', label: 'Вентилятор' },
   { value: 'OPTICAL_DRIVE', label: 'Привод' },
   { value: 'EXPANSION_CARD', label: 'Карта расширения' },
-  { value: 'MONITOR', label: 'Монитор' }
+  { value: 'MONITOR', label: 'Монитор' },
 ];
 
 export const MappingFilters = ({ isOpen, onClose, filters, updateFilters, resetFilters }: MappingFiltersProps) => {
   return (
-    <FilterSidebar title="Фильтры маппинга" isOpen={isOpen} onClose={onClose} onReset={resetFilters}>
+    <FilterSidebar title="Фильтры" isOpen={isOpen} onClose={onClose} onReset={resetFilters}>
       <StaticSelectFilter 
         label="Уверенность (Confidence)"
         value={filters.confidence || ''}
@@ -43,9 +43,8 @@ export const MappingFilters = ({ isOpen, onClose, filters, updateFilters, resetF
           { value: 'BAD_MATCH', label: 'Низкая уверенность' },
         ]}
       />
-
-      <div className={styles.section}>
-        <label className={styles.label}>Тип компонента</label>
+      <div className={formStyles.filterGroup}>
+        <label className={formStyles.label}>Тип компонента</label>
         <Select 
           value={filters.componentType || ''}
           onChange={(val) => updateFilters({ componentType: (val as ExternalComponentCategory) || undefined })}
@@ -54,11 +53,7 @@ export const MappingFilters = ({ isOpen, onClose, filters, updateFilters, resetF
           placeholder="Выберите тип..."
         />
       </div>
-
-      <div className={styles.section}>
-        <h4 className={styles.sectionTitle}>Даты (Создание / Изменение)</h4>
-        <DateRangeFilters filters={filters} updateFilters={updateFilters} />
-      </div>
+       <AuditDateFilters filters={filters} updateFilters={updateFilters} />
     </FilterSidebar>
   );
 };
