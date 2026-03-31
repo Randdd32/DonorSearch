@@ -1,6 +1,7 @@
 import { FilterSidebar } from '../../../../components/ui/FilterSidebar/FilterSidebar';
 import { AuditDateFilters, StaticSelectFilter } from '../../../filters/components/FilterBlocks/FilterBlocks';
 import { Select } from '../../../../components/ui/Select/Select';
+import { COMPONENT_TYPE_OPTIONS } from '../../../../types/componentTypes';
 import type { CommonFilters } from '../../../../hooks/useUrlFilters';
 import type { MappingFiltersType } from '../../../../pages/MappingsPage/mappingsParser';
 import type { MappingConfidence, ExternalComponentCategory } from '../../../../types/integration';
@@ -13,21 +14,6 @@ interface MappingFiltersProps {
   updateFilters: (updates: Partial<CommonFilters & MappingFiltersType>) => void;
   resetFilters: () => void;
 }
-
-const COMPONENT_TYPE_OPTIONS =[
-  { value: 'CPU', label: 'Процессор' },
-  { value: 'CPU_COOLER', label: 'Кулер процессора' },
-  { value: 'MOTHERBOARD', label: 'Материнская плата' },
-  { value: 'MEMORY', label: 'Оперативная память' },
-  { value: 'VIDEO_CARD', label: 'Видеокарта' },
-  { value: 'STORAGE', label: 'Накопитель' },
-  { value: 'POWER_SUPPLY', label: 'Блок питания' },
-  { value: 'CASE', label: 'Корпус' },
-  { value: 'CASE_FAN', label: 'Вентилятор' },
-  { value: 'OPTICAL_DRIVE', label: 'Оптический привод' },
-  { value: 'EXPANSION_CARD', label: 'Карта расширения' },
-  { value: 'MONITOR', label: 'Монитор' },
-];
 
 export const MappingFilters = ({ isOpen, onClose, filters, updateFilters, resetFilters }: MappingFiltersProps) => {
   return (
