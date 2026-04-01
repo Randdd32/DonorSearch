@@ -26,9 +26,10 @@ public final class CompatibilityRuleSpecification {
 
             if (search != null) {
                 Predicate codeMatch = cb.like(cb.lower(root.get("ruleCode")), "%" + search + "%");
+                Predicate nameMatch = cb.like(cb.lower(root.get("ruleName")), "%" + search + "%");
                 Predicate exprMatch = cb.like(cb.lower(root.get("expression")), "%" + search + "%");
                 Predicate descMatch = cb.like(cb.lower(root.get("description")), "%" + search + "%");
-                predicates.add(cb.or(codeMatch, exprMatch, descMatch));
+                predicates.add(cb.or(codeMatch, nameMatch, exprMatch, descMatch));
             }
             CommonSpecificationUtils.addEqualityFilter(predicates, root, cb, "isActive", isActive);
             if (!CollectionUtils.isEmpty(targetTypes)) {
