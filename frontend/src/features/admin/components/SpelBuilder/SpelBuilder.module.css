@@ -1,0 +1,143 @@
+.builderContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+}
+
+.editorHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.editorTitle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+.textarea {
+  width: 100%;
+  padding: 12px;
+  font-family: monospace;
+  font-size: 14px;
+  color: var(--text-primary);
+  background-color: color-mix(in srgb, var(--bg-hover) 50%, transparent);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  outline: none;
+  resize: vertical;
+  transition: border-color 0.2s;
+}
+
+.textarea:focus {
+  border-color: var(--primary-color);
+}
+
+.helperPanels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 8px;
+  border-top: 1px solid var(--border-color);
+  padding-top: 16px;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.panelTitle {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  position: sticky;
+  top: 0;
+  background: var(--bg-surface);
+  padding-bottom: 4px;
+}
+
+.tagList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tagItem {
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tagItem:hover {
+  border-color: var(--primary-color);
+  background: color-mix(in srgb, var(--primary-color) 5%, transparent);
+  transform: translateX(2px);
+}
+
+.tagCode {
+  font-family: monospace;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.tagDesc {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.microBadge {
+  font-size: 10px;
+  padding: 2px 6px;
+  margin-top: 4px;
+  align-self: flex-start;
+}
+
+.typeGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.typeGroupName {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  padding-bottom: 4px;
+  border-bottom: 1px dashed var(--border-color);
+}
+
+.warnText {
+  color: var(--status-critical);
+  font-weight: normal;
+  margin-left: 8px;
+  text-transform: none;
+}
+
+@media (max-width: 800px) {
+  .helperPanels {
+    grid-template-columns: 1fr;
+  }
+}

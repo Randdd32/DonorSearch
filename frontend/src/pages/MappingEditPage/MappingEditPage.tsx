@@ -17,7 +17,7 @@ import { formatDateTime } from '../../utils/formatters';
 import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 import { COMPONENT_TYPE_OPTIONS } from '../../config/componentTypes';
 import type { ExternalComponentCategory, IntegrationMappingDto, MappingConfidence } from '../../types/integration';
-import styles from './MappingEditPage.module.css';
+import styles from '../../styles/layouts/editPageLayout.module.css';
 
 export const MappingEditPage = () => {
   const { id } = useParams<{ id: string }>();

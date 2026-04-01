@@ -24,7 +24,7 @@ export interface MethodMetadataDto {
   methodSignature: string;
   returnType: string;
   description: string;
-  isNullable: boolean;
+  throwsMissingDataException: boolean;
 }
 
 export interface RuleBuilderMetadataDto {

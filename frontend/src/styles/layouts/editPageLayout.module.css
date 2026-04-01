@@ -90,6 +90,51 @@
   color: var(--text-muted);
 }
 
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 12px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-color);
+}
+
+.metaItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.metaLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.metaValue {
+  font-size: 14px;
+  color: var(--text-primary);
+  font-weight: 500;
+  word-break: break-all;
+}
+
+.nativeInput {
+  width: 100%;
+  padding: 8px 12px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 14px;
+  outline: none;
+  transition: var(--transition);
+}
+
+.nativeInput:focus {
+  border-color: var(--primary-color);
+}
+
 .componentSelector {
   display: flex;
   gap: 12px;
@@ -143,33 +188,52 @@
   flex-shrink: 0;
 }
 
-.actions {
+.containerWide {
+  max-width: 1200px;
+}
+
+.leftColumn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.rightColumnWide {
+  flex: 1.5;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.textareaInput {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.flushCard {
+  padding: 0;
+  overflow: hidden;
+  border: none;
+}
+
+.metaGrid {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.actionsClean {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  margin-top: 12px;
-  padding-top: 20px;
-  border-top: 1px solid var(--border-color);
 }
 
-.metaItem {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.metaLabel {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-}
-
-.metaValue {
-  font-size: 14px;
-  color: var(--text-primary);
-  font-weight: 500;
-  word-break: break-all;
+@media (max-width: 1000px) {
+  .rightColumnWide, .leftColumn {
+    flex: auto;
+    width: 100%;
+  }
 }
 
 @media (max-width: 768px) {
