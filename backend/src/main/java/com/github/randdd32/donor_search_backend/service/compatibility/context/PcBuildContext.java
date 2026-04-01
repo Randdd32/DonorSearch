@@ -57,42 +57,29 @@ public class PcBuildContext {
     }
 
     public void putComponent(ComponentEntity component) {
-        log.debug("here");
         if (component instanceof CaseEntity c) {
-            log.debug("here case");
             this.pcCase = c;
         } else if (component instanceof MotherboardEntity m) {
-            log.debug("here motherboard");
             this.motherboard = m;
         } else if (component instanceof PowerSupplyEntity p) {
-            log.debug("here power supply");
             this.psus.add(p);
         } else if (component instanceof CpuEntity c) {
-            log.debug("here cpu");
             this.cpus.add(c);
         } else if (component instanceof CpuCoolerEntity c) {
-            log.debug("here cpu cooler");
             this.coolers.add(c);
         } else if (component instanceof VideoCardEntity v) {
-            log.debug("here video card");
             this.gpus.add(v);
         } else if (component instanceof MemoryEntity m) {
-            log.debug("here  memory");
             this.memories.add(m);
         } else if (component instanceof StorageEntity s) {
-            log.debug("here storage");
             this.storages.add(s);
         } else if (component instanceof ExpansionCardEntity e) {
-            log.debug("here expansion card");
             this.expansionCards.add(e);
         } else if (component instanceof CaseFanEntity c) {
-            log.debug("here casefan");
             this.caseFans.add(c);
         } else if (component instanceof OpticalDriveEntity o) {
-            log.debug("here opticaldrive");
             this.opticalDrives.add(o);
         } else if (component instanceof MonitorEntity m) {
-            log.debug("here monitor");
             this.monitors.add(m);
         }
     }
