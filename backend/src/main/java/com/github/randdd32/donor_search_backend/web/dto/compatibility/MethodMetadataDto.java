@@ -4,5 +4,5 @@ public record MethodMetadataDto(
         String methodSignature,
         String returnType,
         String description,
-        Boolean isNullable
+        Boolean throwsMissingDataException
 ) {}

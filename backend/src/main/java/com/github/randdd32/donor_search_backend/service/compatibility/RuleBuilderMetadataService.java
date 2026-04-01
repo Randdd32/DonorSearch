@@ -37,6 +37,10 @@ public class RuleBuilderMetadataService {
 
     private List<MethodMetadataDto> getContextMethods() {
         return List.of(
+                new MethodMetadataDto("requireCpus()", "List<CpuEntity>", "Список процессоров (вызовет ошибку, если пусто)", true),
+                new MethodMetadataDto("requireCoolers()", "List<CpuCoolerEntity>", "Список кулеров (вызовет ошибку, если пусто)", true),
+                new MethodMetadataDto("requireMemories()", "List<MemoryEntity>", "Список ОЗУ (вызовет ошибку, если пусто)", true),
+                new MethodMetadataDto("requireGpus()", "List<VideoCardEntity>", "Список видеокарт (вызовет ошибку, если пусто)", true),
                 new MethodMetadataDto("getTotalTdpW()", "Integer", "Общее тепловыделение / TDP (Вт)", true),
                 new MethodMetadataDto("getTotalPsuWattage()", "Integer", "Общая мощность блоков питания (Вт)", true),
                 new MethodMetadataDto("getTotalRamCapacityGb()", "Integer", "Общий объем ОЗУ (ГБ)", true),
