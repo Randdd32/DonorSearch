@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Plus, CheckCircle, Edit, Trash2, Filter } from 'lucide-react';
+import { toggleSort } from '../../utils/tableUtils';
 import { useUrlFilters } from '../../hooks/useUrlFilters';
 import { useMappings, useMappingMutations } from '../../features/admin/hooks/useMappings';
 import { parseMappingFilters } from './mappingsParser';
@@ -18,9 +19,9 @@ import styles from './MappingsPage.module.css';
 
 const confidenceConfig: Record<MappingConfidence, { label: string, variant: 'success' | 'info' | 'warning' | 'danger' }> = {
   CONFIRMED: { label: 'Подтверждено', variant: 'success' },
-  AUTO: { label: 'Авто (Высокая)', variant: 'info' },
-  NEEDS_REVIEW: { label: 'Требует проверки', variant: 'warning' },
-  BAD_MATCH: { label: 'Низкая уверенность', variant: 'danger' },
+  AUTO: { label: 'Авто (>=90%)', variant: 'info' },
+  NEEDS_REVIEW: { label: 'Требует проверки (60-89%)', variant: 'warning' },
+  BAD_MATCH: { label: 'Низкая уверенность (<60%)', variant: 'danger' },
 };
 
 export const MappingsPage = () => {
@@ -37,28 +38,8 @@ export const MappingsPage = () => {
   const { confirmMutation, deleteMutation } = useMappingMutations();
 
   const handleSort = (field: string, isShiftPressed: boolean) => {
-    let currentSort = [...filters.sort];
-    const existingIndex = currentSort.findIndex(s => s.startsWith(field));
-    let newDirection = 'asc';
-
-    if (existingIndex >= 0) {
-      const currentDir = currentSort[existingIndex].split(',')[1];
-      newDirection = currentDir === 'asc' ? 'desc' : '';
-    }
-
-    const sortString = newDirection ? `${field},${newDirection}` : null;
-
-    if (isShiftPressed) {
-      if (existingIndex >= 0) {
-        if (sortString) currentSort[existingIndex] = sortString;
-        else currentSort.splice(existingIndex, 1);
-      } else if (sortString) {
-        currentSort.push(sortString);
-      }
-    } else {
-      currentSort = sortString ? [sortString] : ['updatedAt,desc'];
-    }
-    updateFilters({ sort: currentSort, page: 0 });
+    const newSort = toggleSort(filters.sort as string[], field, isShiftPressed);
+    updateFilters({ sort: newSort, page: 0 });
   };
 
   return (

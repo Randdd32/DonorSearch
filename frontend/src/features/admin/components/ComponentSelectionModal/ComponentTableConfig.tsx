@@ -39,6 +39,9 @@ const COMMON_FILTERS: FilterDef[] =[
   { key: 'hwManufacturers', label: 'Производитель', type: 'dictionary', dictName: 'hwManufacturers' },
 ];
 
+const renderBoolBadge = (val: unknown) => 
+  val ? <Badge variant="info">Да</Badge> : <Badge variant="danger">Нет</Badge>;
+
 export const COMPONENT_REGISTRY: Record<ExternalComponentCategory | 'DEFAULT', ComponentConfig> = {
   CPU: {
     columns:[
@@ -46,7 +49,7 @@ export const COMPONENT_REGISTRY: Record<ExternalComponentCategory | 'DEFAULT', C
       { key: 'coreCount', label: 'Ядра', sortable: true },
       { key: 'coreClockGhz', label: 'Частота (ГГц)', sortable: true },
       { key: 'tdpW', label: 'TDP (Вт)', sortable: true },
-      { key: 'eccSupport', label: 'ECC', render: (r) => (r.eccSupport as boolean) ? <Badge variant="info">Да</Badge> : 'Нет' },
+      { key: 'eccSupport', label: 'ECC', sortable: true, render: (r) => renderBoolBadge(r.eccSupport) },
       { key: 'socketName', label: 'Сокет' },
     ],
     filters:[
@@ -63,7 +66,7 @@ export const COMPONENT_REGISTRY: Record<ExternalComponentCategory | 'DEFAULT', C
   CPU_COOLER: {
     columns:[
       ...COMMON_COLUMNS,
-      { key: 'isWaterCooled', label: 'СЖО', render: (r) => (r.isWaterCooled as boolean) ? <Badge variant="info">Да</Badge> : 'Нет' },
+      { key: 'isWaterCooled', label: 'СЖО', sortable: true, render: (r) => renderBoolBadge(r.isWaterCooled) },
       { key: 'heightMm', label: 'Высота (мм)', sortable: true },
       { key: 'waterCooledSizeMm', label: 'Размер СЖО (мм)', sortable: true },
       { key: 'rpmMax', label: 'Макс. RPM', sortable: true },
@@ -105,7 +108,7 @@ export const COMPONENT_REGISTRY: Record<ExternalComponentCategory | 'DEFAULT', C
       { key: 'memoryTypeName', label: 'Тип' },
       { key: 'frequencyMhz', label: 'Частота (МГц)', sortable: true },
       { key: 'modulesSizeGb', label: 'Объем модуля (ГБ)', sortable: true },
-      { key: 'modulesCount', label: 'Кол-во', sortable: true },
+      { key: 'isEcc', label: 'ECC', render: (r) => renderBoolBadge(r.isEcc) },
     ],
     filters:[
       ...COMMON_FILTERS,
@@ -143,6 +146,7 @@ export const COMPONENT_REGISTRY: Record<ExternalComponentCategory | 'DEFAULT', C
       { key: 'typeName', label: 'Тип (HDD/SSD)' },
       { key: 'capacityGb', label: 'Емкость (ГБ)', sortable: true },
       { key: 'formFactorName', label: 'Форм-фактор' },
+      { key: 'isExternal', label: 'Внешний', render: (r) => renderBoolBadge(r.isExternal) },
     ],
     filters:[
       ...COMMON_FILTERS,
@@ -190,15 +194,15 @@ export const COMPONENT_REGISTRY: Record<ExternalComponentCategory | 'DEFAULT', C
       { key: 'length', label: 'Длина (мм)', type: 'range', rangeMinKey: 'minLength', rangeMaxKey: 'maxLength' },
       { key: 'width', label: 'Ширина (мм)', type: 'range', rangeMinKey: 'minWidth', rangeMaxKey: 'maxWidth' },
       { key: 'height', label: 'Высота (мм)', type: 'range', rangeMinKey: 'minHeight', rangeMaxKey: 'maxHeight' },
-      { key: 'bays35', label: 'Внутренние отсеки 3.5" (От)', type: 'range', rangeMinKey: 'minInt35Bays' },
-      { key: 'expSlots', label: 'Слоты расширения (От)', type: 'range', rangeMinKey: 'minExpansionSlots' },
+      { key: 'bays35', label: 'Внутренние отсеки 3.5" (от)', type: 'range', rangeMinKey: 'minInt35Bays' },
+      { key: 'expSlots', label: 'Слоты расширения (от)', type: 'range', rangeMinKey: 'minExpansionSlots' },
     ],
   },
   CASE_FAN: {
     columns:[
       ...COMMON_COLUMNS,
       { key: 'sizeMm', label: 'Размер (мм)', sortable: true },
-      { key: 'pwm', label: 'PWM', render: (r) => (r.pwm as boolean) ? 'Да' : 'Нет' },
+      { key: 'pwm', label: 'PWM', render: (r) => renderBoolBadge(r.pwm) },
       { key: 'rpmMax', label: 'Макс. RPM', sortable: true },
     ],
     filters:[
@@ -235,7 +239,7 @@ export const COMPONENT_REGISTRY: Record<ExternalComponentCategory | 'DEFAULT', C
       { key: 'resolutionIds', label: 'Разрешение', type: 'dictionary', dictName: 'monitorResolutions' },
       { key: 'panelTypeIds', label: 'Тип матрицы', type: 'dictionary', dictName: 'panelTypes' },
       { key: 'aspectRatioIds', label: 'Соотношение сторон', type: 'dictionary', dictName: 'aspectRatios' },
-      { key: 'size', label: 'Диагональ (Дюймы)', type: 'range', rangeMinKey: 'minScreenSize', rangeMaxKey: 'maxScreenSize' },
+      { key: 'size', label: 'Диагональ (дюймы)', type: 'range', rangeMinKey: 'minScreenSize', rangeMaxKey: 'maxScreenSize' },
       { key: 'refresh', label: 'Частота (Гц)', type: 'range', rangeMinKey: 'minRefreshRate', rangeMaxKey: 'maxRefreshRate' },
       { key: 'responseTime', label: 'Отклик (мс)', type: 'range', rangeMinKey: 'minResponseTime', rangeMaxKey: 'maxResponseTime' },
     ],
@@ -262,10 +266,6 @@ export const COMPONENT_REGISTRY: Record<ExternalComponentCategory | 'DEFAULT', C
       { key: 'sampleRate', label: 'Частота дискретизации (кГц)', type: 'range', rangeMinKey: 'minSampleRateKhz', rangeMaxKey: 'maxSampleRateKhz' },
     ],
   },
-  UNKNOWN: { 
-    columns: COMMON_COLUMNS, filters: COMMON_FILTERS 
-  },
-  DEFAULT: { 
-    columns: COMMON_COLUMNS, filters: COMMON_FILTERS 
-  },
+  UNKNOWN: { columns: COMMON_COLUMNS, filters: COMMON_FILTERS },
+  DEFAULT: { columns: COMMON_COLUMNS, filters: COMMON_FILTERS }
 };

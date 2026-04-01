@@ -1,7 +1,7 @@
 import { FilterSidebar } from '../../../../components/ui/FilterSidebar/FilterSidebar';
 import { AuditDateFilters, StaticSelectFilter } from '../../../filters/components/FilterBlocks/FilterBlocks';
 import { Select } from '../../../../components/ui/Select/Select';
-import { COMPONENT_TYPE_OPTIONS } from '../../../../types/componentTypes';
+import { COMPONENT_TYPE_OPTIONS } from '../../../../config/componentTypes';
 import type { CommonFilters } from '../../../../hooks/useUrlFilters';
 import type { MappingFiltersType } from '../../../../pages/MappingsPage/mappingsParser';
 import type { MappingConfidence, ExternalComponentCategory } from '../../../../types/integration';
@@ -25,9 +25,9 @@ export const MappingFilters = ({ isOpen, onClose, filters, updateFilters, resetF
         options={[
           { value: '', label: 'Все' },
           { value: 'CONFIRMED', label: 'Подтверждено' },
-          { value: 'AUTO', label: 'Авто (Высокая)' },
-          { value: 'NEEDS_REVIEW', label: 'Требует проверки' },
-          { value: 'BAD_MATCH', label: 'Низкая уверенность' },
+          { value: 'AUTO', label: 'Авто (>=90%)' },
+          { value: 'NEEDS_REVIEW', label: 'Требует проверки (60-89%)' },
+          { value: 'BAD_MATCH', label: 'Низкая уверенность (<60%)' }
         ]}
       />
       <div className={formStyles.filterGroup}>

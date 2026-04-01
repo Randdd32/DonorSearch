@@ -10,10 +10,15 @@ export const TableCard = ({ children, isLoading }: { children: ReactNode; isLoad
   </div>
 );
 
-export const Table = ({ children }: { children: ReactNode }) => <table className={styles.table}>{children}</table>;
+export const Table = ({ children, className }: { children: ReactNode; className?: string }) => (
+  <table className={clsx(styles.table, className)}>{children}</table>
+);
 export const TableHead = ({ children }: { children: ReactNode }) => <thead>{children}</thead>;
 export const TableBody = ({ children }: { children: ReactNode }) => <tbody>{children}</tbody>;
-export const TableRow = ({ children }: { children: ReactNode }) => <tr className={styles.row}>{children}</tr>;
+export const TableRow = ({ children, className, onClick }: 
+  { children: ReactNode; className?: string; onClick?: () => void }) => (
+  <tr className={clsx(styles.row, className)} onClick={onClick}>{children}</tr>
+);
 
 interface ThProps {
   children: ReactNode;

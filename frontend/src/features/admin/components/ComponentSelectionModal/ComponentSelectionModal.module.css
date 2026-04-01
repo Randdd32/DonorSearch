@@ -178,6 +178,27 @@
   color: var(--text-muted);
 }
 
+.borderedTable th,
+.borderedTable td {
+  border-right: 1px solid var(--border-color);
+  border-left: 1px solid var(--border-color);
+}
+.borderedTable th:first-child,
+.borderedTable td:first-child {
+  border-left: none;
+}
+.borderedTable th:last-child,
+.borderedTable td:last-child {
+  border-right: none;
+}
+
+.clickableRow {
+  cursor: pointer;
+}
+.activeRow {
+  background-color: color-mix(in srgb, var(--primary-color) 10%, transparent) !important;
+}
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }

@@ -9,6 +9,7 @@ import { DeviceDetailsPage } from './pages/DeviceDetailsPage/DeviceDetailsPage';
 import { ProfilePage } from './pages/ProfilePage/ProfilePage';
 import { SearchResultsPage } from './pages/SearchResultsPage/SearchResultsPage';
 import { MappingsPage } from './pages/MappingsPage/MappingsPage';
+import { MappingEditPage } from './pages/MappingEditPage/MappingEditPage';
 import './styles/globals.css';
 
 const queryClient = new QueryClient({
@@ -38,6 +39,7 @@ export const App = () => {
             <Route path="profile" element={<ProfilePage />} />
             <Route path="compatibility" element={<div>Правила совместимости</div>} />
             <Route path="mappings" element={<MappingsPage />} />
+            <Route path="mappings/:id" element={<MappingEditPage />} />
           </Route>
         </Routes>
       </BrowserRouter>

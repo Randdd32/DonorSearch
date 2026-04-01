@@ -59,6 +59,3 @@
 .row:hover {
   background-color: color-mix(in srgb, var(--bg-hover) 40%, transparent);
 }
-.row:last-child td {
-  border-bottom: none;
-}

@@ -10,7 +10,7 @@ import { Badge } from '../../components/ui/Badge/Badge';
 import { Button } from '../../components/ui/Button/Button';
 import { getStateConfig, formatDateTime } from '../../utils/formatters';
 import type { ExternalComponentDto, ExternalComponentCategory } from '../../types/integration';
-import { COMPONENT_CATEGORY_CONFIG } from '../../types/componentTypes';
+import { COMPONENT_CATEGORY_CONFIG } from '../../config/componentTypes';
 import styles from './DeviceDetailsPage.module.css';
 
 const ALL_CATEGORIES: ExternalComponentCategory[] =[
@@ -147,7 +147,16 @@ export const DeviceDetailsPage = () => {
 
                         <div className={styles.compActions}>
                           {!isMapped && (
-                            <Button variant="secondary" onClick={() => navigate('/mappings')}>
+                            <Button 
+                              variant="secondary" 
+                              onClick={() => {
+                                const params = new URLSearchParams({
+                                  externalName: comp.externalName,
+                                  type: category
+                                });
+                                navigate(`/mappings/new?${params.toString()}`);
+                              }}
+                            >
                               Сопоставить
                             </Button>
                           )}

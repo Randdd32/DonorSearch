@@ -1,11 +1,12 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '../../../config/api';
 import { useDebounce } from '../../../hooks/useDebounce';
 import { getComponentEndpoint } from '../../../utils/componentEndpoints';
 import type { PageDto } from '../../../types/pagination';
+import { toggleSort } from '../../../utils/tableUtils';
 
-export const useComponentSelection = (componentType: string, isOpen: boolean) => {
+export const useComponentSelection = (componentType: string, isOpen: boolean, selectedId: number | null) => {
   const[page, setPage] = useState(0);
   const [size, setSize] = useState(10);
   const [sort, setSort] = useState<string[]>(['id,desc']);
@@ -15,24 +16,21 @@ export const useComponentSelection = (componentType: string, isOpen: boolean) =>
   const debouncedSearch = useDebounce(search, 500);
   const endpoint = getComponentEndpoint(componentType);
 
-  const queryParams = useMemo(() => {
-    const params = new URLSearchParams();
-    params.append('page', String(page));
-    params.append('size', String(size));
-    if (debouncedSearch) params.append('search', debouncedSearch);
-    sort.forEach(s => params.append('sort', s));
-    
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value !== undefined && value !== null && value !== '') {
-        if (Array.isArray(value)) value.forEach(v => params.append(key, String(v)));
-        else params.append(key, String(value));
-      }
-    });
-    return params;
-  },[page, size, sort, debouncedSearch, filters]);
+  const queryParams: Record<string, string | number | boolean | string[] | undefined> = {
+    page,
+    size,
+    search: debouncedSearch || undefined,
+    sort: sort.length > 0 ? sort : undefined,
+  };
+
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== '') {
+      queryParams[key] = value as string | number | boolean | string[];
+    }
+  });
 
   const { data, isLoading } = useQuery({
-    queryKey:['components-modal', endpoint, queryParams.toString()],
+    queryKey:['components-modal', endpoint, queryParams],
     queryFn: async () => {
       if (!endpoint) return null;
       const response = await apiClient.get<PageDto<Record<string, unknown>>>(endpoint, { params: queryParams });
@@ -41,28 +39,21 @@ export const useComponentSelection = (componentType: string, isOpen: boolean) =>
     enabled: isOpen && !!endpoint,
   });
 
+  const { data: selectedItem } = useQuery({
+    queryKey:['components-modal-selected', endpoint, selectedId],
+    queryFn: async () => {
+      if (!endpoint || !selectedId) return null;
+      const response = await apiClient.get<PageDto<Record<string, unknown>>>(endpoint, {
+        params: { search: String(selectedId), size: 1 }
+      });
+      return response.data.items.find(i => i.id === selectedId) || null;
+    },
+    enabled: isOpen && !!endpoint && !!selectedId
+  });
+
   const handleSort = (field: string, isShiftPressed: boolean) => {
-    let currentSort =[...sort];
-    const existingIndex = currentSort.findIndex(s => s.startsWith(field));
-    let newDirection = 'asc';
-
-    if (existingIndex >= 0) {
-      const currentDir = currentSort[existingIndex].split(',')[1];
-      newDirection = currentDir === 'asc' ? 'desc' : '';
-    }
-
-    const sortString = newDirection ? `${field},${newDirection}` : null;
-
-    if (isShiftPressed) {
-      if (existingIndex >= 0) {
-        if (sortString) currentSort[existingIndex] = sortString;
-        else currentSort.splice(existingIndex, 1);
-      } else if (sortString) currentSort.push(sortString);
-    } else {
-      currentSort = sortString ? [sortString] : ['id,desc'];
-    }
-    
-    setSort(currentSort);
+    const newSort = toggleSort(sort as string[], field, isShiftPressed);
+    setSort(newSort);
     setPage(0);
   };
 
@@ -88,6 +79,7 @@ export const useComponentSelection = (componentType: string, isOpen: boolean) =>
   return {
     state: { page, size, sort, search, filters },
     data,
+    selectedItem,
     isLoading,
     handlers: { setPage, setSize, setSearch, handleSort, updateFilter, resetFilters }
   };

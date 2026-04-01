@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import type { FilterDef, ColumnDef } from './ComponentTableConfig';
 import { useState } from 'react';
 import { X, Search, CheckCircle, Filter } from 'lucide-react';
+import { Badge } from '../../../../components/ui/Badge/Badge';
 import { Input } from '../../../../components/ui/Input/Input';
 import { Button } from '../../../../components/ui/Button/Button';
 import { Pagination } from '../../../../components/ui/Pagination/Pagination';
@@ -27,7 +28,7 @@ export const ComponentSelectionModal = ({
   const [showFilters, setShowFilters] = useState(false);
   const config = COMPONENT_REGISTRY[componentType as ExternalComponentCategory] || COMPONENT_REGISTRY.DEFAULT;
   
-  const { state, data, isLoading, handlers } = useComponentSelection(componentType, isOpen);
+  const { state, data, selectedItem, isLoading, handlers } = useComponentSelection(componentType, isOpen, selectedId);
 
   if (!isOpen) return null;
 
@@ -37,7 +38,7 @@ export const ComponentSelectionModal = ({
       <div className={styles.modal}>
         <div className={styles.header}>
           <div>
-            <h3 className={styles.title}>Выбор компонента БД</h3>
+            <h3 className={styles.title}>Выбор компонента из БД</h3>
             <p className={styles.subtitle}>Категория: {componentType}</p>
           </div>
           <button className={styles.closeBtn} onClick={onClose}><X size={20} /></button>
@@ -46,7 +47,7 @@ export const ComponentSelectionModal = ({
         <div className={styles.toolbar}>
           <div className={styles.searchBar}>
             <Input 
-              icon={<Search size={18} />} placeholder="Поиск по названию..." 
+              icon={<Search size={18} />} placeholder="Поиск записей..." 
               value={state.search} onChange={(e) => handlers.setSearch(e.target.value)} onClear={() => handlers.setSearch('')}
             />
           </div>
@@ -82,7 +83,7 @@ export const ComponentSelectionModal = ({
           )}
 
           <TableCard isLoading={isLoading}>
-            <Table>
+            <Table className={styles.borderedTable}>
               <TableHead>
                 <TableRow>
                   {config.columns.map((col: ColumnDef) => (
@@ -94,23 +95,39 @@ export const ComponentSelectionModal = ({
                 </TableRow>
               </TableHead>
               <TableBody>
-                {data?.items.map(row => {
-                  const isSelected = (row.id as number) === selectedId;
-                  return (
-                    <TableRow key={row.id as number}>
-                      {config.columns.map(col => (
+                {selectedItem && (
+                  <TableRow className={styles.activeRow}>
+                    {config.columns.map((col: ColumnDef) => (
+                      <TableCell key={`sel-${col.key}`} className={col.key === 'id' ? styles.muted : ''}>
+                        {col.render ? col.render(selectedItem) : (selectedItem[col.key] as ReactNode)}
+                      </TableCell>
+                    ))}
+                    <TableCell>
+                      <Badge variant="success">Текущий выбор</Badge>
+                    </TableCell>
+                  </TableRow>
+                )}
+
+                {data?.items
+                  .filter(row => row.id !== selectedId)
+                  .map(row => (
+                    <TableRow 
+                      key={row.id as number}
+                      onClick={() => { onSelect(row.id as number, row.name as string); onClose(); }}
+                      className={styles.clickableRow}
+                    >
+                      {config.columns.map((col: ColumnDef) => (
                         <TableCell key={col.key} className={col.key === 'id' ? styles.muted : ''}>
                           {col.render ? col.render(row) : (row[col.key] as ReactNode)}
                         </TableCell>
                       ))}
                       <TableCell>
-                        <Button variant={isSelected ? 'secondary' : 'primary'} onClick={() => { onSelect(row.id as number, row.name as string); onClose(); }} disabled={isSelected}>
-                          {isSelected ? 'Выбрано' : 'Выбрать'}
+                        <Button variant="primary" onClick={(e) => { e.stopPropagation(); onSelect(row.id as number, row.name as string); onClose(); }}>
+                          Выбрать
                         </Button>
                       </TableCell>
                     </TableRow>
-                  );
-                })}
+                ))}
               </TableBody>
             </Table>
             
