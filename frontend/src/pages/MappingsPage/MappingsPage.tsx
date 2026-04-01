@@ -15,7 +15,7 @@ import { TableCard, Table, TableHead, TableRow, TableHeader, TableBody, TableCel
 import { MappingFilters } from '../../features/admin/components/MappingFilters/MappingFilters';
 import { ConfirmModal } from '../../components/ui/ConfirmModal/ConfirmModal';
 import type { MappingConfidence } from '../../types/integration';
-import styles from './MappingsPage.module.css';
+import styles from '../../styles/layouts/tablePageLayout.module.css';
 
 const confidenceConfig: Record<MappingConfidence, { label: string, variant: 'success' | 'info' | 'warning' | 'danger' }> = {
   CONFIRMED: { label: 'Подтверждено', variant: 'success' },
@@ -136,13 +136,13 @@ export const MappingsPage = () => {
           </TableBody>
         </Table>
         
-        <div className={styles.pagination}>
+        <div className={styles.paginationWrapper}>
           <Pagination
             currentPage={data?.currentPage || 0} totalPages={data?.totalPages || 0}
             totalItems={data?.totalItems || 0} pageSize={data?.currentSize || 10}
             onPageChange={(p) => updateFilters({ page: p }, false)}
             onPageSizeChange={(s) => updateFilters({ size: s, page: 0 }, false)}
-            pageSizeOptions={[6, 12, 24, 48]}
+            pageSizeOptions={[6, 12, 24, 48, 96]}
           />
         </div>
       </TableCard>

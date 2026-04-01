@@ -16,6 +16,11 @@ export const getString = (searchParams: URLSearchParams, key: string): string =>
   return searchParams.get(key) || '';
 };
 
+export const getStringArray = (searchParams: URLSearchParams, key: string): string[] => {
+  const val = searchParams.get(key);
+  return val ? val.split(',').filter(Boolean) :[];
+};
+
 export interface CommonFilters {
   [key: string]: FilterValue;
   page?: number;

@@ -1,7 +1,7 @@
-.container {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
+.container { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 24px; 
 }
 
 .header {
@@ -42,6 +42,7 @@
   align-items: center;
   gap: 12px;
   justify-content: flex-end;
+  flex-wrap: wrap;
   width: 100%;
 }
 
@@ -60,6 +61,20 @@
   color: var(--text-primary);
 }
 
+.targetTypesWrapper {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  max-width: 200px;
+}
+
+.codeCell { 
+  font-family: monospace; 
+  font-size: 13px; 
+  color: var(--text-primary); 
+  font-weight: 500; 
+}
+
 .compCell {
   display: flex;
   flex-direction: column;
@@ -69,6 +84,10 @@
 .compName {
   font-weight: 500;
   color: var(--text-primary);
+  white-space: nowrap; 
+  overflow: hidden; 
+  text-overflow: ellipsis; 
+  max-width: 300px;
 }
 
 .compId {
@@ -100,17 +119,22 @@
 .iconEdit:hover { color: var(--primary-color); }
 .iconDanger:hover { color: var(--status-critical); }
 
-.pagination {
-  padding: 20px;
-  border-top: 1px solid var(--border-color);
-}
+.paginationWrapper { padding: 20px; }
 
 @media (max-width: 1000px) {
-  .header {
-    flex-direction: column;
-    align-items: stretch;
+  .header { 
+    flex-direction: column; 
+    align-items: stretch; 
   }
-  .controlsArea {
-    align-items: stretch;
+  .controlsArea { 
+    min-width: 100%;
+    align-items: stretch; 
+  }
+  .toolbar { 
+    flex-direction: column; 
+    align-items: stretch; 
+  }
+  .searchBar { 
+    max-width: 100%; 
   }
 }
