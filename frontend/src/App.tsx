@@ -11,6 +11,7 @@ import { SearchResultsPage } from './pages/SearchResultsPage/SearchResultsPage';
 import { MappingsPage } from './pages/MappingsPage/MappingsPage';
 import { MappingEditPage } from './pages/MappingEditPage/MappingEditPage';
 import { RulesPage } from './pages/RulesPage/RulesPage';
+import { RuleEditPage } from './pages/RuleEditPage/RuleEditPage';
 import './styles/globals.css';
 
 const queryClient = new QueryClient({
@@ -39,6 +40,7 @@ export const App = () => {
             <Route path="search/results/:sessionId" element={<SearchResultsPage />} />
             <Route path="profile" element={<ProfilePage />} />
             <Route path="compatibility" element={<RulesPage />} />
+            <Route path="compatibility/:id" element={<RuleEditPage />} />
             <Route path="mappings" element={<MappingsPage />} />
             <Route path="mappings/:id" element={<MappingEditPage />} />
           </Route>
