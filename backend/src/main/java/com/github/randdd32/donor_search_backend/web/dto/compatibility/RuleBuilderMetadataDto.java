@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 public record RuleBuilderMetadataDto(
-        Map<String, String> contextProperties,
+        Map<String, ContextPropertyMetadataDto> contextProperties,
         List<MethodMetadataDto> contextMethods,
         Map<String, List<FieldMetadataDto>> componentFields
 ) {}

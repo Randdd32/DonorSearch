@@ -1,5 +1,6 @@
 package com.github.randdd32.donor_search_backend.service.compatibility;
 
+import com.github.randdd32.donor_search_backend.web.dto.compatibility.ContextPropertyMetadataDto;
 import com.github.randdd32.donor_search_backend.web.dto.compatibility.FieldMetadataDto;
 import com.github.randdd32.donor_search_backend.web.dto.compatibility.MethodMetadataDto;
 import com.github.randdd32.donor_search_backend.web.dto.compatibility.RuleBuilderMetadataDto;
@@ -18,20 +19,20 @@ public class RuleBuilderMetadataService {
         );
     }
 
-    private Map<String, String> getContextProperties() {
+    private Map<String, ContextPropertyMetadataDto> getContextProperties() {
         return Map.ofEntries(
-                Map.entry("pcCase", "Корпус (объект)"),
-                Map.entry("motherboard", "Материнская плата (объект)"),
-                Map.entry("psus", "Блоки питания (список)"),
-                Map.entry("cpus", "Процессоры (список)"),
-                Map.entry("coolers", "Кулеры для процессоров (список)"),
-                Map.entry("gpus", "Видеокарты (список)"),
-                Map.entry("memories", "Оперативная память (список)"),
-                Map.entry("storages", "Накопители (список)"),
-                Map.entry("expansionCards", "Карты расширения (список)"),
-                Map.entry("caseFans", "Корпусные вентиляторы (список)"),
-                Map.entry("opticalDrives", "Оптические приводы (список)"),
-                Map.entry("monitors", "Мониторы (список)")
+                Map.entry("CASE", new ContextPropertyMetadataDto("pcCase", "Корпус (объект)")),
+                Map.entry("MOTHERBOARD", new ContextPropertyMetadataDto("motherboard", "Материнская плата (объект)")),
+                Map.entry("POWER_SUPPLY", new ContextPropertyMetadataDto("psus", "Блоки питания (список)")),
+                Map.entry("CPU", new ContextPropertyMetadataDto("cpus", "Процессоры (список)")),
+                Map.entry("CPU_COOLER", new ContextPropertyMetadataDto("coolers", "Кулеры для процессоров (список)")),
+                Map.entry("VIDEO_CARD", new ContextPropertyMetadataDto("gpus", "Видеокарты (список)")),
+                Map.entry("MEMORY", new ContextPropertyMetadataDto("memories", "Оперативная память (список)")),
+                Map.entry("STORAGE", new ContextPropertyMetadataDto("storages", "Накопители (список)")),
+                Map.entry("EXPANSION_CARD", new ContextPropertyMetadataDto("expansionCards", "Карты расширения (список)")),
+                Map.entry("CASE_FAN", new ContextPropertyMetadataDto("caseFans", "Корпусные вентиляторы (список)")),
+                Map.entry("OPTICAL_DRIVE", new ContextPropertyMetadataDto("opticalDrives", "Оптические приводы (список)")),
+                Map.entry("MONITOR", new ContextPropertyMetadataDto("monitors", "Мониторы (список)"))
         );
     }
 
