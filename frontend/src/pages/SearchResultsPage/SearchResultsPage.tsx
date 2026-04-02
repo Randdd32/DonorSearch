@@ -57,7 +57,7 @@ export const SearchResultsPage = () => {
             <ArrowLeft size={16} /> Назад
           </Button>
           <h1 className={styles.title}>Результаты подбора доноров</h1>
-          <p className={styles.subtitle}>Список отсортирован по релевантности (меньше штрафов — лучше)</p>
+          <p className={styles.subtitle}>По умолчанию, список отсортирован по релевантности (меньше штрафов — лучше)</p>
         </div>
 
         <div className={styles.controlsArea}>
