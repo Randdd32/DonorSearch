@@ -18,11 +18,11 @@ export const useValidateExpression = () => {
       toast.success('Синтаксис выражения корректен!', { icon: '✅' });
     },
     onError: (e: Error | AxiosError<{ message: string }>) => {
-      if (e instanceof AxiosError) {
-        toast.error(e.response?.data?.message || 'Ошибка синтаксиса SpEL (сервер)', { duration: 5000 });
-      } else {
-        toast.error(e.message || 'Неизвестная ошибка', { duration: 5000 });
-      }
+      const backendMsg = e instanceof AxiosError ? (e.response?.data?.message || e.message) : e.message;
+      toast.error(
+        `К сожалению, правило не удалось корректно обработать.\n\nТекст ошибки:\n${backendMsg}`, 
+        { duration: 8000 }
+      );
     }
   });
 };

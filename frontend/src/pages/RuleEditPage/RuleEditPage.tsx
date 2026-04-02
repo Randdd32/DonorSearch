@@ -128,7 +128,7 @@ const RuleForm = ({ isNew, id, originalData }: RuleFormProps) => {
                 setTargetTypes(selected ? selected.map(s => s.value) :[]);
               }}
               styles={getSelectStyles()}
-              placeholder="Выберите типы (влияет на доступные поля SpEL)"
+              placeholder="Выберите типы..."
               noOptionsMessage={() => 'Не найдено'}
             />
           </div>
@@ -152,7 +152,7 @@ const RuleForm = ({ isNew, id, originalData }: RuleFormProps) => {
             <Select 
               value={isActive ? 'true' : 'false'}
               onChange={(val) => setIsActive(val === 'true')}
-              options={[{ value: 'true', label: 'Включено (Проверяется)' }, { value: 'false', label: 'Отключено (Игнорируется)' }]}
+              options={[{ value: 'true', label: 'Включено (проверяется)' }, { value: 'false', label: 'Отключено (игнорируется)' }]}
               isSearchable={false}
             />
           </div>

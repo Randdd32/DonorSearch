@@ -56,14 +56,13 @@ export const RulesPage = () => {
               />
             </div>
             <Button onClick={() => navigate('/compatibility/new')}>
-              <Plus size={18} /> Создать правило
-            </Button>
-
-            <Button variant="secondary" onClick={() => setIsFiltersOpen(true)}>
-              <Filter size={18} />
-              <span>Фильтры</span>
+              <Plus size={18} /> Добавить
             </Button>
           </div>
+          <Button variant="secondary" onClick={() => setIsFiltersOpen(true)}>
+              <Filter size={18} />
+              <span>Фильтры</span>
+          </Button>
         </div>
       </div>
 

@@ -35,17 +35,18 @@
   margin-top: 8px;
 }
 
-.content {
-  display: flex;
-  align-items: flex-start;
-  gap: 24px;
-}
+.content { 
+  display: flex; 
+  align-items: stretch;
+  gap: 24px; 
+} 
 
 .formCard {
   flex: 2;
   display: flex;
   flex-direction: column;
   gap: 20px;
+  height: 100%;
 }
 
 .metaColumn {
@@ -57,7 +58,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  background-color: color-mix(in srgb, var(--bg-hover) 30%, transparent);
+  background-color: color-mix(in srgb, var(--bg-hover) 40%, var(--bg-surface));
 }
 
 .cardTitle {
@@ -189,7 +190,7 @@
 }
 
 .containerWide {
-  max-width: 1200px;
+  max-width: 1600px;
 }
 
 .leftColumn {
@@ -200,10 +201,11 @@
 }
 
 .rightColumnWide {
-  flex: 1.5;
+  flex: 2.5;
   display: flex;
   flex-direction: column;
   gap: 24px;
+  height: 100%;
 }
 
 .textareaInput {
@@ -215,6 +217,9 @@
   padding: 0;
   overflow: hidden;
   border: none;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .metaGrid {

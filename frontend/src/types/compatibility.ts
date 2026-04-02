@@ -27,8 +27,13 @@ export interface MethodMetadataDto {
   throwsMissingDataException: boolean;
 }
 
+export interface ContextPropertyMetadataDto {
+  propertyName: string;
+  description: string;
+}
+
 export interface RuleBuilderMetadataDto {
-  contextProperties: Record<string, string>;
+  contextProperties: Record<string, ContextPropertyMetadataDto>;
   contextMethods: MethodMetadataDto[];
   componentFields: Record<ExternalComponentCategory | string, FieldMetadataDto[]>;
 }

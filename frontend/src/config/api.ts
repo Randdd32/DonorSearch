@@ -29,6 +29,10 @@ apiClient.interceptors.response.use(
   (error) => {
     if (axios.isCancel(error)) return Promise.reject(error);
 
+    if (error.config?.url?.includes('/validate-expression')) {
+      return Promise.reject(error);
+    }
+
     const message = error.response?.data?.message || 'Произошла непредвиденная ошибка сервера';
     toast.error(message);
     
