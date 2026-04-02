@@ -39,10 +39,22 @@ export const DonorCard = ({ result }: DonorCardProps) => {
             </div>
             
             <div className={styles.deviceSubGrid}>
-              <div className={styles.subItem}><Hash size={14} /> {device.inventoryNumber || 'Н/Д'}</div>
-              <div className={styles.subItem}><User size={14} /> {device.ownerFullName || 'Неизвестно'}</div>
-              <div className={styles.subItem}><Building size={14} /> {device.departmentName || 'Отдел не указан'}</div>
-              <div className={styles.subItem}><MapPin size={14} /> {device.locationPath}</div>
+              <div className={styles.subItem}>
+                <Hash size={14} className={styles.iconShrink} /> 
+                <span className={styles.truncate}>{device.inventoryNumber || 'Н/Д'}</span>
+              </div>
+              <div className={styles.subItem} title={device.ownerFullName}>
+                <User size={14} className={styles.iconShrink} /> 
+                <span className={styles.truncate}>{device.ownerFullName || 'Неизвестно'}</span>
+              </div>
+              <div className={styles.subItem} title={device.departmentName}>
+                <Building size={14} className={styles.iconShrink} /> 
+                <span className={styles.truncate}>{device.departmentName || 'Отдел не указан'}</span>
+              </div>
+              <div className={styles.subItem} title={device.locationPath}>
+                <MapPin size={14} className={styles.iconShrink} /> 
+                <span className={styles.truncate}>{device.locationPath}</span>
+              </div>
             </div>
           </div>
         </div>

@@ -18,12 +18,14 @@
   align-items: flex-start;
   gap: 12px;
   flex: 1;
+  min-width: 0;
 }
 
 .deviceMeta {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  min-width: 0;
 }
 
 .deviceHeaderRow {
@@ -46,7 +48,17 @@
   gap: 4px;
   font-size: 13px;
   color: var(--text-secondary);
+  max-width: 100%;
+}
+
+.truncate {
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.iconShrink {
+  flex-shrink: 0;
 }
 
 .iconWrapper {
