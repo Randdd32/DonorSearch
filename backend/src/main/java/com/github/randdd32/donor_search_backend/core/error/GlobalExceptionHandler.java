@@ -89,6 +89,11 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(PdfGenerationException.class)
+    public ResponseEntity<ErrorDetails> handlePdfGenerationException(PdfGenerationException ex, WebRequest request) {
+        return buildServerError("PDF_GENERATION_FAILED", ex, request, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<ErrorDetails> handleIllegalStateException(IllegalStateException ex, WebRequest request) {
         return buildServerError("ILLEGAL_STATE", ex, request, HttpStatus.INTERNAL_SERVER_ERROR);
