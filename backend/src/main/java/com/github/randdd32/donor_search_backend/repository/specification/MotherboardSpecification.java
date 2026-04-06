@@ -1,7 +1,9 @@
 package com.github.randdd32.donor_search_backend.repository.specification;
 
 import com.github.randdd32.donor_search_backend.core.util.CommonSpecificationUtils;
+import com.github.randdd32.donor_search_backend.core.util.QueryUtils;
 import com.github.randdd32.donor_search_backend.model.hardware.MotherboardEntity;
+import com.github.randdd32.donor_search_backend.web.dto.filter.MotherboardFilter;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
@@ -10,13 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class MotherboardSpecification {
-    public static Specification<MotherboardEntity> withFilters(
-            String search,
-            List<Long> manufacturerIds, List<Long> socketIds,
-            List<Long> formFactorIds, List<Long> memoryTypeIds,
-            Integer minMaxMemoryGb, Integer minMemorySlots, Integer minMemorySpeedMhz,
-            Boolean eccSupport, Boolean usesBackConnect) {
-
+    public static Specification<MotherboardEntity> withFilters(MotherboardFilter filter) {
         return (root, query, cb) -> {
             if (query != null && Long.class != query.getResultType() && long.class != query.getResultType()) {
                 root.fetch("manufacturer", JoinType.LEFT);
@@ -28,18 +24,20 @@ public final class MotherboardSpecification {
 
             List<Predicate> predicates = new ArrayList<>();
 
-            CommonSpecificationUtils.addSearchNamePredicate(predicates, root, cb, search);
-            CommonSpecificationUtils.addDictionaryFilter(predicates, root, "manufacturer", manufacturerIds);
-            CommonSpecificationUtils.addDictionaryFilter(predicates, root, "socket", socketIds);
-            CommonSpecificationUtils.addDictionaryFilter(predicates, root, "formFactor", formFactorIds);
-            CommonSpecificationUtils.addDictionaryFilter(predicates, root, "memoryType", memoryTypeIds);
+            String cleanSearch = QueryUtils.cleanSearchToken(filter.search());
+            CommonSpecificationUtils.addSearchNamePredicate(predicates, root, cb, cleanSearch);
 
-            CommonSpecificationUtils.addRangeFilter(predicates, root, cb, "maxMemoryGb", minMaxMemoryGb, null);
-            CommonSpecificationUtils.addRangeFilter(predicates, root, cb, "memorySlots", minMemorySlots, null);
-            CommonSpecificationUtils.addRangeFilter(predicates, root, cb, "memorySpeedMaxMhz", minMemorySpeedMhz, null);
+            CommonSpecificationUtils.addDictionaryFilter(predicates, root, "manufacturer", filter.manufacturerIds());
+            CommonSpecificationUtils.addDictionaryFilter(predicates, root, "socket", filter.socketIds());
+            CommonSpecificationUtils.addDictionaryFilter(predicates, root, "formFactor", filter.formFactorIds());
+            CommonSpecificationUtils.addDictionaryFilter(predicates, root, "memoryType", filter.memoryTypeIds());
 
-            CommonSpecificationUtils.addEqualityFilter(predicates, root, cb, "eccSupport", eccSupport);
-            CommonSpecificationUtils.addEqualityFilter(predicates, root, cb, "usesBackConnect", usesBackConnect);
+            CommonSpecificationUtils.addRangeFilter(predicates, root, cb, "maxMemoryGb", filter.minMaxMemoryGb(), null);
+            CommonSpecificationUtils.addRangeFilter(predicates, root, cb, "memorySlots", filter.minMemorySlots(), null);
+            CommonSpecificationUtils.addRangeFilter(predicates, root, cb, "memorySpeedMaxMhz", filter.minMemorySpeedMhz(), null);
+
+            CommonSpecificationUtils.addEqualityFilter(predicates, root, cb, "eccSupport", filter.eccSupport());
+            CommonSpecificationUtils.addEqualityFilter(predicates, root, cb, "usesBackConnect", filter.usesBackConnect());
 
             if (predicates.isEmpty()) {
                 return cb.conjunction();

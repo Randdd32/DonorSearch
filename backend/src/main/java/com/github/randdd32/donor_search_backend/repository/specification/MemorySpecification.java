@@ -1,7 +1,9 @@
 package com.github.randdd32.donor_search_backend.repository.specification;
 
 import com.github.randdd32.donor_search_backend.core.util.CommonSpecificationUtils;
+import com.github.randdd32.donor_search_backend.core.util.QueryUtils;
 import com.github.randdd32.donor_search_backend.model.hardware.MemoryEntity;
+import com.github.randdd32.donor_search_backend.web.dto.filter.MemoryFilter;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
@@ -10,16 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class MemorySpecification {
-    public static Specification<MemoryEntity> withFilters(
-            String search,
-            List<Long> manufacturerIds, List<Long> formFactorIds,
-            List<Long> memoryTypeIds, List<Long> colorIds,
-            Integer minFrequency, Integer maxFrequency,
-            Integer minModulesCount, Integer maxModulesCount,
-            Integer minModulesSize, Integer maxModulesSize,
-            Integer minCas, Integer maxCas,
-            Boolean isEcc, Boolean isRegistered) {
-
+    public static Specification<MemoryEntity> withFilters(MemoryFilter filter) {
         return (root, query, cb) -> {
             if (query != null && Long.class != query.getResultType() && long.class != query.getResultType()) {
                 root.fetch("manufacturer", JoinType.LEFT);
@@ -30,19 +23,21 @@ public final class MemorySpecification {
 
             List<Predicate> predicates = new ArrayList<>();
 
-            CommonSpecificationUtils.addSearchNamePredicate(predicates, root, cb, search);
-            CommonSpecificationUtils.addDictionaryFilter(predicates, root, "manufacturer", manufacturerIds);
-            CommonSpecificationUtils.addDictionaryFilter(predicates, root, "formFactor", formFactorIds);
-            CommonSpecificationUtils.addDictionaryFilter(predicates, root, "memoryType", memoryTypeIds);
-            CommonSpecificationUtils.addDictionaryFilter(predicates, root, "color", colorIds);
+            String cleanSearch = QueryUtils.cleanSearchToken(filter.search());
+            CommonSpecificationUtils.addSearchNamePredicate(predicates, root, cb, cleanSearch);
 
-            CommonSpecificationUtils.addRangeFilter(predicates, root, cb, "frequencyMhz", minFrequency, maxFrequency);
-            CommonSpecificationUtils.addRangeFilter(predicates, root, cb, "modulesCount", minModulesCount, maxModulesCount);
-            CommonSpecificationUtils.addRangeFilter(predicates, root, cb, "modulesSizeGb", minModulesSize, maxModulesSize);
-            CommonSpecificationUtils.addRangeFilter(predicates, root, cb, "casLatency", minCas, maxCas);
+            CommonSpecificationUtils.addDictionaryFilter(predicates, root, "manufacturer", filter.manufacturerIds());
+            CommonSpecificationUtils.addDictionaryFilter(predicates, root, "formFactor", filter.formFactorIds());
+            CommonSpecificationUtils.addDictionaryFilter(predicates, root, "memoryType", filter.memoryTypeIds());
+            CommonSpecificationUtils.addDictionaryFilter(predicates, root, "color", filter.colorIds());
 
-            CommonSpecificationUtils.addEqualityFilter(predicates, root, cb, "isEcc", isEcc);
-            CommonSpecificationUtils.addEqualityFilter(predicates, root, cb, "isRegistered", isRegistered);
+            CommonSpecificationUtils.addRangeFilter(predicates, root, cb, "frequencyMhz", filter.minFrequency(), filter.maxFrequency());
+            CommonSpecificationUtils.addRangeFilter(predicates, root, cb, "modulesCount", filter.minModulesCount(), filter.maxModulesCount());
+            CommonSpecificationUtils.addRangeFilter(predicates, root, cb, "modulesSizeGb", filter.minModulesSize(), filter.maxModulesSize());
+            CommonSpecificationUtils.addRangeFilter(predicates, root, cb, "casLatency", filter.minCas(), filter.maxCas());
+
+            CommonSpecificationUtils.addEqualityFilter(predicates, root, cb, "isEcc", filter.isEcc());
+            CommonSpecificationUtils.addEqualityFilter(predicates, root, cb, "isRegistered", filter.isRegistered());
 
             if (predicates.isEmpty()) {
                 return cb.conjunction();

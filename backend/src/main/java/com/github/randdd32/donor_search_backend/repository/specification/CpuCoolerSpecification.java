@@ -1,7 +1,9 @@
 package com.github.randdd32.donor_search_backend.repository.specification;
 
 import com.github.randdd32.donor_search_backend.core.util.CommonSpecificationUtils;
+import com.github.randdd32.donor_search_backend.core.util.QueryUtils;
 import com.github.randdd32.donor_search_backend.model.hardware.CpuCoolerEntity;
+import com.github.randdd32.donor_search_backend.web.dto.filter.CpuCoolerFilter;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
@@ -10,14 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class CpuCoolerSpecification {
-    public static Specification<CpuCoolerEntity> withFilters(
-            String search,
-            List<Long> manufacturerIds, List<Long> colorIds, List<Long> socketIds,
-            Boolean isWaterCooled,
-            Integer minHeight, Integer maxHeight,
-            Integer minWaterSize, Integer maxWaterSize,
-            Integer minRpm, Integer maxRpm) {
-
+    public static Specification<CpuCoolerEntity> withFilters(CpuCoolerFilter filter) {
         return (root, query, cb) -> {
             if (query != null && Long.class != query.getResultType() && long.class != query.getResultType()) {
                 root.fetch("manufacturer", JoinType.LEFT);
@@ -26,16 +21,18 @@ public final class CpuCoolerSpecification {
 
             List<Predicate> predicates = new ArrayList<>();
 
-            CommonSpecificationUtils.addSearchNamePredicate(predicates, root, cb, search);
-            CommonSpecificationUtils.addDictionaryFilter(predicates, root, "manufacturer", manufacturerIds);
-            CommonSpecificationUtils.addDictionaryFilter(predicates, root, "color", colorIds);
-            CommonSpecificationUtils.addManyToManyFilter(predicates, root, "sockets", socketIds);
+            String cleanSearch = QueryUtils.cleanSearchToken(filter.search());
+            CommonSpecificationUtils.addSearchNamePredicate(predicates, root, cb, cleanSearch);
 
-            CommonSpecificationUtils.addEqualityFilter(predicates, root, cb, "isWaterCooled", isWaterCooled);
+            CommonSpecificationUtils.addDictionaryFilter(predicates, root, "manufacturer", filter.manufacturerIds());
+            CommonSpecificationUtils.addDictionaryFilter(predicates, root, "color", filter.colorIds());
+            CommonSpecificationUtils.addManyToManyFilter(predicates, root, "sockets", filter.socketIds());
 
-            CommonSpecificationUtils.addRangeFilter(predicates, root, cb, "heightMm", minHeight, maxHeight);
-            CommonSpecificationUtils.addRangeFilter(predicates, root, cb, "waterCooledSizeMm", minWaterSize, maxWaterSize);
-            CommonSpecificationUtils.addRangeFilter(predicates, root, cb, "rpmMax", minRpm, maxRpm);
+            CommonSpecificationUtils.addEqualityFilter(predicates, root, cb, "isWaterCooled", filter.isWaterCooled());
+
+            CommonSpecificationUtils.addRangeFilter(predicates, root, cb, "heightMm", filter.minHeight(), filter.maxHeight());
+            CommonSpecificationUtils.addRangeFilter(predicates, root, cb, "waterCooledSizeMm", filter.minWaterSize(), filter.maxWaterSize());
+            CommonSpecificationUtils.addRangeFilter(predicates, root, cb, "rpmMax", filter.minRpm(), filter.maxRpm());
 
             if (predicates.isEmpty()) {
                 return cb.conjunction();

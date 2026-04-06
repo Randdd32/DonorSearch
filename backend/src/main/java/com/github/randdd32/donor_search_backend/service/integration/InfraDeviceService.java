@@ -3,6 +3,7 @@ package com.github.randdd32.donor_search_backend.service.integration;
 import com.github.randdd32.donor_search_backend.core.error.NotFoundException;
 import com.github.randdd32.donor_search_backend.core.util.QueryUtils;
 import com.github.randdd32.donor_search_backend.service.IntegrationMappingService;
+import com.github.randdd32.donor_search_backend.web.dto.filter.InfraDeviceFilter;
 import com.github.randdd32.donor_search_backend.web.dto.integration.ExternalComponentDto;
 import com.github.randdd32.donor_search_backend.web.dto.integration.ExternalDeviceDto;
 import com.github.randdd32.donor_search_backend.web.dto.integration.enums.ExternalComponentCategory;
@@ -19,7 +20,6 @@ import org.springframework.util.CollectionUtils;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -71,19 +71,14 @@ public class InfraDeviceService {
         LEFT JOIN dbo.[Здание] b ON f.[ИД здания] = b.[Идентификатор]
     """;
 
-    public PageDto<ExternalDeviceDto> getDevicesPage(
-            String search, List<Long> stateIds, List<Long> departmentIds,
-            List<Long> manufacturerIds, List<Long> typeIds, List<Long> modelIds,
-            List<Long> buildingIds, List<Long> floorIds, List<Long> roomIds,
-            Instant dateReceivedFrom, Instant dateReceivedTo, Boolean isWorking,
-            Pageable pageable) {
+    public PageDto<ExternalDeviceDto> getDevicesPage(InfraDeviceFilter filter, Pageable pageable) {
         int page = pageable.getPageNumber();
         int size = pageable.getPageSize();
 
         StringBuilder where = new StringBuilder(" WHERE 1=1 ");
         MapSqlParameterSource params = new MapSqlParameterSource();
 
-        String cleanSearch = QueryUtils.cleanSearchToken(search);
+        String cleanSearch = QueryUtils.cleanSearchToken(filter.search());
         if (cleanSearch != null) {
             where.append(" AND (LOWER(pc.[Название]) LIKE '%' + :search + '%' ")
                     .append(" OR LOWER(pc.[Инвентарный номер]) LIKE '%' + :search + '%' ")
@@ -91,26 +86,26 @@ public class InfraDeviceService {
             params.addValue("search", cleanSearch);
         }
 
-        addListFilter(where, params, "state.[ID]", "stateIds", stateIds);
-        addListFilter(where, params, "dep.[Идентификатор]", "departmentIds", departmentIds);
-        addListFilter(where, params, "manuf.[Идентификатор]", "manufacturerIds", manufacturerIds);
-        addListFilter(where, params, "pct.[ID]", "typeIds", typeIds);
-        addListFilter(where, params, "too.[Идентификатор]", "modelIds", modelIds);
-        addListFilter(where, params, "b.[Идентификатор]", "buildingIds", buildingIds);
-        addListFilter(where, params, "f.[Идентификатор]", "floorIds", floorIds);
-        addListFilter(where, params, "r.[Идентификатор]", "roomIds", roomIds);
+        addListFilter(where, params, "state.[ID]", "stateIds", filter.stateIds());
+        addListFilter(where, params, "dep.[Идентификатор]", "departmentIds", filter.departmentIds());
+        addListFilter(where, params, "manuf.[Идентификатор]", "manufacturerIds", filter.manufacturerIds());
+        addListFilter(where, params, "pct.[ID]", "typeIds", filter.typeIds());
+        addListFilter(where, params, "too.[Идентификатор]", "modelIds", filter.modelIds());
+        addListFilter(where, params, "b.[Идентификатор]", "buildingIds", filter.buildingIds());
+        addListFilter(where, params, "f.[Идентификатор]", "floorIds", filter.floorIds());
+        addListFilter(where, params, "r.[Идентификатор]", "roomIds", filter.roomIds());
 
-        if (isWorking != null) {
+        if (filter.isWorking() != null) {
             where.append(" AND a.[IsWorking] = :isWorking ");
-            params.addValue("isWorking", isWorking ? 1 : 0);
+            params.addValue("isWorking", filter.isWorking() ? 1 : 0);
         }
-        if (dateReceivedFrom != null) {
+        if (filter.dateReceivedFrom() != null) {
             where.append(" AND a.[DateReceived] >= :dateFrom ");
-            params.addValue("dateFrom", java.sql.Timestamp.from(dateReceivedFrom));
+            params.addValue("dateFrom", java.sql.Timestamp.from(filter.dateReceivedFrom()));
         }
-        if (dateReceivedTo != null) {
+        if (filter.dateReceivedTo() != null) {
             where.append(" AND a.[DateReceived] <= :dateTo ");
-            params.addValue("dateTo", java.sql.Timestamp.from(dateReceivedTo));
+            params.addValue("dateTo", java.sql.Timestamp.from(filter.dateReceivedTo()));
         }
 
         String countSql = "SELECT COUNT(1) " + BASE_DEVICE_FROM_JOINS + where;

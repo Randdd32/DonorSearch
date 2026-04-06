@@ -1,22 +1,18 @@
 package com.github.randdd32.donor_search_backend.repository.specification;
 
 import com.github.randdd32.donor_search_backend.core.util.CommonSpecificationUtils;
+import com.github.randdd32.donor_search_backend.core.util.QueryUtils;
 import com.github.randdd32.donor_search_backend.model.IntegrationMappingEntity;
-import com.github.randdd32.donor_search_backend.model.enums.ComponentType;
-import com.github.randdd32.donor_search_backend.model.enums.MappingConfidence;
+import com.github.randdd32.donor_search_backend.web.dto.filter.IntegrationMappingFilter;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
 public final class IntegrationMappingSpecification {
-    public static Specification<IntegrationMappingEntity> withFilters(
-            String search, MappingConfidence confidence, ComponentType componentType,
-            Instant createdAfter, Instant createdBefore, Instant updatedAfter, Instant updatedBefore) {
-
+    public static Specification<IntegrationMappingEntity> withFilters(IntegrationMappingFilter filter) {
         return (root, query, cb) -> {
             if (query != null && Long.class != query.getResultType() && long.class != query.getResultType()) {
                 root.fetch("internalComponent", JoinType.LEFT);
@@ -24,16 +20,19 @@ public final class IntegrationMappingSpecification {
 
             List<Predicate> predicates = new ArrayList<>();
 
-            if (search != null) {
-                Predicate extName = cb.like(cb.lower(root.get("externalName")), "%" + search + "%");
-                Predicate intSearchName = cb.like(cb.lower(root.get("internalComponent").get("searchName")), "%" + search + "%");
+            String cleanSearch = QueryUtils.cleanSearchToken(filter.search());
+            if (cleanSearch != null) {
+                Predicate extName = cb.like(cb.lower(root.get("externalName")), "%" + cleanSearch + "%");
+                Predicate intSearchName = cb.like(cb.lower(root.get("internalComponent").get("searchName")), "%" + cleanSearch + "%");
                 predicates.add(cb.or(extName, intSearchName));
             }
-            CommonSpecificationUtils.addEqualityFilter(predicates, root, cb, "confidence", confidence);
-            if (componentType != null) {
-                predicates.add(cb.equal(root.get("internalComponent").get("type"), componentType));
+
+            CommonSpecificationUtils.addEqualityFilter(predicates, root, cb, "confidence", filter.confidence());
+            if (filter.componentType() != null) {
+                predicates.add(cb.equal(root.get("internalComponent").get("type"), filter.componentType()));
             }
-            CommonSpecificationUtils.addAuditDateFilters(predicates, root, cb, createdAfter, createdBefore, updatedAfter, updatedBefore);
+            CommonSpecificationUtils.addAuditDateFilters(predicates, root, cb, filter.createdAfter(), filter.createdBefore(),
+                    filter.updatedAfter(), filter.updatedBefore());
 
             if (predicates.isEmpty()) {
                 return cb.conjunction();

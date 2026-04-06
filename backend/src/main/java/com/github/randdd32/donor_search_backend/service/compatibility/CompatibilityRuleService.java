@@ -1,11 +1,11 @@
 package com.github.randdd32.donor_search_backend.service.compatibility;
 
-import com.github.randdd32.donor_search_backend.core.util.QueryUtils;
 import com.github.randdd32.donor_search_backend.model.compatibility.CompatibilityRuleEntity;
 import com.github.randdd32.donor_search_backend.model.enums.ComponentType;
 import com.github.randdd32.donor_search_backend.repository.compatibility.CompatibilityRuleRepository;
 import com.github.randdd32.donor_search_backend.repository.specification.CompatibilityRuleSpecification;
 import com.github.randdd32.donor_search_backend.service.AbstractCrudService;
+import com.github.randdd32.donor_search_backend.web.dto.filter.CompatibilityRuleFilter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,16 +28,8 @@ public class CompatibilityRuleService extends AbstractCrudService<CompatibilityR
     }
 
     @Transactional(readOnly = true)
-    public Page<CompatibilityRuleEntity> getAll(
-            String search, Boolean isActive, List<ComponentType> targetTypes,
-            Instant createdAfter, Instant createdBefore,
-            Instant updatedAfter, Instant updatedBefore,
-            Pageable pageable) {
-
-        Specification<CompatibilityRuleEntity> spec = CompatibilityRuleSpecification.withFilters(
-                QueryUtils.cleanSearchToken(search), isActive, targetTypes,
-                createdAfter, createdBefore, updatedAfter, updatedBefore
-        );
+    public Page<CompatibilityRuleEntity> getAll(CompatibilityRuleFilter filter, Pageable pageable) {
+        Specification<CompatibilityRuleEntity> spec = CompatibilityRuleSpecification.withFilters(filter);
         return repository.findAll(spec, pageable);
     }
 

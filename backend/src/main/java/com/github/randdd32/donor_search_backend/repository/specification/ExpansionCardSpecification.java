@@ -1,8 +1,9 @@
 package com.github.randdd32.donor_search_backend.repository.specification;
 
 import com.github.randdd32.donor_search_backend.core.util.CommonSpecificationUtils;
-import com.github.randdd32.donor_search_backend.model.enums.ExpansionCardType;
+import com.github.randdd32.donor_search_backend.core.util.QueryUtils;
 import com.github.randdd32.donor_search_backend.model.hardware.ExpansionCardEntity;
+import com.github.randdd32.donor_search_backend.web.dto.filter.ExpansionCardFilter;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
@@ -11,14 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class ExpansionCardSpecification {
-    public static Specification<ExpansionCardEntity> withFilters(
-            String search, ExpansionCardType cardType,
-            List<Long> manufacturerIds, List<Long> interfaceIds, List<Long> colorIds,
-            List<Long> audioChipsetIds, List<Long> protocolIds,
-            Double minChannels, Double maxChannels,
-            Integer minDigitalAudioBit, Integer maxDigitalAudioBit,
-            Double minSampleRateKhz, Double maxSampleRateKhz) {
-
+    public static Specification<ExpansionCardEntity> withFilters(ExpansionCardFilter filter) {
         return (root, query, cb) -> {
             if (query != null && Long.class != query.getResultType() && long.class != query.getResultType()) {
                 root.fetch("manufacturer", JoinType.LEFT);
@@ -30,18 +24,19 @@ public final class ExpansionCardSpecification {
 
             List<Predicate> predicates = new ArrayList<>();
 
-            CommonSpecificationUtils.addSearchNamePredicate(predicates, root, cb, search);
-            CommonSpecificationUtils.addEqualityFilter(predicates, root, cb, "cardType", cardType);
+            String cleanSearch = QueryUtils.cleanSearchToken(filter.search());
+            CommonSpecificationUtils.addSearchNamePredicate(predicates, root, cb, cleanSearch);
+            CommonSpecificationUtils.addEqualityFilter(predicates, root, cb, "cardType", filter.cardType());
 
-            CommonSpecificationUtils.addDictionaryFilter(predicates, root, "manufacturer", manufacturerIds);
-            CommonSpecificationUtils.addDictionaryFilter(predicates, root, "interfaceType", interfaceIds);
-            CommonSpecificationUtils.addDictionaryFilter(predicates, root, "color", colorIds);
-            CommonSpecificationUtils.addDictionaryFilter(predicates, root, "audioChipset", audioChipsetIds);
-            CommonSpecificationUtils.addDictionaryFilter(predicates, root, "protocol", protocolIds);
+            CommonSpecificationUtils.addDictionaryFilter(predicates, root, "manufacturer", filter.manufacturerIds());
+            CommonSpecificationUtils.addDictionaryFilter(predicates, root, "interfaceType", filter.interfaceIds());
+            CommonSpecificationUtils.addDictionaryFilter(predicates, root, "color", filter.colorIds());
+            CommonSpecificationUtils.addDictionaryFilter(predicates, root, "audioChipset", filter.audioChipsetIds());
+            CommonSpecificationUtils.addDictionaryFilter(predicates, root, "protocol", filter.protocolIds());
 
-            CommonSpecificationUtils.addRangeFilter(predicates, root, cb, "channels", minChannels, maxChannels);
-            CommonSpecificationUtils.addRangeFilter(predicates, root, cb, "digitalAudioBit", minDigitalAudioBit, maxDigitalAudioBit);
-            CommonSpecificationUtils.addRangeFilter(predicates, root, cb, "sampleRateKhz", minSampleRateKhz, maxSampleRateKhz);
+            CommonSpecificationUtils.addRangeFilter(predicates, root, cb, "channels", filter.minChannels(), filter.maxChannels());
+            CommonSpecificationUtils.addRangeFilter(predicates, root, cb, "digitalAudioBit", filter.minDigitalAudioBit(), filter.maxDigitalAudioBit());
+            CommonSpecificationUtils.addRangeFilter(predicates, root, cb, "sampleRateKhz", filter.minSampleRateKhz(), filter.maxSampleRateKhz());
 
             if (predicates.isEmpty()) {
                 return cb.conjunction();

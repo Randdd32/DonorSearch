@@ -12,6 +12,7 @@ import com.github.randdd32.donor_search_backend.service.IntegrationMappingServic
 import com.github.randdd32.donor_search_backend.service.compatibility.CompatibilityEngineService;
 import com.github.randdd32.donor_search_backend.service.integration.InfraDeviceService;
 import com.github.randdd32.donor_search_backend.service.compatibility.context.PcBuildContext;
+import com.github.randdd32.donor_search_backend.web.dto.filter.DonorSearchFilter;
 import com.github.randdd32.donor_search_backend.web.dto.integration.ExternalComponentDto;
 import com.github.randdd32.donor_search_backend.web.dto.integration.ExternalDeviceDto;
 import com.github.randdd32.donor_search_backend.web.dto.integration.enums.ExternalComponentCategory;
@@ -105,21 +106,14 @@ public class DonorSearchService {
         return sessionId;
     }
 
-    public PageDto<DonorResultDto> getResults(
-            String sessionId, String search, List<Long> stateIds,
-            List<Long> departmentIds, List<Long> buildingIds, List<Long> floorIds, List<Long> roomIds,
-            List<Long> deviceManufacturerIds, List<Long> typeIds, List<Long> modelIds,
-            Instant dateReceivedFrom, Instant dateReceivedTo, Boolean isWorking,
-            List<Long> componentManufacturerIds, Integer maxTotalPenalty, Pageable pageable) {
+    public PageDto<DonorResultDto> getResults(String sessionId, DonorSearchFilter filter, Pageable pageable) {
         List<DonorResultDto> cachedResults = searchCache.getIfPresent(sessionId);
         if (cachedResults == null) {
             throw new NotFoundException(String.format("Сессия поиска [%s] истекла или не найдена. Запустите поиск заново.", sessionId));
         }
 
         List<DonorResultDto> filtered = cachedResults.stream()
-                .filter(d -> matchesFilters(d, search, stateIds, departmentIds, buildingIds, floorIds, roomIds,
-                        deviceManufacturerIds, typeIds, modelIds, dateReceivedFrom, dateReceivedTo,
-                        isWorking, componentManufacturerIds, maxTotalPenalty))
+                .filter(d -> matchesFilters(d, filter))
                 .toList();
 
         Comparator<DonorResultDto> comparator = Comparator.comparingInt(DonorResultDto::totalPenalty);
@@ -148,15 +142,10 @@ public class DonorSearchService {
         return PageDtoMapper.toDto(sorted.subList(fromIndex, toIndex), totalCount, page, size);
     }
 
-    private boolean matchesFilters(
-            DonorResultDto dto, String search, List<Long> stateIds,
-            List<Long> departmentIds, List<Long> buildingIds, List<Long> floorIds, List<Long> roomIds,
-            List<Long> deviceManufacturerIds, List<Long> typeIds, List<Long> modelIds,
-            Instant dateReceivedFrom, Instant dateReceivedTo, Boolean isWorking,
-            List<Long> componentManufacturerIds, Integer maxTotalPenalty) {
+    private boolean matchesFilters(DonorResultDto dto, DonorSearchFilter filter) {
         ExternalDeviceDto dev = dto.donorDevice();
 
-        String q = QueryUtils.cleanSearchToken(search);
+        String q = QueryUtils.cleanSearchToken(filter.search());
         if (q != null) {
             boolean matchName = dev.name() != null && dev.name().toLowerCase().contains(q);
             boolean matchInv = dev.inventoryNumber() != null && dev.inventoryNumber().toLowerCase().contains(q);
@@ -164,24 +153,24 @@ public class DonorSearchService {
             if (!matchName && !matchInv && !matchSn) return false;
         }
 
-        if (!isMatch(stateIds, dev.stateId())) return false;
-        if (!isMatch(departmentIds, dev.departmentId())) return false;
-        if (!isMatch(deviceManufacturerIds, dev.manufacturerId())) return false;
-        if (!isMatch(typeIds, dev.typeId())) return false;
-        if (!isMatch(modelIds, dev.modelId())) return false;
-        if (!isMatch(buildingIds, dev.buildingId())) return false;
-        if (!isMatch(floorIds, dev.floorId())) return false;
-        if (!isMatch(roomIds, dev.roomId())) return false;
+        if (!isMatch(filter.stateIds(), dev.stateId())) return false;
+        if (!isMatch(filter.departmentIds(), dev.departmentId())) return false;
+        if (!isMatch(filter.deviceManufacturerIds(), dev.manufacturerId())) return false;
+        if (!isMatch(filter.typeIds(), dev.typeId())) return false;
+        if (!isMatch(filter.modelIds(), dev.modelId())) return false;
+        if (!isMatch(filter.buildingIds(), dev.buildingId())) return false;
+        if (!isMatch(filter.floorIds(), dev.floorId())) return false;
+        if (!isMatch(filter.roomIds(), dev.roomId())) return false;
 
-        if (isWorking != null && !isWorking.equals(dev.isWorking())) return false;
-        if (dateReceivedFrom != null && dev.dateReceived() != null && dev.dateReceived().isBefore(dateReceivedFrom)) return false;
-        if (dateReceivedTo != null && dev.dateReceived() != null && dev.dateReceived().isAfter(dateReceivedTo)) return false;
-        if (maxTotalPenalty != null && dto.totalPenalty() > maxTotalPenalty) return false;
+        if (filter.isWorking() != null && !filter.isWorking().equals(dev.isWorking())) return false;
+        if (filter.dateReceivedFrom() != null && dev.dateReceived() != null && dev.dateReceived().isBefore(filter.dateReceivedFrom())) return false;
+        if (filter.dateReceivedTo() != null && dev.dateReceived() != null && dev.dateReceived().isAfter(filter.dateReceivedTo())) return false;
+        if (filter.maxTotalPenalty() != null && dto.totalPenalty() > filter.maxTotalPenalty()) return false;
 
-        if (!CollectionUtils.isEmpty(componentManufacturerIds)) {
+        if (!CollectionUtils.isEmpty(filter.componentManufacturerIds())) {
             return dto.compatibleComponents().stream()
                     .anyMatch(c -> c.externalInfo().manufacturerId() != null &&
-                            componentManufacturerIds.contains(c.externalInfo().manufacturerId()));
+                            filter.componentManufacturerIds().contains(c.externalInfo().manufacturerId()));
         }
 
         return true;

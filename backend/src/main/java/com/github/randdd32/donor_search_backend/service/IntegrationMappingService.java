@@ -1,6 +1,5 @@
 package com.github.randdd32.donor_search_backend.service;
 
-import com.github.randdd32.donor_search_backend.core.util.QueryUtils;
 import com.github.randdd32.donor_search_backend.model.IntegrationMappingEntity;
 import com.github.randdd32.donor_search_backend.model.enums.ComponentType;
 import com.github.randdd32.donor_search_backend.model.enums.MappingConfidence;
@@ -9,6 +8,7 @@ import com.github.randdd32.donor_search_backend.repository.IntegrationMappingRep
 import com.github.randdd32.donor_search_backend.repository.hardware.ComponentScoreProjection;
 import com.github.randdd32.donor_search_backend.repository.specification.IntegrationMappingSpecification;
 import com.github.randdd32.donor_search_backend.service.hardware.ComponentService;
+import com.github.randdd32.donor_search_backend.web.dto.filter.IntegrationMappingFilter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,15 +41,8 @@ public class IntegrationMappingService extends AbstractCrudService<IntegrationMa
     }
 
     @Transactional(readOnly = true)
-    public Page<IntegrationMappingEntity> getAll(
-            String search, MappingConfidence confidence, ComponentType componentType,
-            Instant createdAfter, Instant createdBefore, Instant updatedAfter, Instant updatedBefore,
-            Pageable pageable) {
-
-        Specification<IntegrationMappingEntity> spec = IntegrationMappingSpecification.withFilters(
-                QueryUtils.cleanSearchToken(search), confidence, componentType,
-                createdAfter, createdBefore, updatedAfter, updatedBefore
-        );
+    public Page<IntegrationMappingEntity> getAll(IntegrationMappingFilter filter, Pageable pageable) {
+        Specification<IntegrationMappingEntity> spec = IntegrationMappingSpecification.withFilters(filter);
         return repository.findAll(spec, pageable);
     }
 

@@ -1,7 +1,9 @@
 package com.github.randdd32.donor_search_backend.repository.specification;
 
 import com.github.randdd32.donor_search_backend.core.util.CommonSpecificationUtils;
+import com.github.randdd32.donor_search_backend.core.util.QueryUtils;
 import com.github.randdd32.donor_search_backend.model.hardware.CaseFanEntity;
+import com.github.randdd32.donor_search_backend.web.dto.filter.CaseFanFilter;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
@@ -10,13 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class CaseFanSpecification {
-    public static Specification<CaseFanEntity> withFilters(
-            String search,
-            List<Long> manufacturerIds, List<Long> colorIds, List<Long> connectorIds,
-            List<Integer> sizes, Boolean pwm,
-            Integer minRpm, Integer maxRpm,
-            Integer minAirflow, Integer maxAirflow) {
-
+    public static Specification<CaseFanEntity> withFilters(CaseFanFilter filter) {
         return (root, query, cb) -> {
             if (query != null && Long.class != query.getResultType() && long.class != query.getResultType()) {
                 root.fetch("manufacturer", JoinType.LEFT);
@@ -25,16 +21,18 @@ public final class CaseFanSpecification {
 
             List<Predicate> predicates = new ArrayList<>();
 
-            CommonSpecificationUtils.addSearchNamePredicate(predicates, root, cb, search);
-            CommonSpecificationUtils.addDictionaryFilter(predicates, root, "manufacturer", manufacturerIds);
-            CommonSpecificationUtils.addDictionaryFilter(predicates, root, "color", colorIds);
+            String cleanSearch = QueryUtils.cleanSearchToken(filter.search());
+            CommonSpecificationUtils.addSearchNamePredicate(predicates, root, cb, cleanSearch);
 
-            CommonSpecificationUtils.addManyToManyFilter(predicates, root, "connectors", connectorIds);
-            CommonSpecificationUtils.addInFilter(predicates, root, "sizeMm", sizes);
-            CommonSpecificationUtils.addEqualityFilter(predicates, root, cb, "pwm", pwm);
+            CommonSpecificationUtils.addDictionaryFilter(predicates, root, "manufacturer", filter.manufacturerIds());
+            CommonSpecificationUtils.addDictionaryFilter(predicates, root, "color", filter.colorIds());
 
-            CommonSpecificationUtils.addRangeFilter(predicates, root, cb, "rpmMax", minRpm, maxRpm);
-            CommonSpecificationUtils.addRangeFilter(predicates, root, cb, "airflowMax", minAirflow, maxAirflow);
+            CommonSpecificationUtils.addManyToManyFilter(predicates, root, "connectors", filter.connectorIds());
+            CommonSpecificationUtils.addInFilter(predicates, root, "sizeMm", filter.sizes());
+            CommonSpecificationUtils.addEqualityFilter(predicates, root, cb, "pwm", filter.pwm());
+
+            CommonSpecificationUtils.addRangeFilter(predicates, root, cb, "rpmMax", filter.minRpm(), filter.maxRpm());
+            CommonSpecificationUtils.addRangeFilter(predicates, root, cb, "airflowMax", filter.minAirflow(), filter.maxAirflow());
 
             if (predicates.isEmpty()) {
                 return cb.conjunction();
