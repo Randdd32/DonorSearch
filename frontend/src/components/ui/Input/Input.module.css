@@ -33,12 +33,12 @@
   font-size: 14px;
   transition: var(--transition);
   outline: none;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
-.input::placeholder {
+.input:placeholder-shown {
   text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
 }
 
 .input.withIcon {
@@ -46,7 +46,7 @@
 }
 
 .input.withClear {
-  padding-right: 36px; 
+  padding-right: 40px; 
 }
 
 .clearButton {

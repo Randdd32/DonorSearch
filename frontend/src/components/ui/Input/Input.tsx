@@ -11,8 +11,9 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ className, icon, error, onClear, value, ...props }, ref) => {
+  ({ className, icon, error, onClear, value, placeholder, title, ...props }, ref) => {
     const showClearButton = onClear && value && String(value).length > 0;
+    const computedTitle = !value && placeholder ? placeholder : title;
 
     return (
       <div className={styles.wrapper}>
@@ -22,6 +23,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           <input
             ref={ref}
             value={value}
+            placeholder={placeholder}
+            title={computedTitle}
             className={clsx(
               styles.input,
               { 

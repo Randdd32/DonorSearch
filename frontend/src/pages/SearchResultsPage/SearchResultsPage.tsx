@@ -109,7 +109,7 @@ export const SearchResultsPage = () => {
         </div>
 
         <div className={styles.controlsArea}>
-          <div className={styles.toolbar}>
+          <div className={styles.toolbarTop}>
             <div className={styles.searchBar}>
               <Input 
                 icon={<Search size={18} />} 
@@ -128,8 +128,9 @@ export const SearchResultsPage = () => {
                 title="Скачать PDF отчет"
               >
                 <Download size={18} />
-                <span className={styles.filterBtnText}>PDF</span>
+                <span className={styles.outputBtnText}>PDF</span>
               </Button>
+
               <Button 
                 variant="secondary" 
                 onClick={handlePrint} 
@@ -137,11 +138,14 @@ export const SearchResultsPage = () => {
                 title="Распечатать результаты"
               >
                 <Printer size={18} />
-                <span className={styles.filterBtnText}>Печать</span>
+                <span className={styles.outputBtnText}>Печать</span>
               </Button>
             </div>
+          </div>
 
-            <SortSelect 
+          <div className={styles.toolbarBottom}>
+            <SortSelect
+              className={styles.sortSelect}
               value={filters.sort[0] || ''}  
               onChange={(val) => updateFilters({ sort: [val] })}
               options={[
@@ -153,12 +157,12 @@ export const SearchResultsPage = () => {
                 { value: 'inventoryNumber,asc', label: 'По инв. номеру' }
               ]}
             />
-          </div>
 
-          <Button variant="secondary" onClick={() => setIsFiltersOpen(true)} className={styles.filterBtn}>
-            <Filter size={18} />
-            <span className={styles.filterBtnText}>Фильтры</span>
-          </Button>
+            <Button variant="secondary" onClick={() => setIsFiltersOpen(true)}>
+              <Filter size={18} />
+              <span className={styles.filterBtnText}>Фильтры</span>
+            </Button>
+          </div>
         </div>
       </div>
 
