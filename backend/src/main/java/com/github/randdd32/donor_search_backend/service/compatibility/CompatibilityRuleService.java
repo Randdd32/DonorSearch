@@ -35,9 +35,9 @@ public class CompatibilityRuleService extends AbstractCrudService<CompatibilityR
 
     @Transactional(readOnly = true)
     public List<CompatibilityRuleEntity> getActiveRulesByComponentType(ComponentType type) {
-        Specification<CompatibilityRuleEntity> spec = CompatibilityRuleSpecification.withFilters(
-                null, true, List.of(type), null, null, null, null
-        );
+        CompatibilityRuleFilter filter = new CompatibilityRuleFilter(null, true, List.of(type), null,
+                null, null, null);
+        Specification<CompatibilityRuleEntity> spec = CompatibilityRuleSpecification.withFilters(filter);
         return repository.findAll(spec);
     }
 
