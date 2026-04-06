@@ -63,26 +63,22 @@ export const SearchResultsPage = () => {
   const handlePrint = async () => {
     try {
       setIsPrinting(true);
+
       const blob = await searchService.exportPdf(sessionId!, filters);
-      const url = window.URL.createObjectURL(blob);
-      
-      const iframe = document.createElement('iframe');
-      iframe.style.display = 'none';
-      iframe.src = url;
-      document.body.appendChild(iframe);
-      
-      iframe.onload = () => {
-        setTimeout(() => {
-          iframe.contentWindow?.focus();
-          iframe.contentWindow?.print();
-          setTimeout(() => {
-            window.URL.revokeObjectURL(url);
-            document.body.removeChild(iframe);
-          }, 1000);
-        }, 100);
-      };
-    } catch {
+      const url = URL.createObjectURL(blob);
+
+      const win = window.open(url);
+
+      if (win) {
+        win.onload = () => {
+          win.focus();
+          win.print();
+        };
+      }
+
+    } catch (e) {
       toast.error('Ошибка при подготовке документа к печати');
+      console.error(e);
     } finally {
       setIsPrinting(false);
     }
