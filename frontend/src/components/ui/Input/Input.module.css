@@ -35,6 +35,12 @@
   outline: none;
 }
 
+.input::placeholder {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
 .input.withIcon {
   padding-left: 40px;
 }
