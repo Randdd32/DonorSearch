@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, SearchX, Filter, Search } from 'lucide-react';
+import { ArrowLeft, SearchX, Filter, Search, Download, Printer } from 'lucide-react';
+import toast from 'react-hot-toast';
+import { searchService } from '../../services/search.service';
 import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 import { useSearchResults } from '../../features/search/hooks/useSearchResults';
 import { DonorCard } from '../../features/search/components/DonorCard/DonorCard';
@@ -32,8 +34,58 @@ export const SearchResultsPage = () => {
     search: debouncedSearch || undefined
   });
 
+  const[isExporting, setIsExporting] = useState(false);
+  const[isPrinting, setIsPrinting] = useState(false);
+
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     updateFilters({ search: e.target.value });
+  };
+
+  const handleExportPdf = async () => {
+    try {
+      setIsExporting(true);
+      const blob = await searchService.exportPdf(sessionId!, filters);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `donor-report.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch {
+      toast.error('Ошибка при скачивании PDF отчета');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handlePrint = async () => {
+    try {
+      setIsPrinting(true);
+      const blob = await searchService.exportPdf(sessionId!, filters);
+      const url = window.URL.createObjectURL(blob);
+      
+      const iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      iframe.src = url;
+      document.body.appendChild(iframe);
+      
+      iframe.onload = () => {
+        setTimeout(() => {
+          iframe.contentWindow?.focus();
+          iframe.contentWindow?.print();
+          setTimeout(() => {
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(iframe);
+          }, 1000);
+        }, 100);
+      };
+    } catch {
+      toast.error('Ошибка при подготовке документа к печати');
+    } finally {
+      setIsPrinting(false);
+    }
   };
 
   if (isLoading) return <Spinner fullPage size={40} />;
@@ -70,6 +122,27 @@ export const SearchResultsPage = () => {
                 onChange={handleSearchChange}
                 onClear={() => updateFilters({ search: '' })}
               />
+            </div>
+
+            <div className={styles.actionButtons}>
+              <Button 
+                variant="secondary" 
+                onClick={handleExportPdf} 
+                isLoading={isExporting}
+                title="Скачать PDF отчет"
+              >
+                <Download size={18} />
+                <span className={styles.filterBtnText}>PDF</span>
+              </Button>
+              <Button 
+                variant="secondary" 
+                onClick={handlePrint} 
+                isLoading={isPrinting}
+                title="Распечатать результаты"
+              >
+                <Printer size={18} />
+                <span className={styles.filterBtnText}>Печать</span>
+              </Button>
             </div>
 
             <SortSelect 

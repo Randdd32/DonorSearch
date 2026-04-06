@@ -69,6 +69,11 @@
   max-width: 400px;
 }
 
+.actionButtons {
+  display: flex;
+  gap: 8px;
+}
+
 .filterBtn {
   align-self: flex-end;
 }
@@ -112,5 +117,15 @@
   }
   .filterBtnText {
     display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .actionButtons {
+    width: 100%;
+  }
+  
+  .actionButtons button {
+    flex: 1;
   }
 }
