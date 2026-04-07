@@ -101,7 +101,7 @@ export const ComponentSelectionModal = ({
                       {col.label}
                     </TableHeader>
                   ))}
-                  <TableHeader>Действие</TableHeader>
+                  <TableHeader className={styles.textCenter}>Действие</TableHeader>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -143,8 +143,11 @@ export const ComponentSelectionModal = ({
                           {col.render ? col.render(row) : (row[col.key] as ReactNode)}
                         </TableCell>
                       ))}
-                      <TableCell>
-                        <Button variant="primary" onClick={(e) => { e.stopPropagation(); onSelect(row.id as number, row.name as string); onClose(); }}>
+                      <TableCell className={styles.textCenter}>
+                        <Button 
+                          variant="primary" 
+                          onClick={(e) => { e.stopPropagation(); onSelect(row.id as number, row.name as string); onClose(); }}
+                        >
                           Выбрать
                         </Button>
                       </TableCell>
@@ -155,7 +158,16 @@ export const ComponentSelectionModal = ({
             
             {data && data.totalItems > 0 && (
               <div className={styles.pagination}>
-                <Pagination currentPage={data.currentPage} totalPages={data.totalPages} totalItems={data.totalItems} pageSize={data.currentSize} onPageChange={handlers.setPage} onPageSizeChange={(s) => { handlers.setSize(s); handlers.setPage(0); }} pageSizeOptions={[10, 20, 50]} placement="top" />
+                <Pagination
+                  currentPage={data.currentPage} 
+                  totalPages={data.totalPages} 
+                  totalItems={data.totalItems} 
+                  pageSize={data.currentSize} 
+                  onPageChange={handlers.setPage} 
+                  onPageSizeChange={(s) => { handlers.setSize(s); handlers.setPage(0); }} 
+                  pageSizeOptions={[10, 20, 50]} 
+                  placement="top" 
+                />
               </div>
             )}
           </TableCard>

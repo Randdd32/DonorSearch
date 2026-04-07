@@ -6,7 +6,15 @@ import styles from './Table.module.css';
 
 export const TableCard = ({ children, isLoading }: { children: ReactNode; isLoading?: boolean }) => (
   <div className={styles.tableCard}>
-    {isLoading ? <Spinner fullPage size={40} /> : <div className={styles.tableWrapper}>{children}</div>}
+    {isLoading ? (
+      <Spinner fullPage size={40} />
+    ) : (
+      <div className={styles.tableWrapper}>
+        <div className={styles.tableContent}>
+          {children}
+        </div>
+      </div>
+    )}
   </div>
 );
 

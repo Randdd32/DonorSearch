@@ -102,6 +102,10 @@
   gap: 24px;
 }
 
+.paginationSpacing {
+  margin-top: 16px; 
+}
+
 @media (max-width: 1500px) {
   .outputBtnText {
     display: none;

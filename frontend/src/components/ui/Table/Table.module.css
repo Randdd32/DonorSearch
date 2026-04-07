@@ -13,10 +13,18 @@
   width: 100%;
 }
 
+.tableContent {
+  min-width: max-content;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
 .table {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .table th {

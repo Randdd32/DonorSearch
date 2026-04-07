@@ -119,7 +119,7 @@
 .iconEdit:hover { color: var(--primary-color); }
 .iconDanger:hover { color: var(--status-critical); }
 
-.paginationWrapper { padding: 20px; }
+.paginationWrapper { padding: 25px 20px 20px 20px; }
 
 @media (max-width: 1000px) {
   .header { 

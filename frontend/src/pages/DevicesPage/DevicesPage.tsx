@@ -93,6 +93,7 @@ export const DevicesPage = () => {
           
           {data && data.totalItems > 0 && (
             <Pagination
+              className={styles.paginationSpacing}
               currentPage={data.currentPage}
               totalPages={data.totalPages}
               totalItems={data.totalItems}
