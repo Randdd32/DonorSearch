@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import type { FilterDef, ColumnDef } from './ComponentTableConfig';
 import { useState } from 'react';
 import { X, Search, CheckCircle, Filter } from 'lucide-react';
+import { COMPONENT_CATEGORY_CONFIG } from '../../../../config/componentTypes';
 import { Badge } from '../../../../components/ui/Badge/Badge';
 import { Input } from '../../../../components/ui/Input/Input';
 import { Button } from '../../../../components/ui/Button/Button';
@@ -39,7 +40,9 @@ export const ComponentSelectionModal = ({
         <div className={styles.header}>
           <div>
             <h3 className={styles.title}>Выбор компонента из БД</h3>
-            <p className={styles.subtitle}>Категория: {componentType}</p>
+            <p className={styles.subtitle}>
+              Категория: {COMPONENT_CATEGORY_CONFIG[componentType]?.label || componentType}
+            </p>
           </div>
           <button className={styles.closeBtn} onClick={onClose}><X size={20} /></button>
         </div>
