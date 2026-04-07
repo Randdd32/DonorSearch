@@ -1,77 +1,285 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
 <head>
     <meta charset="UTF-8"/>
     <style>
         @page {
             size: A4;
-            margin: 15mm;
+            margin: 10mm 12mm 15mm 12mm;
             @bottom-right {
                 content: "Страница " counter(page) " из " counter(pages);
-                font-family: "Roboto", sans-serif;
+                font-family: "Roboto", "Helvetica Neue", sans-serif;
                 font-size: 9pt;
+                color: #64748b;
             }
         }
-        body { font-family: "Roboto", sans-serif; color: #0f172a; line-height: 1.4; }
-        h1 { color: #3b82f6; border-bottom: 2px solid #3b82f6; padding-bottom: 10px; }
+
+        body {
+            font-family: "Roboto", "Helvetica Neue", sans-serif;
+            color: #0f172a;
+            line-height: 1.4;
+            font-size: 10pt;
+        }
+
+        .header-table {
+            width: 100%;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 8px;
+            margin-bottom: 16px;
+        }
+        .header-table h1 {
+            color: #1e293b;
+            font-size: 22pt;
+            margin: 0;
+            padding: 0;
+        }
+        .header-date {
+            text-align: right;
+            vertical-align: bottom;
+            color: #64748b;
+            font-size: 10pt;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background-color: #f8fafc;
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            margin-top: 40px;
+        }
+        .empty-state h2 {
+            color: #334155;
+            font-size: 16pt;
+            margin-bottom: 8px;
+            margin-top: 0;
+        }
+        .empty-state p {
+            color: #64748b;
+            font-size: 11pt;
+            margin: 0;
+        }
 
         .donor-card {
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
+        }
+
+        .card-top-info {
+            background-color: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-bottom: none;
+            border-radius: 8px 8px 0 0;
+            padding: 20px 20px 10px 20px;
             page-break-inside: avoid;
+        }
+
+        .card-body {
+            background-color: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            padding: 0 20px 16px 20px;
+        }
+
+        .card-header {
+            margin-bottom: 14px;
+            border-bottom: 1px solid #f1f5f9;
+            padding-bottom: 12px;
+        }
+        .card-title {
+            font-size: 16pt;
+            font-weight: bold;
+            color: #2563eb;
+            display: inline-block;
+            margin: 0;
         }
 
         .score-badge {
             float: right;
-            color: white;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 10pt;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 11pt;
             font-weight: bold;
-            background-color: #3b82f6;
         }
-        .perfect { background-color: #10b981 !important; }
-        .warning { background-color: #eab308 !important; }
-        .danger { background-color: #ef4444 !important; }
+        .badge-perfect { background-color: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+        .badge-warning { background-color: #fffbeb; color: #b45309; border: 1px solid #fde047; }
+        .badge-danger { background-color: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
 
-        .donor-title { font-weight: bold; font-size: 14pt; margin-bottom: 5px; }
-        .donor-meta { font-size: 10pt; color: #64748b; }
-        .component-box { margin-top: 15px; padding-left: 10px; border-left: 3px solid #cbd5e1; }
-        .warning-text { color: #ef4444; font-size: 10pt; list-style-type: none; padding-left: 0; }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 9pt;
+            font-weight: bold;
+            background-color: #f1f5f9;
+            color: #475569;
+            border: 1px solid transparent;
+            margin-left: 12px;
+            vertical-align: 3px;
+        }
+        .state-written_off { background-color: #fef2f2; color: #dc2626; border-color: #fecaca; }
+        .state-storage { background-color: #f0fdf4; color: #16a34a; border-color: #bbf7d0; }
+        .state-in_use { background-color: #eff6ff; color: #2563eb; border-color: #bfdbfe; }
+        .state-repair, .state-unaccounted { background-color: #fffbeb; color: #d97706; border-color: #fef08a; }
+        .state-unknown { background-color: #f8fafc; color: #64748b; border-color: #e2e8f0; }
+
+        .meta-table {
+            width: 100%;
+            font-size: 10pt;
+            color: #334155;
+            border-collapse: collapse;
+            margin-bottom: 14px;
+        }
+        .meta-table td {
+            padding: 4px 10px 4px 0;
+            vertical-align: top;
+        }
+        .meta-label {
+            color: #94a3b8;
+            font-weight: bold;
+            font-size: 9pt;
+            text-transform: uppercase;
+        }
+
+        .components-title {
+            font-size: 11pt;
+            font-weight: bold;
+            color: #1e293b;
+            margin-top: 14px;
+        }
+
+        .component-box {
+            padding: 12px 16px;
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            margin-bottom: 6px;
+        }
+        .comp-name {
+            font-weight: bold;
+            color: #0f172a;
+            font-size: 11pt;
+            margin-bottom: 11px;
+        }
+
+        .components-title, .comp-name {
+            page-break-after: avoid;
+        }
+
+        .warning-block {
+            margin-top: 8px;
+            padding: 8px 14px;
+            background-color: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            border-radius: 0 6px 6px 0;
+            font-size: 9.5pt;
+            color: #78350f;
+        }
+        .perfect-block {
+            margin-top: 8px;
+            padding: 8px 14px;
+            background-color: #f0fdf4;
+            border-left: 4px solid #10b981;
+            border-radius: 0 6px 6px 0;
+            font-size: 9.5pt;
+            color: #064e3b;
+        }
+        .warning-item {
+            margin-top: 4px;
+            margin-bottom: 10px;
+            page-break-inside: avoid;
+        }
+        .warning-item:last-child { margin-bottom: 0; }
+        .sev-label { font-size: 9pt; font-weight: bold; text-transform: uppercase; }
+        .sev-critical { color: #dc2626; }
+        .sev-high { color: #ea580c; }
+        .sev-medium { color: #ca8a04; }
+        .sev-low { color: #2563eb; }
+        .sev-info { color: #10b981; }
+        .warning-text { font-size: 9.5pt; display: block; margin-top: 2px; }
     </style>
 </head>
 <body>
+    <table class="header-table">
+        <tr>
+            <td><h1>Отчет по подбору доноров</h1></td>
+            <td class="header-date" th:text="'Сформировано: ' + ${generatedAt}"></td>
+        </tr>
+    </table>
 
-<h1>Отчет по подбору доноров</h1>
-<p th:text="'Дата формирования: ' + ${#temporals.format(#temporals.createNow(), 'dd.MM.yyyy HH:mm')}"></p>
-
-<div th:each="res : ${results}" class="donor-card">
-    <div class="score-badge"
-         th:classappend="${res.totalPenalty() == 0 ? 'perfect' : (res.totalPenalty() > 20 ? 'danger' : 'warning')}"
-         th:text="${res.totalPenalty() == 0 ? 'Идеально' : 'Штраф: ' + res.totalPenalty()}">
+    <div th:if="${#lists.isEmpty(results)}" class="empty-state">
+        <h2>Доноров не найдено</h2>
+        <p>По заданным критериям фильтрации нет устройств с подходящими совместимыми деталями.</p>
     </div>
 
-    <div class="donor-title" th:text="${res.donorDevice()?.name() ?: 'Устройство без названия'}"></div>
+    <div th:unless="${#lists.isEmpty(results)}">
+        <div th:each="res : ${results}"
+             th:with="
+                 comps=${#lists.size(res.compatibleComponents())},
+                 w1=${comps > 0 ? #lists.size(res.compatibleComponents()[0].componentWarnings()) : 0},
+                 w2=${comps > 1 ? #lists.size(res.compatibleComponents()[1].componentWarnings()) : 0},
+                 w3=${comps > 2 ? #lists.size(res.compatibleComponents()[2].componentWarnings()) : 0},
+                 weight=${comps + w1 + w2 + w3},
+                 isHuge=${weight > 9}
+             "
+             class="donor-card"
+             th:style="${isHuge ? '' : 'page-break-inside: avoid;'}">
+            <div class="card-top-info">
+                <div class="card-header">
+                    <div class="score-badge"
+                         th:classappend="${res.totalPenalty() == 0 ? 'badge-perfect' : (res.totalPenalty() > 20 ? 'badge-danger' : 'badge-warning')}"
+                         th:text="${res.totalPenalty() == 0 ? 'Идеально (0)' : 'Штраф: ' + res.totalPenalty()}">
+                    </div>
 
-    <div class="donor-meta">
-        Инв №: <span th:text="${res.donorDevice()?.inventoryNumber() ?: '—'}"></span> |
-        Статус: <span th:text="${res.donorDevice()?.lifeCycleState()?.getInfraName() ?: 'Неизвестно'}"></span>
-    </div>
-    <div class="donor-meta" th:text="'Путь: ' + ${res.donorDevice()?.locationPath() ?: 'Не указан'}"></div>
+                    <div class="card-title" th:text="${res.donorDevice()?.name() ?: 'Устройство без названия'}"></div>
 
-    <div class="component-box">
-        <div th:each="comp : ${res.compatibleComponents()}">
-            <strong th:text="${comp.externalInfo()?.externalName()}"></strong>
-            <div th:if="${#lists.isEmpty(comp.componentWarnings())}" style="color: #10b981; font-size: 9pt;">
-                ✓ Полная совместимость
+                    <div class="status-badge"
+                         th:classappend="${res.donorDevice()?.lifeCycleState() != null
+                         ? 'state-' + #strings.toLowerCase(res.donorDevice().lifeCycleState().name())
+                         : 'state-unknown'}"
+                         th:text="${res.donorDevice()?.lifeCycleState()?.getInfraName() ?: 'Неизвестно'}">
+                    </div>
+                </div>
+
+                <table class="meta-table">
+                    <tr>
+                        <td width="40%"><span class="meta-label">Инв. №:</span> <span th:text="${res.donorDevice()?.inventoryNumber() ?: '—'}"></span></td>
+                        <td width="60%"><span class="meta-label">Пользователь:</span> <span th:text="${res.donorDevice()?.ownerFullName() ?: 'Неизвестно'}"></span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="meta-label">Отдел:</span> <span th:text="${res.donorDevice()?.departmentName() ?: 'Отдел не указан'}"></span></td>
+                        <td><span class="meta-label">Расположение:</span> <span th:text="${res.donorDevice()?.locationPath() ?: '—'}"></span></td>
+                    </tr>
+                </table>
+
+                <div class="components-title">Найденные совместимые детали:</div>
             </div>
-            <ul class="warning-text" th:if="${!#lists.isEmpty(comp.componentWarnings())}">
-                <li th:each="w : ${comp.componentWarnings()}" th:text="'— ' + ${w.message()}"></li>
-            </ul>
+
+            <div class="card-body">
+                <div th:each="comp : ${res.compatibleComponents()}" class="component-box">
+                    <div class="comp-name" th:text="${comp.externalInfo()?.externalName() ?: 'Деталь без названия'}"></div>
+
+                    <div th:if="${#lists.isEmpty(comp.componentWarnings())}" class="perfect-block" style="page-break-inside: avoid;">
+                        <span class="sev-label sev-info">НИЗКИЙ РИСК</span><br/>
+                        <span class="warning-text">Деталь полностью совместима. Рекомендуется базовая проверка.</span>
+                    </div>
+
+                    <div th:if="${!#lists.isEmpty(comp.componentWarnings())}" class="warning-block">
+                        <div th:each="w : ${comp.componentWarnings()}" class="warning-item">
+                        <span class="sev-label"
+                              th:classappend="'sev-' + ${#strings.toLowerCase(w.severity().name())}"
+                              th:text="${w.severity().name() == 'CRITICAL' ? 'КРИТИЧНО' :
+                                       (w.severity().name() == 'HIGH' ? 'ВЫСОКИЙ РИСК' :
+                                       (w.severity().name() == 'MEDIUM' ? 'СРЕДНИЙ РИСК' :
+                                       (w.severity().name() == 'LOW' ? 'НИЗКИЙ РИСК' : 'ИНФОРМАЦИЯ')))}">
+                        </span><br/>
+                            <span class="warning-text" th:text="${w.message()}"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
-</div>
 </body>
 </html>

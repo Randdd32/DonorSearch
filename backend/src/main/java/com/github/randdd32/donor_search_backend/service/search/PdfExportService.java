@@ -10,6 +10,9 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 import java.io.ByteArrayOutputStream;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -21,6 +24,10 @@ public class PdfExportService {
         try {
             Context context = new Context();
             context.setVariable("results", results);
+
+            ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Europe/Samara"));
+            String formattedDate = now.format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"));
+            context.setVariable("generatedAt", formattedDate);
 
             String htmlContent = templateEngine.process("donor-report", context);
 
