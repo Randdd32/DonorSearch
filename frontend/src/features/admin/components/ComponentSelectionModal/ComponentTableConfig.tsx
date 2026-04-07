@@ -7,6 +7,7 @@ export interface ColumnDef {
   key: string;
   label: string;
   sortable?: boolean;
+  align?: 'left' | 'center' | 'right';
   render?: (row: Record<string, unknown>) => ReactNode;
 }
 
@@ -28,8 +29,8 @@ export const renderArray = (arr: unknown) => {
   return <span title={arr.join(', ')}>{arr[0]}, {arr[1]} <Badge variant="default">+{arr.length - 2}</Badge></span>;
 };
 
-const COMMON_COLUMNS: ColumnDef[] =[
-  { key: 'id', label: 'ID', sortable: true },
+const COMMON_COLUMNS: ColumnDef[] = [
+  { key: 'id', label: 'ID', sortable: true, align: 'center' },
   { key: 'name', label: 'Название', sortable: true },
   { key: 'manufacturerName', label: 'Производитель' },
   { key: 'partNumbers', label: 'Part Numbers', render: (r) => renderArray(r.partNumbers) },
@@ -44,12 +45,12 @@ const renderBoolBadge = (val: unknown) =>
 
 export const COMPONENT_REGISTRY: Record<ExternalComponentCategory | 'DEFAULT', ComponentConfig> = {
   CPU: {
-    columns:[
+    columns: [
       ...COMMON_COLUMNS,
-      { key: 'coreCount', label: 'Ядра', sortable: true },
-      { key: 'coreClockGhz', label: 'Частота (ГГц)', sortable: true },
-      { key: 'tdpW', label: 'TDP (Вт)', sortable: true },
-      { key: 'eccSupport', label: 'ECC', sortable: true, render: (r) => renderBoolBadge(r.eccSupport) },
+      { key: 'coreCount', label: 'Ядра', sortable: true, align: 'center' },
+      { key: 'coreClockGhz', label: 'Частота (ГГц)', sortable: true, align: 'center' },
+      { key: 'tdpW', label: 'TDP (Вт)', sortable: true, align: 'center' },
+      { key: 'eccSupport', label: 'ECC', sortable: true, align: 'center', render: (r) => renderBoolBadge(r.eccSupport) },
       { key: 'socketName', label: 'Сокет' },
       { key: 'microarchitectureName', label: 'Микроархитектура' },
       { key: 'graphicsName', label: 'Встроенная графика' }
@@ -66,12 +67,12 @@ export const COMPONENT_REGISTRY: Record<ExternalComponentCategory | 'DEFAULT', C
     ],
   },
   CPU_COOLER: {
-    columns:[
+    columns: [
       ...COMMON_COLUMNS,
-      { key: 'isWaterCooled', label: 'СЖО', sortable: true, render: (r) => renderBoolBadge(r.isWaterCooled) },
-      { key: 'heightMm', label: 'Высота (мм)', sortable: true },
-      { key: 'waterCooledSizeMm', label: 'Размер СЖО (мм)', sortable: true },
-      { key: 'rpmMax', label: 'Макс. RPM', sortable: true },
+      { key: 'isWaterCooled', label: 'СЖО', sortable: true, align: 'center', render: (r) => renderBoolBadge(r.isWaterCooled) },
+      { key: 'heightMm', label: 'Высота (мм)', sortable: true, align: 'center' },
+      { key: 'waterCooledSizeMm', label: 'Размер СЖО (мм)', sortable: true, align: 'center' },
+      { key: 'rpmMax', label: 'Макс. RPM', sortable: true, align: 'center' },
       { key: 'sockets', label: 'Сокеты', render: (r) => renderArray(r.sockets) },
       { key: 'colorName', label: 'Цвет' }
     ],
@@ -86,16 +87,16 @@ export const COMPONENT_REGISTRY: Record<ExternalComponentCategory | 'DEFAULT', C
     ],
   },
   MOTHERBOARD: {
-    columns:[
+    columns: [
       ...COMMON_COLUMNS,
       { key: 'socketName', label: 'Сокет' },
       { key: 'formFactorName', label: 'Форм-фактор' },
       { key: 'memoryTypeName', label: 'Тип ОЗУ' },
-      { key: 'maxMemoryGb', label: 'Макс ОЗУ (ГБ)', sortable: true },
-      { key: 'memorySlots', label: 'Кол-во слотов ОЗУ', sortable: true },
-      { key: 'memorySpeedMaxMhz', label: 'Макс. скорость ОЗУ (МГц)', sortable: true },
-      { key: 'eccSupport', label: 'Поддержка ECC', render: (r) => renderBoolBadge(r.eccSupport) },
-      { key: 'usesBackConnect', label: 'Разъемы сзади', render: (r) => renderBoolBadge(r.usesBackConnect) }
+      { key: 'maxMemoryGb', label: 'Макс ОЗУ (ГБ)', sortable: true, align: 'center' },
+      { key: 'memorySlots', label: 'Кол-во слотов ОЗУ', sortable: true, align: 'center' },
+      { key: 'memorySpeedMaxMhz', label: 'Макс. скорость ОЗУ (МГц)', sortable: true, align: 'center' },
+      { key: 'eccSupport', label: 'Поддержка ECC', align: 'center', render: (r) => renderBoolBadge(r.eccSupport) },
+      { key: 'usesBackConnect', label: 'Разъемы сзади', align: 'center', render: (r) => renderBoolBadge(r.usesBackConnect) }
     ],
     filters:[
       ...COMMON_FILTERS,
@@ -110,18 +111,17 @@ export const COMPONENT_REGISTRY: Record<ExternalComponentCategory | 'DEFAULT', C
     ],
   },
   MEMORY: {
-    columns:[
+    columns: [
       ...COMMON_COLUMNS,
       { key: 'memoryTypeName', label: 'Тип' },
       { key: 'formFactorName', label: 'Форм-фактор' },
       { key: 'colorName', label: 'Цвет' },
-      { key: 'frequencyMhz', label: 'Частота (МГц)', sortable: true },
-      { key: 'modulesCount', label: 'Кол-во модулей', sortable: true },
-      { key: 'modulesSizeGb', label: 'Объем модуля (ГБ)', sortable: true },
-      { key: 'casLatency', label: 'CAS Latency', sortable: true },
-      { key: 'isEcc', label: 'ECC', render: (r) => renderBoolBadge(r.isEcc) },
-      { key: 'isRegistered', label: 'Буферизованная (Reg)', render: (r) => renderBoolBadge(r.isRegistered) }
-
+      { key: 'frequencyMhz', label: 'Частота (МГц)', sortable: true, align: 'center' },
+      { key: 'modulesCount', label: 'Кол-во модулей', sortable: true, align: 'center' },
+      { key: 'modulesSizeGb', label: 'Объем модуля (ГБ)', sortable: true, align: 'center' },
+      { key: 'casLatency', label: 'CAS Latency', sortable: true, align: 'center' },
+      { key: 'isEcc', label: 'ECC', align: 'center', render: (r) => renderBoolBadge(r.isEcc) },
+      { key: 'isRegistered', label: 'Буферизованная (Reg)', align: 'center', render: (r) => renderBoolBadge(r.isRegistered) }
     ],
     filters:[
       ...COMMON_FILTERS,
@@ -137,14 +137,14 @@ export const COMPONENT_REGISTRY: Record<ExternalComponentCategory | 'DEFAULT', C
     ],
   },
   VIDEO_CARD: {
-    columns:[
+    columns: [
       ...COMMON_COLUMNS,
       { key: 'chipsetName', label: 'Чипсет' },
       { key: 'memoryTypeName', label: 'Тип памяти' },
-      { key: 'memoryGb', label: 'Память (ГБ)', sortable: true },
-      { key: 'lengthMm', label: 'Длина (мм)', sortable: true },
-      { key: 'tdpW', label: 'TDP (Вт)', sortable: true },
-      { key: 'slotWidth', label: 'Ширина (в слотах)', sortable: true }
+      { key: 'memoryGb', label: 'Память (ГБ)', sortable: true, align: 'center' },
+      { key: 'lengthMm', label: 'Длина (мм)', sortable: true, align: 'center' },
+      { key: 'tdpW', label: 'TDP (Вт)', sortable: true, align: 'center' },
+      { key: 'slotWidth', label: 'Ширина (в слотах)', sortable: true, align: 'center' }
     ],
     filters:[
       ...COMMON_FILTERS,
@@ -156,16 +156,16 @@ export const COMPONENT_REGISTRY: Record<ExternalComponentCategory | 'DEFAULT', C
     ],
   },
   STORAGE: {
-    columns:[
+    columns: [
       ...COMMON_COLUMNS,
       { key: 'typeName', label: 'Тип (HDD/SSD)' },
       { key: 'formFactorName', label: 'Форм-фактор' },
       { key: 'colorName', label: 'Цвет' },
       { key: 'interfaces', label: 'Интерфейсы', render: (r) => renderArray(r.interfaces) },
-      { key: 'capacityGb', label: 'Емкость (ГБ)', sortable: true },
-      { key: 'cacheMb', label: 'Кэш (МБ)', sortable: true },
-      { key: 'rpm', label: 'Скорость шпинделя (RPM)', sortable: true },
-      { key: 'isExternal', label: 'Внешний', render: (r) => renderBoolBadge(r.isExternal) }
+      { key: 'capacityGb', label: 'Емкость (ГБ)', sortable: true, align: 'center' },
+      { key: 'cacheMb', label: 'Кэш (МБ)', sortable: true, align: 'center' },
+      { key: 'rpm', label: 'Скорость шпинделя (RPM)', sortable: true, align: 'center' },
+      { key: 'isExternal', label: 'Внешний', align: 'center', render: (r) => renderBoolBadge(r.isExternal) }
     ],
     filters:[
       ...COMMON_FILTERS,
@@ -180,14 +180,14 @@ export const COMPONENT_REGISTRY: Record<ExternalComponentCategory | 'DEFAULT', C
     ],
   },
   POWER_SUPPLY: {
-    columns:[
+    columns: [
       ...COMMON_COLUMNS,
       { key: 'typeName', label: 'Тип БП' },
       { key: 'efficiencyName', label: 'Сертификат' },
       { key: 'modularName', label: 'Модульность' },
       { key: 'colorName', label: 'Цвет' },
-      { key: 'wattageW', label: 'Мощность (Вт)', sortable: true },
-      { key: 'lengthMm', label: 'Длина (мм)', sortable: true }
+      { key: 'wattageW', label: 'Мощность (Вт)', sortable: true, align: 'center' },
+      { key: 'lengthMm', label: 'Длина (мм)', sortable: true, align: 'center' }
     ],
     filters:[
       ...COMMON_FILTERS,
@@ -205,13 +205,13 @@ export const COMPONENT_REGISTRY: Record<ExternalComponentCategory | 'DEFAULT', C
       { key: 'caseTypeName', label: 'Тип корпуса' },
       { key: 'colorName', label: 'Цвет' },
       { key: 'sidePanelName', label: 'Боковая панель' },
-      { key: 'lengthMm', label: 'Длина (мм)', sortable: true },
-      { key: 'widthMm', label: 'Ширина (мм)', sortable: true },
-      { key: 'heightMm', label: 'Высота (мм)', sortable: true },
-      { key: 'maxGpuLenMm', label: 'Макс. длина GPU', sortable: true },
-      { key: 'maxCpuCoolerHeightMm', label: 'Макс. высота кулера', sortable: true },
-      { key: 'int35Bays', label: 'Отсеки 3.5"', sortable: true },
-      { key: 'expansionSlotsFullHeight', label: 'Слоты расширения', sortable: true },
+      { key: 'lengthMm', label: 'Длина (мм)', sortable: true, align: 'center' },
+      { key: 'widthMm', label: 'Ширина (мм)', sortable: true, align: 'center' },
+      { key: 'heightMm', label: 'Высота (мм)', sortable: true, align: 'center' },
+      { key: 'maxGpuLenMm', label: 'Макс. длина GPU', sortable: true, align: 'center' },
+      { key: 'maxCpuCoolerHeightMm', label: 'Макс. высота кулера', sortable: true, align: 'center' },
+      { key: 'int35Bays', label: 'Отсеки 3.5"', sortable: true, align: 'center' },
+      { key: 'expansionSlotsFullHeight', label: 'Слоты расширения', sortable: true, align: 'center' },
       { key: 'moboFormFactors', label: 'Поддержка мат. плат', render: (r) => renderArray(r.moboFormFactors) },
       { key: 'frontPanelUsbTypes', label: 'USB на панели', render: (r) => renderArray(r.frontPanelUsbTypes) }
     ],
@@ -232,11 +232,11 @@ export const COMPONENT_REGISTRY: Record<ExternalComponentCategory | 'DEFAULT', C
   CASE_FAN: {
     columns: [
       ...COMMON_COLUMNS,
-      { key: 'sizeMm', label: 'Размер (мм)', sortable: true },
+      { key: 'sizeMm', label: 'Размер (мм)', sortable: true, align: 'center' },
       { key: 'colorName', label: 'Цвет' },
-      { key: 'pwm', label: 'PWM', render: (r) => renderBoolBadge(r.pwm) },
-      { key: 'rpmMax', label: 'Макс. RPM', sortable: true },
-      { key: 'airflowMax', label: 'Воздушный поток (CFM)', sortable: true },
+      { key: 'pwm', label: 'PWM', align: 'center', render: (r) => renderBoolBadge(r.pwm) },
+      { key: 'rpmMax', label: 'Макс. RPM', sortable: true, align: 'center' },
+      { key: 'airflowMax', label: 'Воздушный поток (CFM)', sortable: true, align: 'center' },
       { key: 'connectors', label: 'Коннекторы', render: (r) => renderArray(r.connectors) }
     ],
     filters: [
@@ -263,11 +263,11 @@ export const COMPONENT_REGISTRY: Record<ExternalComponentCategory | 'DEFAULT', C
   MONITOR: {
     columns: [
       ...COMMON_COLUMNS,
-      { key: 'screenSizeIn', label: 'Диагональ', sortable: true },
+      { key: 'screenSizeIn', label: 'Диагональ', sortable: true, align: 'center' },
       { key: 'resolutionName', label: 'Разрешение' },
-      { key: 'aspectRatioName', label: 'Соотношение сторон' },
-      { key: 'refreshRateHz', label: 'Герцовка', sortable: true },
-      { key: 'responseTimeMs', label: 'Отклик (мс)', sortable: true },
+      { key: 'aspectRatioName', label: 'Соотношение сторон', align: 'center' },
+      { key: 'refreshRateHz', label: 'Герцовка', sortable: true, align: 'center' },
+      { key: 'responseTimeMs', label: 'Отклик (мс)', sortable: true, align: 'center' },
       { key: 'panelTypeName', label: 'Матрица' },
     ],
     filters: [
@@ -288,9 +288,9 @@ export const COMPONENT_REGISTRY: Record<ExternalComponentCategory | 'DEFAULT', C
       { key: 'colorName', label: 'Цвет' },
       { key: 'audioChipsetName', label: 'Аудиочипсет' },
       { key: 'protocolName', label: 'Wi-Fi протокол' },
-      { key: 'channels', label: 'Аудиоканалы', sortable: true },
-      { key: 'digitalAudioBit', label: 'Битность аудио', sortable: true },
-      { key: 'sampleRateKhz', label: 'Частота (кГц)', sortable: true }
+      { key: 'channels', label: 'Аудиоканалы', sortable: true, align: 'center' },
+      { key: 'digitalAudioBit', label: 'Битность аудио', sortable: true, align: 'center' },
+      { key: 'sampleRateKhz', label: 'Частота (кГц)', sortable: true, align: 'center' }
     ],
     filters: [
       ...COMMON_FILTERS,

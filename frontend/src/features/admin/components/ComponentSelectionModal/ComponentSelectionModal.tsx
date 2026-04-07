@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import type { FilterDef, ColumnDef } from './ComponentTableConfig';
 import { useState } from 'react';
 import { X, Search, CheckCircle, Filter } from 'lucide-react';
+import clsx from 'clsx';
 import { COMPONENT_CATEGORY_CONFIG } from '../../../../config/componentTypes';
 import { Badge } from '../../../../components/ui/Badge/Badge';
 import { Input } from '../../../../components/ui/Input/Input';
@@ -90,7 +91,13 @@ export const ComponentSelectionModal = ({
               <TableHead>
                 <TableRow>
                   {config.columns.map((col: ColumnDef) => (
-                    <TableHeader key={col.key} sortField={col.sortable ? col.key : undefined} currentSort={state.sort} onSort={handlers.handleSort}>
+                    <TableHeader 
+                      key={col.key} 
+                      sortField={col.sortable ? col.key : undefined} 
+                      currentSort={state.sort} 
+                      onSort={handlers.handleSort}
+                      className={styles.textCenter}
+                    >
                       {col.label}
                     </TableHeader>
                   ))}
@@ -101,7 +108,13 @@ export const ComponentSelectionModal = ({
                 {selectedItem && (
                   <TableRow className={styles.activeRow}>
                     {config.columns.map((col: ColumnDef) => (
-                      <TableCell key={`sel-${col.key}`} className={col.key === 'id' ? styles.muted : ''}>
+                      <TableCell 
+                        key={`sel-${col.key}`} 
+                        className={clsx(
+                          col.key === 'id' && styles.muted,
+                          col.align === 'center' && styles.textCenter
+                        )}
+                      >
                         {col.render ? col.render(selectedItem) : (selectedItem[col.key] as ReactNode)}
                       </TableCell>
                     ))}
@@ -120,7 +133,13 @@ export const ComponentSelectionModal = ({
                       className={styles.clickableRow}
                     >
                       {config.columns.map((col: ColumnDef) => (
-                        <TableCell key={col.key} className={col.key === 'id' ? styles.muted : ''}>
+                        <TableCell 
+                          key={col.key} 
+                          className={clsx(
+                            col.key === 'id' && styles.muted,
+                            col.align === 'center' && styles.textCenter
+                          )}
+                        >
                           {col.render ? col.render(row) : (row[col.key] as ReactNode)}
                         </TableCell>
                       ))}
