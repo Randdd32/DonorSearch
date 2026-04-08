@@ -60,7 +60,7 @@ export const DonorCard = ({ result }: DonorCardProps) => {
         </div>
 
         <div className={styles.scoreSection}>
-          <div className={styles.scoreLabel}>Штраф совместимости</div>
+          <div className={styles.scoreLabel}>Итоговый штраф</div>
           <Badge 
             variant={result.totalPenalty === 0 ? 'success' : result.totalPenalty > 20 ? 'danger' : 'warning'} 
             className={styles.scoreBadge}>
