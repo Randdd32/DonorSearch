@@ -198,7 +198,7 @@ public class DonorSearchService {
 
             List<DonorWarningDto> compWarnings = new ArrayList<>();
             int compPenalty = 0;
-            ComponentEntity internalDonor = null;
+            ComponentEntity internalDonor;
 
             IntegrationMappingEntity mapping = bulkMappings.get(rawDonorComp.externalName().toLowerCase().trim());
 
