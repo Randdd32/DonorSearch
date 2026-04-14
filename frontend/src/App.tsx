@@ -54,6 +54,10 @@ export const App = () => {
             background: 'var(--bg-surface)',
             color: 'var(--text-primary)',
             border: '1px solid var(--border-color)',
+            maxWidth: '500px',          
+            wordBreak: 'break-word',    
+            whiteSpace: 'pre-wrap',
+            padding: '12px 16px'
           }
         }}
       />
