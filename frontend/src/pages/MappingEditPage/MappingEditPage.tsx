@@ -96,9 +96,7 @@ const MappingForm = ({ isNew, id, originalData }: MappingFormProps) => {
       navigate('/mappings');
     },
     onError: (e: Error | AxiosError<{ message: string }>) => {
-      if (e instanceof AxiosError) {
-        toast.error(e.response?.data?.message || 'Ошибка сохранения (Сервер)');
-      } else {
+      if (!(e instanceof AxiosError)) {
         toast.error(e.message || 'Ошибка сохранения');
       }
     }

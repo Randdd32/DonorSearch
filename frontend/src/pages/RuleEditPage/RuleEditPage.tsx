@@ -84,10 +84,8 @@ const RuleForm = ({ isNew, id, originalData }: RuleFormProps) => {
       navigate('/compatibility');
     },
     onError: (e: Error | AxiosError<{ message: string }>) => {
-      if (e instanceof AxiosError) {
-        toast.error(e.response?.data?.message || 'Ошибка валидации полей (сервер)');
-      } else {
-        toast.error(e.message || 'Ошибка сохранения');
+      if (!(e instanceof AxiosError)) {
+        toast.error(e.message || 'Ошибка валидации');
       }
     }
   });
