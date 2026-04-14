@@ -19,7 +19,7 @@ export const DeviceCard = ({ device }: DeviceCardProps) => {
       <Card isHoverable className={styles.cardContent}>
         <div className={styles.header}>
           <div className={styles.iconWrapper}>
-            <DeviceIcon typeName={device.typeName} size={24} />
+            <DeviceIcon typeName={device.typeName} size={24} className={styles.deviceIcon} />
           </div>
           <div className={styles.titleInfo}>
             <h3 className={styles.name}>{device.name || 'Без названия'}</h3>

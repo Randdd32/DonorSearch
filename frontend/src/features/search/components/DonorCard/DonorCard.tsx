@@ -28,7 +28,7 @@ export const DonorCard = ({ result }: DonorCardProps) => {
       <div className={styles.header}>
         <div className={styles.deviceInfo}>
           <div className={styles.iconWrapper}>
-            <DeviceIcon typeName={device.typeName} size={24} />
+            <DeviceIcon typeName={device.typeName} size={24} className={styles.deviceIcon} />
           </div>
           <div className={styles.deviceMeta}>
             <div className={styles.deviceHeaderRow}>
