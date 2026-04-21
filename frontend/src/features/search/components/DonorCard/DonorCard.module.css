@@ -58,7 +58,7 @@
 }
 
 .deviceIcon {
-   min-width: 16px;
+   min-width: 24px;
    flex-shrink: 0;
 }
 
@@ -67,7 +67,7 @@
 }
 
 .iconWrapper {
-  width: 48px;
+  min-width: 48px;
   height: 48px;
   background-color: var(--bg-hover);
   border-radius: var(--radius-md);
