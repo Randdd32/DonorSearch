@@ -40,16 +40,25 @@ public class InfraDeviceService {
 
     private static final String BASE_DEVICE_SELECT = """
         SELECT 
-            pc.[Идентификатор] AS id, pc.[Название] AS name, pc.[Инвентарный номер] AS inv_num, pc.[SerialNumber] AS serial_num,
+            pc.[Идентификатор] AS id, 
+            NULLIF(LTRIM(RTRIM(pc.[Название])), '') AS name, 
+            NULLIF(LTRIM(RTRIM(pc.[Инвентарный номер])), '') AS inv_num, 
+            NULLIF(LTRIM(RTRIM(pc.[SerialNumber])), '') AS serial_num,
+            NULLIF(LTRIM(RTRIM(pc.[Примечание])), '') AS note,
+            NULLIF(LTRIM(RTRIM(pc.[AssetTag])), '') AS asset_tag,
+            NULLIF(LTRIM(RTRIM(pc.[Code])), '') AS code,
+            NULLIF(LTRIM(RTRIM(pc.[Description])), '') AS description,
             too.[Идентификатор] AS model_id, too.[Название] AS model_name, 
             manuf.[Идентификатор] AS manuf_id, manuf.[Название] AS manuf_name, 
             pct.[ID] AS type_id, pct.[Name] AS type_name, 
             state.[ID] AS state_id, state.[Name] AS state_name,
-            LTRIM(RTRIM(ISNULL(u.[Фамилия], '') + ' ' + ISNULL(u.[Имя], '') + ' ' + ISNULL(u.[Отчество], ''))) AS owner_name,
-            dep.[Идентификатор] AS dept_id, ISNULL(dep.[Название], 'Без отдела') AS dept_name,
+            NULLIF(LTRIM(RTRIM(ISNULL(u.[Фамилия], '') + ' ' + ISNULL(u.[Имя], '') + ' ' + ISNULL(u.[Отчество], ''))), '') AS owner_name,
+            dep.[Идентификатор] AS dept_id, NULLIF(LTRIM(RTRIM(dep.[Название])), '') AS dept_name,
             b.[Идентификатор] AS building_id, f.[Идентификатор] AS floor_id, r.[Идентификатор] AS room_id,
-            ISNULL(b.[Название], 'Без здания') + ' -> ' + ISNULL(f.[Название], 'Без этажа') + ' -> ' + 
-            ISNULL(r.[Название], 'Без комнаты') + ' -> ' + ISNULL(wp.[Название], 'Без РМ') AS location_path,
+            COALESCE(NULLIF(LTRIM(RTRIM(b.[Название])), ''), 'Без здания') + ' -> ' + 
+            COALESCE(NULLIF(LTRIM(RTRIM(f.[Название])), ''), 'Без этажа') + ' -> ' + 
+            COALESCE(NULLIF(LTRIM(RTRIM(r.[Название])), ''), 'Без комнаты') + ' -> ' + 
+            COALESCE(NULLIF(LTRIM(RTRIM(wp.[Название])), ''), 'Без РМ') AS location_path,
             a.[DateReceived] AS date_received, a.[IsWorking] AS is_working
     """;
 
@@ -57,16 +66,16 @@ public class InfraDeviceService {
         FROM dbo.[Оконечное оборудование] pc
         JOIN dbo.[Asset] a ON pc.[Идентификатор] = a.[DeviceID]
         JOIN dbo.[LifeCycleState] state ON a.[LifeCycleStateID] = state.[ID]
-        LEFT JOIN dbo.[Типы оконечного оборудования] too ON pc.[ИД типа ОО] = too.[Идентификатор]
+        LEFT JOIN dbo.[Типы оконечного оборудования] too ON NULLIF(pc.[ИД типа ОО], 0) = too.[Идентификатор]
         LEFT JOIN dbo.[Производители] manuf ON too.[ИД производителя] = manuf.[Идентификатор]
         LEFT JOIN dbo.[ProductCatalogType] pct ON too.[ProductCatalogTypeID] = pct.[ID]
         LEFT JOIN dbo.[Пользователи] u ON a.[UtilizerID] = u.[IMObjID] AND a.[UtilizerClassID] = 9
         LEFT JOIN dbo.[Подразделение] dep ON dep.[Идентификатор] = CASE
-            WHEN a.[UtilizerClassID] = 102 THEN a.[UtilizerID]         
-            WHEN a.[UtilizerClassID] = 9 THEN u.[ИД подразделения]     
+            WHEN a.[UtilizerClassID] = 102 THEN a.[UtilizerID]
+            WHEN a.[UtilizerClassID] = 9 THEN u.[ИД подразделения]
         END
-        LEFT JOIN dbo.[Рабочее место] wp ON pc.[ИД рабочего места] = wp.[Идентификатор]
-        LEFT JOIN dbo.[Комната] r ON COALESCE(wp.[ИД комнаты], pc.[ИД комнаты]) = r.[Идентификатор]
+        LEFT JOIN dbo.[Рабочее место] wp ON NULLIF(pc.[ИД рабочего места], 0) = wp.[Идентификатор]
+        LEFT JOIN dbo.[Комната] r ON COALESCE(wp.[ИД комнаты], NULLIF(pc.[ИД комнаты], 0)) = r.[Идентификатор]
         LEFT JOIN dbo.[Этаж] f ON r.[ИД этажа] = f.[Идентификатор]
         LEFT JOIN dbo.[Здание] b ON f.[ИД здания] = b.[Идентификатор]
     """;
@@ -75,7 +84,7 @@ public class InfraDeviceService {
         int page = pageable.getPageNumber();
         int size = pageable.getPageSize();
 
-        StringBuilder where = new StringBuilder(" WHERE 1=1 ");
+        StringBuilder where = new StringBuilder(" WHERE pc.[Removed] = 0 ");
         MapSqlParameterSource params = new MapSqlParameterSource();
 
         String cleanSearch = QueryUtils.cleanSearchToken(filter.search());
@@ -144,7 +153,7 @@ public class InfraDeviceService {
     }
 
     public ExternalDeviceDto getDeviceDetails(Long externalDeviceId) {
-        String deviceSql = BASE_DEVICE_SELECT + BASE_DEVICE_FROM_JOINS + " WHERE pc.[Идентификатор] = :id";
+        String deviceSql = BASE_DEVICE_SELECT + BASE_DEVICE_FROM_JOINS + " WHERE pc.[Идентификатор] = :id AND pc.[Removed] = 0";
 
         List<ExternalDeviceDto> devices = jdbcTemplate.query(
                 deviceSql,
@@ -152,7 +161,7 @@ public class InfraDeviceService {
                 this::mapDeviceRow
         );
         if (devices.isEmpty()) {
-            throw new NotFoundException(String.format("External device with id [%s] not found", externalDeviceId));
+            throw new NotFoundException(String.format("External device with id[%s] not found", externalDeviceId));
         }
         ExternalDeviceDto device = devices.get(0);
 
@@ -160,11 +169,11 @@ public class InfraDeviceService {
             SELECT 
                 ad.[AdapterID] AS adapter_id,
                 pct.[ID] AS category_id,
-                ad.[Name] AS external_name,
-                pct.[Name] AS category_name_ru,
+                NULLIF(LTRIM(RTRIM(ad.[Name])), '') AS external_name,
+                NULLIF(LTRIM(RTRIM(pct.[Name])), '') AS category_name_ru,
                 m.[Идентификатор] AS manufacturer_id,
-                m.[Название] AS manufacturer_name,
-                ad.[SerialNo] AS serial_number
+                NULLIF(LTRIM(RTRIM(m.[Название])), '') AS manufacturer_name,
+                NULLIF(LTRIM(RTRIM(ad.[SerialNo])), '') AS serial_number
             FROM dbo.[Adapter] ad
             JOIN dbo.[AdapterType] at ON ad.[AdapterTypeID] = at.[AdapterTypeID]
             JOIN dbo.[ProductCatalogType] pct ON at.[ProductCatalogTypeID] = pct.[ID]
@@ -193,6 +202,7 @@ public class InfraDeviceService {
 
         List<String> extNamesToFetch = rawComponents.stream()
                 .map(ExternalComponentDto::externalName)
+                .filter(name -> name != null && !name.isBlank())
                 .distinct()
                 .toList();
 
@@ -225,11 +235,11 @@ public class InfraDeviceService {
             ,
             ad.[AdapterID] AS adapter_id,
             pct_comp.[ID] AS category_id,
-            ad.[Name] AS external_name,
-            pct_comp.[Name] AS category_name_ru,
+            NULLIF(LTRIM(RTRIM(ad.[Name])), '') AS external_name,
+            NULLIF(LTRIM(RTRIM(pct_comp.[Name])), '') AS category_name_ru,
             comp_manuf.[Идентификатор] AS comp_manufacturer_id,
-            comp_manuf.[Название] AS comp_manufacturer_name,
-            ad.[SerialNo] AS comp_serial_number
+            NULLIF(LTRIM(RTRIM(comp_manuf.[Название])), '') AS comp_manufacturer_name,
+            NULLIF(LTRIM(RTRIM(ad.[SerialNo])), '') AS comp_serial_number
             """ + BASE_DEVICE_FROM_JOINS + """
             JOIN dbo.[Adapter] ad ON pc.[Идентификатор] = ad.[TerminalDeviceID]
             JOIN dbo.[AdapterType] at ON ad.[AdapterTypeID] = at.[AdapterTypeID]
@@ -237,6 +247,7 @@ public class InfraDeviceService {
             LEFT JOIN dbo.[Производители] comp_manuf ON at.[VendorID] = comp_manuf.[Идентификатор]
             
             WHERE pc.[Идентификатор] != :excludeId
+              AND pc.[Removed] = 0
               AND LOWER(pct_comp.[Name]) LIKE '%' + LOWER(:categoryName) + '%'
         """;
 
@@ -307,13 +318,21 @@ public class InfraDeviceService {
 
     private ExternalDeviceDto mapDeviceRow(ResultSet rs, int rowNum) throws SQLException {
         return new ExternalDeviceDto(
-                rs.getLong("id"), rs.getString("name"), rs.getString("inv_num"), rs.getString("serial_num"),
+                rs.getLong("id"),
+                rs.getString("name") != null ? rs.getString("name") : "Без названия",
+                rs.getString("inv_num"),
+                rs.getString("serial_num"),
+                rs.getString("note"),
+                rs.getString("asset_tag"),
+                rs.getString("code"),
+                rs.getString("description"),
                 rs.getLong("model_id"), rs.getString("model_name"),
                 rs.getLong("manuf_id"), rs.getString("manuf_name"),
                 rs.getLong("type_id"), rs.getString("type_name"),
                 rs.getLong("state_id"), ExternalDeviceState.fromInfraName(rs.getString("state_name")),
-                rs.getString("owner_name").isBlank() ? "Неизвестно" : rs.getString("owner_name"),
-                rs.getLong("dept_id"), rs.getString("dept_name"),
+                rs.getString("owner_name") != null ? rs.getString("owner_name") : "Неизвестно",
+                rs.getLong("dept_id"),
+                rs.getString("dept_name") != null ? rs.getString("dept_name") : "Без отдела",
                 rs.getLong("building_id"), rs.getLong("floor_id"), rs.getLong("room_id"),
                 rs.getString("location_path"),
                 rs.getTimestamp("date_received") != null ? rs.getTimestamp("date_received").toInstant() : null,
