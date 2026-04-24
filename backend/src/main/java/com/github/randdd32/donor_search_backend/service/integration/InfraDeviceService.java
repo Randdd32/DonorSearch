@@ -89,9 +89,9 @@ public class InfraDeviceService {
 
         String cleanSearch = QueryUtils.cleanSearchToken(filter.search());
         if (cleanSearch != null) {
-            where.append(" AND (LOWER(pc.[Название]) LIKE '%' + :search + '%' ")
-                    .append(" OR LOWER(pc.[Инвентарный номер]) LIKE '%' + :search + '%' ")
-                    .append(" OR LOWER(pc.[SerialNumber]) LIKE '%' + :search + '%') ");
+            where.append(" AND (pc.[Название] LIKE '%' + :search + '%' ")
+                    .append(" OR pc.[Инвентарный номер] LIKE '%' + :search + '%' ")
+                    .append(" OR pc.[SerialNumber] LIKE '%' + :search + '%') ");
             params.addValue("search", cleanSearch);
         }
 
