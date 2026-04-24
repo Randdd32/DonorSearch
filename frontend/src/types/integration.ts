@@ -24,8 +24,12 @@ export interface ExternalComponentDto {
 export interface ExternalDeviceDto {
   externalId: number;
   name: string;
-  inventoryNumber: string;
-  serialNumber: string;
+  inventoryNumber: string | null;
+  serialNumber: string | null;
+  note: string | null;
+  assetTag: string | null;
+  code: string | null;
+  description: string | null;
   modelName: string;
   manufacturerName: string;
   typeName: string;

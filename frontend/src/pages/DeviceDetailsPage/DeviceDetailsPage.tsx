@@ -87,6 +87,18 @@ export const DeviceDetailsPage = () => {
             <span className={styles.infoLabel}>Серийный номер</span>
             <span className={styles.infoValue}>{device.serialNumber || 'Н/Д'}</span>
           </div>
+          {device.assetTag && (
+             <div className={styles.infoItem}>
+               <span className={styles.infoLabel}>Тег имущества (Asset Tag)</span>
+               <span className={styles.infoValue}>{device.assetTag}</span>
+             </div>
+          )}
+          {device.code && (
+             <div className={styles.infoItem}>
+               <span className={styles.infoLabel}>Код</span>
+               <span className={styles.infoValue}>{device.code}</span>
+             </div>
+          )}
           <div className={styles.infoItem}>
             <span className={styles.infoLabel}>Пользователь</span>
             <span className={styles.infoValue}>{device.ownerFullName}</span>
@@ -106,11 +118,29 @@ export const DeviceDetailsPage = () => {
         </div>
       </Card>
 
+      {(device.note || device.description) && (
+        <Card className={styles.notesCard}>
+          <h3 className={styles.cardTitle}>Дополнительная информация</h3>
+          {device.description && (
+            <div className={styles.noteBlock}>
+              <span className={styles.noteLabel}>Описание:</span>
+              <p className={styles.noteText}>{device.description}</p>
+            </div>
+          )}
+          {device.note && (
+            <div className={styles.noteBlock}>
+              <span className={styles.noteLabel}>Примечание:</span>
+              <p className={styles.noteText}>{device.note}</p>
+            </div>
+          )}
+        </Card>
+      )}
+
       <h2 className={styles.sectionTitle}>Компонентный состав</h2>
 
       <div className={styles.componentsLayout}>
         {ALL_CATEGORIES.map(category => {
-          const components = groupedComponents[category] || [];
+          const components = groupedComponents[category] ||[];
           const config = COMPONENT_CATEGORY_CONFIG[category] || COMPONENT_CATEGORY_CONFIG['UNKNOWN'];
           const Icon = config.icon;
 
