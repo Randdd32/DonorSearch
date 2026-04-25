@@ -21,6 +21,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -50,26 +51,45 @@ public class InfraDeviceService {
             NULLIF(LTRIM(RTRIM(pc.[Code])), '') AS code,
             NULLIF(LTRIM(RTRIM(pc.[Description])), '') AS description,
             too.[Идентификатор] AS model_id, 
-            NULLIF(LTRIM(RTRIM(too.[Название])), '') AS model_name,
+            NULLIF(LTRIM(RTRIM(too.[Название])), '') AS model_name, 
             NULLIF(LTRIM(RTRIM(too.[ProductNumber])), '') AS model_product_number,
             NULLIF(LTRIM(RTRIM(too.[Note])), '') AS model_note,
-            manuf.[Идентификатор] AS manuf_id, manuf.[Название] AS manuf_name, 
-            pct.[ID] AS type_id, pct.[Name] AS type_name, 
-            state.[ID] AS state_id, state.[Name] AS state_name,
+            manuf.[Идентификатор] AS manuf_id, 
+            NULLIF(LTRIM(RTRIM(manuf.[Название])), '') AS manuf_name, 
+            pct.[ID] AS type_id, 
+            NULLIF(LTRIM(RTRIM(pct.[Name])), '') AS type_name, 
+            state.[ID] AS state_id, 
+            NULLIF(LTRIM(RTRIM(state.[Name])), '') AS state_name,
             NULLIF(LTRIM(RTRIM(ISNULL(u.[Фамилия], '') + ' ' + ISNULL(u.[Имя], '') + ' ' + ISNULL(u.[Отчество], ''))), '') AS owner_name,
-            dep.[Идентификатор] AS dept_id, NULLIF(LTRIM(RTRIM(dep.[Название])), '') AS dept_name,
-            b.[Идентификатор] AS building_id, f.[Идентификатор] AS floor_id, r.[Идентификатор] AS room_id,
+            dep.[Идентификатор] AS dept_id, 
+            NULLIF(LTRIM(RTRIM(dep.[Название])), '') AS dept_name,
+            b.[Идентификатор] AS building_id, 
+            f.[Идентификатор] AS floor_id, 
+            r.[Идентификатор] AS room_id,
             COALESCE(NULLIF(LTRIM(RTRIM(b.[Название])), ''), 'Без здания') + ' -> ' + 
             COALESCE(NULLIF(LTRIM(RTRIM(f.[Название])), ''), 'Без этажа') + ' -> ' + 
             COALESCE(NULLIF(LTRIM(RTRIM(r.[Название])), ''), 'Без комнаты') + ' -> ' + 
             COALESCE(NULLIF(LTRIM(RTRIM(wp.[Название])), ''), 'Без РМ') AS location_path,
-            a.[DateReceived] AS date_received, a.[IsWorking] AS is_working
+            a.[DateReceived] AS date_received, 
+            a.[IsWorking] AS is_working,
+            a.[Cost] AS cost,
+            NULLIF(LTRIM(RTRIM(a.[UserField1])), '') AS pc_composition,
+            NULLIF(LTRIM(RTRIM(a.[UserField3])), '') AS ownership_note,
+            a.[DateInquiry] AS date_inquiry,
+            a.[AppointmentDate] AS appointment_date,
+            a.[DateAnnuled] AS date_annuled,
+            NULLIF(LTRIM(RTRIM(org.[Название])), '') AS organization_name
     """;
 
     private static final String BASE_DEVICE_FROM_JOINS = """
         FROM dbo.[Оконечное оборудование] pc
-        JOIN dbo.[Asset] a ON pc.[Идентификатор] = a.[DeviceID]
-        JOIN dbo.[LifeCycleState] state ON a.[LifeCycleStateID] = state.[ID]
+        OUTER APPLY (
+            SELECT TOP 1 * 
+            FROM dbo.[Asset] a_inner 
+            WHERE a_inner.[DeviceID] = pc.[Идентификатор] 
+            ORDER BY a_inner.[DateInquiry] DESC, a_inner.[DateReceived] DESC
+        ) a
+        LEFT JOIN dbo.[LifeCycleState] state ON a.[LifeCycleStateID] = state.[ID]
         LEFT JOIN dbo.[Типы оконечного оборудования] too ON NULLIF(pc.[ИД типа ОО], 0) = too.[Идентификатор]
         LEFT JOIN dbo.[Производители] manuf ON too.[ИД производителя] = manuf.[Идентификатор]
         LEFT JOIN dbo.[ProductCatalogType] pct ON too.[ProductCatalogTypeID] = pct.[ID]
@@ -78,10 +98,11 @@ public class InfraDeviceService {
             WHEN a.[UtilizerClassID] = 102 THEN a.[UtilizerID]
             WHEN a.[UtilizerClassID] = 9 THEN u.[ИД подразделения]
         END
+        LEFT JOIN dbo.[Организация] org ON a.[UtilizerID] = org.[Идентификатор] AND a.[UtilizerClassID] = 101
         LEFT JOIN dbo.[Рабочее место] wp ON NULLIF(pc.[ИД рабочего места], 0) = wp.[Идентификатор]
-        LEFT JOIN dbo.[Комната] r ON COALESCE(wp.[ИД комнаты], NULLIF(pc.[ИД комнаты], 0)) = r.[Идентификатор]
-        LEFT JOIN dbo.[Этаж] f ON r.[ИД этажа] = f.[Идентификатор]
-        LEFT JOIN dbo.[Здание] b ON f.[ИД здания] = b.[Идентификатор]
+        LEFT JOIN dbo.[Комната] r ON COALESCE(NULLIF(wp.[ИД комнаты], 0), NULLIF(pc.[ИД комнаты], 0)) = r.[Идентификатор]
+        LEFT JOIN dbo.[Этаж] f ON NULLIF(r.[ИД этажа], 0) = f.[Идентификатор]
+        LEFT JOIN dbo.[Здание] b ON NULLIF(f.[ИД здания], 0) = b.[Идентификатор]
     """;
 
     public PageDto<ExternalDeviceDto> getDevicesPage(InfraDeviceFilter filter, Pageable pageable) {
@@ -118,13 +139,18 @@ public class InfraDeviceService {
             where.append(" AND a.[IsWorking] = :isWorking ");
             params.addValue("isWorking", filter.isWorking() ? 1 : 0);
         }
-        if (filter.dateReceivedFrom() != null) {
-            where.append(" AND a.[DateReceived] >= :dateFrom ");
-            params.addValue("dateFrom", java.sql.Timestamp.from(filter.dateReceivedFrom()));
+
+        addDateRangeFilter(where, params, "a.[DateReceived]", "dateReceived", filter.dateReceivedFrom(), filter.dateReceivedTo());
+        addDateRangeFilter(where, params, "a.[DateInquiry]", "dateInquiry", filter.dateInquiryFrom(), filter.dateInquiryTo());
+        addDateRangeFilter(where, params, "a.[AppointmentDate]", "appointmentDate", filter.appointmentDateFrom(), filter.appointmentDateTo());
+
+        if (filter.minCost() != null) {
+            where.append(" AND a.[Cost] >= :minCost ");
+            params.addValue("minCost", filter.minCost());
         }
-        if (filter.dateReceivedTo() != null) {
-            where.append(" AND a.[DateReceived] <= :dateTo ");
-            params.addValue("dateTo", java.sql.Timestamp.from(filter.dateReceivedTo()));
+        if (filter.maxCost() != null) {
+            where.append(" AND a.[Cost] <= :maxCost ");
+            params.addValue("maxCost", filter.maxCost());
         }
 
         String countSql = "SELECT COUNT(1) " + BASE_DEVICE_FROM_JOINS + where;
@@ -270,11 +296,11 @@ public class InfraDeviceService {
             LEFT JOIN dbo.[Производители] comp_manuf ON at.[VendorID] = comp_manuf.[Идентификатор]
             
             WHERE pc.[Идентификатор] != :excludeId
-                AND pc.[Removed] = 0
-                AND pct.[ID] IN (:allowedTypes)
-                AND (too.[Removed] = 0 OR too.[Removed] IS NULL)
-                AND (pct.[Removed] = 0 OR pct.[Removed] IS NULL)
-                AND pct_comp.[Name] IN (:categoryNames)
+              AND pc.[Removed] = 0
+              AND pct.[ID] IN (:allowedTypes)
+              AND (too.[Removed] = 0 OR too.[Removed] IS NULL)
+              AND (pct.[Removed] = 0 OR pct.[Removed] IS NULL)
+              AND pct_comp.[Name] IN (:categoryNames)
         """;
 
         MapSqlParameterSource params = new MapSqlParameterSource()
@@ -357,16 +383,29 @@ public class InfraDeviceService {
                 rs.getString("model_name") != null ? rs.getString("model_name") : "Неизвестно",
                 rs.getString("model_product_number"),
                 rs.getString("model_note"),
-                rs.getLong("manuf_id"), rs.getString("manuf_name"),
-                rs.getLong("type_id"), rs.getString("type_name"),
-                rs.getLong("state_id"), ExternalDeviceState.fromInfraName(rs.getString("state_name")),
+                rs.getLong("manuf_id"),
+                rs.getString("manuf_name"),
+                rs.getLong("type_id"),
+                rs.getString("type_name"),
+                rs.getLong("state_id"),
+                ExternalDeviceState.fromInfraName(rs.getString("state_name")),
                 rs.getString("owner_name") != null ? rs.getString("owner_name") : "Неизвестно",
                 rs.getLong("dept_id"),
                 rs.getString("dept_name") != null ? rs.getString("dept_name") : "Без отдела",
-                rs.getLong("building_id"), rs.getLong("floor_id"), rs.getLong("room_id"),
+                rs.getLong("building_id"),
+                rs.getLong("floor_id"),
+                rs.getLong("room_id"),
                 rs.getString("location_path"),
                 rs.getTimestamp("date_received") != null ? rs.getTimestamp("date_received").toInstant() : null,
-                rs.getBoolean("is_working"), new ArrayList<>()
+                rs.getObject("is_working") != null ? rs.getBoolean("is_working") : null,
+                rs.getBigDecimal("cost"),
+                rs.getString("pc_composition"),
+                rs.getString("ownership_note"),
+                rs.getTimestamp("date_inquiry") != null ? rs.getTimestamp("date_inquiry").toInstant() : null,
+                rs.getTimestamp("appointment_date") != null ? rs.getTimestamp("appointment_date").toInstant() : null,
+                rs.getTimestamp("date_annuled") != null ? rs.getTimestamp("date_annuled").toInstant() : null,
+                rs.getString("organization_name"),
+                new ArrayList<>()
         );
     }
 
@@ -374,6 +413,18 @@ public class InfraDeviceService {
         if (!CollectionUtils.isEmpty(values)) {
             where.append(" AND ").append(column).append(" IN (:").append(paramName).append(") ");
             params.addValue(paramName, values);
+        }
+    }
+
+    private void addDateRangeFilter(StringBuilder where, MapSqlParameterSource params, String column,
+                                    String paramPrefix, Instant from, Instant to) {
+        if (from != null) {
+            where.append(" AND ").append(column).append(" >= :").append(paramPrefix).append("From ");
+            params.addValue(paramPrefix + "From", java.sql.Timestamp.from(from));
+        }
+        if (to != null) {
+            where.append(" AND ").append(column).append(" <= :").append(paramPrefix).append("To ");
+            params.addValue(paramPrefix + "To", java.sql.Timestamp.from(to));
         }
     }
 }

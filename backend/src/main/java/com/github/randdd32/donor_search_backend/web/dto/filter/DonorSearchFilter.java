@@ -1,5 +1,6 @@
 package com.github.randdd32.donor_search_backend.web.dto.filter;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 
@@ -15,6 +16,12 @@ public record DonorSearchFilter(
         List<Long> modelIds,
         Instant dateReceivedFrom,
         Instant dateReceivedTo,
+        Instant dateInquiryFrom,
+        Instant dateInquiryTo,
+        Instant appointmentDateFrom,
+        Instant appointmentDateTo,
+        BigDecimal minCost,
+        BigDecimal maxCost,
         Boolean isWorking,
         List<Long> componentManufacturerIds,
         Integer maxTotalPenalty
