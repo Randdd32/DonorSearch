@@ -1,6 +1,6 @@
 import type { ExternalDeviceState } from '../types/integration';
 
-export const formatDateTime = (dateString?: string): string => {
+export const formatDateTime = (dateString?: string | null): string => {
   if (!dateString) return 'Н/Д';
   const date = new Date(dateString);
   return date.toLocaleString('ru-RU', {

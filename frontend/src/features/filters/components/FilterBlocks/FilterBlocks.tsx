@@ -138,23 +138,32 @@ export const StaticSelectFilter = ({ label, value, onChange, options }: StaticSe
   </div>
 );
 
-export const DateRangeFilters = ({ filters, updateFilters }: { filters: Record<string, FilterValue>, updateFilters: UpdateFiltersFn }) => (
-  <>
+interface DateRangeProps {
+  filters: Record<string, FilterValue>;
+  updateFilters: UpdateFiltersFn;
+  label: string;
+  fromKey: string;
+  toKey: string;
+}
+
+export const DateRangeFilters = ({ filters, updateFilters, label, fromKey, toKey }: DateRangeProps) => (
+  <div className={styles.hierarchyGroup}>
+    <h4 className={styles.hierarchyTitle}>{label}</h4>
     <div className={styles.filterGroup}>
-      <label className={styles.label}>Дата поступления (от)</label>
+      <label className={styles.label}>От</label>
       <input type="datetime-local" step="1" className={styles.nativeInput}
-        value={(filters.dateReceivedFrom as string) || ''}
-        onChange={(e) => updateFilters({ dateReceivedFrom: e.target.value })}
+        value={(filters[fromKey] as string) || ''}
+        onChange={(e) => updateFilters({ [fromKey]: e.target.value })}
       />
     </div>
     <div className={styles.filterGroup}>
-      <label className={styles.label}>Дата поступления (до)</label>
+      <label className={styles.label}>До</label>
       <input type="datetime-local" step="1" className={styles.nativeInput}
-        value={(filters.dateReceivedTo as string) || ''}
-        onChange={(e) => updateFilters({ dateReceivedTo: e.target.value })}
+        value={(filters[toKey] as string) || ''}
+        onChange={(e) => updateFilters({ [toKey]: e.target.value })}
       />
     </div>
-  </>
+  </div>
 );
 
 interface AuditDateProps {
@@ -164,40 +173,47 @@ interface AuditDateProps {
 
 export const AuditDateFilters = ({ filters, updateFilters }: AuditDateProps) => (
   <>
-    <div className={styles.hierarchyGroup}>
-      <h4 className={styles.hierarchyTitle}>Дата создания</h4>
-      <div className={styles.filterGroup}>
-        <label className={styles.label}>С даты</label>
-        <input type="datetime-local" step="1" className={styles.nativeInput}
-          value={(filters.createdAfter as string) || ''}
-          onChange={(e) => updateFilters({ createdAfter: e.target.value })}
-        />
-      </div>
-      <div className={styles.filterGroup}>
-        <label className={styles.label}>По дату</label>
-        <input type="datetime-local" step="1" className={styles.nativeInput}
-          value={(filters.createdBefore as string) || ''}
-          onChange={(e) => updateFilters({ createdBefore: e.target.value })}
-        />
-      </div>
-    </div>
-
-    <div className={styles.hierarchyGroup}>
-      <h4 className={styles.hierarchyTitle}>Дата обновления</h4>
-      <div className={styles.filterGroup}>
-        <label className={styles.label}>С даты</label>
-        <input type="datetime-local" step="1" className={styles.nativeInput}
-          value={(filters.updatedAfter as string) || ''}
-          onChange={(e) => updateFilters({ updatedAfter: e.target.value })}
-        />
-      </div>
-      <div className={styles.filterGroup}>
-        <label className={styles.label}>По дату</label>
-        <input type="datetime-local" step="1" className={styles.nativeInput}
-          value={(filters.updatedBefore as string) || ''}
-          onChange={(e) => updateFilters({ updatedBefore: e.target.value })}
-        />
-      </div>
-    </div>
+    <DateRangeFilters 
+      label="Дата создания" 
+      fromKey="createdAfter" 
+      toKey="createdBefore" 
+      filters={filters} 
+      updateFilters={updateFilters} 
+    />
+    <DateRangeFilters 
+      label="Дата обновления" 
+      fromKey="updatedAfter" 
+      toKey="updatedBefore" 
+      filters={filters} 
+      updateFilters={updateFilters} 
+    />
   </>
+);
+
+interface NumberRangeProps {
+  filters: Record<string, FilterValue>;
+  updateFilters: UpdateFiltersFn;
+  label: string;
+  minKey: string;
+  maxKey: string;
+}
+
+export const NumberRangeFilter = ({ filters, updateFilters, label, minKey, maxKey }: NumberRangeProps) => (
+  <div className={styles.hierarchyGroup}>
+    <h4 className={styles.hierarchyTitle}>{label}</h4>
+    <div className={styles.filterGroup}>
+      <label className={styles.label}>От</label>
+      <input type="number" className={styles.nativeInput} placeholder="Минимум"
+        value={(filters[minKey] as number) || ''}
+        onChange={(e) => updateFilters({ [minKey]: e.target.value ? Number(e.target.value) : undefined })}
+      />
+    </div>
+    <div className={styles.filterGroup}>
+      <label className={styles.label}>До</label>
+      <input type="number" className={styles.nativeInput} placeholder="Максимум"
+        value={(filters[maxKey] as number) || ''}
+        onChange={(e) => updateFilters({[maxKey]: e.target.value ? Number(e.target.value) : undefined })}
+      />
+    </div>
+  </div>
 );

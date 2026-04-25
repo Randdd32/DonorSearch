@@ -7,6 +7,11 @@ export const getNumberArray = (searchParams: URLSearchParams, key: string): numb
   return val ? val.split(',').map(Number).filter(n => !isNaN(n)) :[];
 };
 
+export const getNumber = (searchParams: URLSearchParams, key: string): number | undefined => {
+  const val = searchParams.get(key);
+  return val ? Number(val) : undefined;
+};
+
 export const getBoolean = (searchParams: URLSearchParams, key: string): boolean | undefined => {
   const val = searchParams.get(key);
   return val === 'true' ? true : val === 'false' ? false : undefined;

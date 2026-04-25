@@ -1,4 +1,4 @@
-import { getNumberArray, getBoolean, getString } from '../../hooks/useUrlFilters';
+import { getNumberArray, getBoolean, getString, getNumber } from '../../hooks/useUrlFilters';
 
 export const parseDeviceFilters = (params: URLSearchParams) => ({
   stateIds: getNumberArray(params, 'stateIds'),
@@ -12,6 +12,12 @@ export const parseDeviceFilters = (params: URLSearchParams) => ({
   isWorking: getBoolean(params, 'isWorking'),
   dateReceivedFrom: getString(params, 'dateReceivedFrom'),
   dateReceivedTo: getString(params, 'dateReceivedTo'),
+  minCost: getNumber(params, 'minCost'),
+  maxCost: getNumber(params, 'maxCost'),
+  dateInquiryFrom: getString(params, 'dateInquiryFrom'),
+  dateInquiryTo: getString(params, 'dateInquiryTo'),
+  appointmentDateFrom: getString(params, 'appointmentDateFrom'),
+  appointmentDateTo: getString(params, 'appointmentDateTo')
 });
 
 export type DeviceFiltersType = ReturnType<typeof parseDeviceFilters>;

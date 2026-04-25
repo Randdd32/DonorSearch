@@ -72,12 +72,19 @@ export const DeviceDetailsPage = () => {
           </div>
           <div className={styles.badgesWrapper}>
             <Badge variant={stateConfig.variant}>{stateConfig.label}</Badge>
-            <Badge variant={device.isWorking ? 'success' : 'danger'}>
-              {device.isWorking ? 'Исправно' : 'Неисправно'}
-            </Badge>
+
+            {device.isWorking === true && <Badge variant="success">Исправно</Badge>}
+            {device.isWorking === false && <Badge variant="danger">Неисправно</Badge>}
+            {device.isWorking === null && <Badge variant="default">Работоспособность неизвестна</Badge>}
           </div>
         </div>
         
+        {device.organizationName && device.organizationName.toLowerCase() === 'не используется' && (
+          <div className={styles.orgWarning}>
+            <Badge variant="warning">Внимание: согласно данным об организации устройство не используется</Badge>
+          </div>
+        )}
+
         <div className={styles.infoGrid}>
           <div className={styles.infoItem}>
             <span className={styles.infoLabel}>Инвентарный номер</span>
@@ -106,6 +113,14 @@ export const DeviceDetailsPage = () => {
              </div>
           )}
           <div className={styles.infoItem}>
+            <span className={styles.infoLabel}>Стоимость</span>
+            <span className={styles.infoValue}>
+              {device.cost !== null 
+                ? new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format(device.cost) 
+                : 'Не указана'}
+            </span>
+          </div>
+          <div className={styles.infoItem}>
             <span className={styles.infoLabel}>Пользователь</span>
             <span className={styles.infoValue}>{device.ownerFullName}</span>
           </div>
@@ -121,10 +136,24 @@ export const DeviceDetailsPage = () => {
             <span className={styles.infoLabel}>Дата поступления</span>
             <span className={styles.infoValue}>{formatDateTime(device.dateReceived)}</span>
           </div>
+          <div className={styles.infoItem}>
+            <span className={styles.infoLabel}>Дата последнего опроса</span>
+            <span className={styles.infoValue}>{formatDateTime(device.dateInquiry)}</span>
+          </div>
+          <div className={styles.infoItem}>
+            <span className={styles.infoLabel}>Дата назначения</span>
+            <span className={styles.infoValue}>{formatDateTime(device.appointmentDate)}</span>
+          </div>
+          {device.dateAnnuled && (
+             <div className={styles.infoItem}>
+               <span className={styles.infoLabel}>Дата аннулирования</span>
+               <span className={styles.infoValue}>{formatDateTime(device.dateAnnuled)}</span>
+             </div>
+          )}
         </div>
       </Card>
 
-      {(device.note || device.description || device.modelNote) && (
+      {(device.note || device.description || device.modelNote || device.pcComposition || device.ownershipNote) && (
         <Card className={styles.notesCard}>
           <h3 className={styles.cardTitle}>Дополнительная информация</h3>
           {device.description && (
@@ -145,6 +174,18 @@ export const DeviceDetailsPage = () => {
               <p className={styles.noteText}>{device.modelNote}</p>
             </div>
           )}
+          {device.pcComposition && (
+            <div className={styles.noteBlock}>
+              <span className={styles.noteLabel}>Состав ПК (и периферия):</span>
+              <p className={styles.noteText}>{device.pcComposition}</p>
+            </div>
+          )}
+          {device.ownershipNote && (
+            <div className={styles.noteBlock}>
+              <span className={styles.noteLabel}>Движение и собственность:</span>
+              <p className={styles.noteText}>{device.ownershipNote}</p>
+            </div>
+          )}
         </Card>
       )}
 
@@ -152,7 +193,7 @@ export const DeviceDetailsPage = () => {
 
       <div className={styles.componentsLayout}>
         {ALL_CATEGORIES.map(category => {
-          const components = groupedComponents[category] ||[];
+          const components = groupedComponents[category] || [];
           const config = COMPONENT_CATEGORY_CONFIG[category] || COMPONENT_CATEGORY_CONFIG['UNKNOWN'];
           const Icon = config.icon;
 

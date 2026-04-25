@@ -1,6 +1,7 @@
 import { FilterSidebar } from '../../../../components/ui/FilterSidebar/FilterSidebar';
 import { useDictionaryFetchers } from '../../../filters/hooks/useDictionaryFetchers';
-import { MultiSelectFilter, ManufacturerModelFilters, LocationFilters, StaticSelectFilter, DateRangeFilters } from '../../../filters/components/FilterBlocks/FilterBlocks';
+import { MultiSelectFilter, ManufacturerModelFilters, LocationFilters, 
+  StaticSelectFilter, DateRangeFilters, NumberRangeFilter } from '../../../filters/components/FilterBlocks/FilterBlocks';
 import { dictionaryService } from '../../../../services/dictionary.service';
 import type { DonorFiltersType } from '../../../../pages/SearchResultsPage/donorParser';
 import type { CommonFilters } from '../../../../hooks/useUrlFilters';
@@ -79,9 +80,25 @@ export const DonorFilters = ({ isOpen, onClose, filters, updateFilters, resetFil
         updateFilters={updateFilters} 
         fetchers={fetchers} 
       />
+      <NumberRangeFilter 
+        label="Стоимость (₽)" 
+        minKey="minCost" maxKey="maxCost" 
+        filters={filters} updateFilters={updateFilters} 
+      />
       <DateRangeFilters 
-        filters={filters} 
-        updateFilters={updateFilters} 
+        label="Дата поступления" 
+        fromKey="dateReceivedFrom" toKey="dateReceivedTo" 
+        filters={filters} updateFilters={updateFilters} 
+      />
+      <DateRangeFilters 
+        label="Дата последнего опроса" 
+        fromKey="dateInquiryFrom" toKey="dateInquiryTo" 
+        filters={filters} updateFilters={updateFilters} 
+      />
+      <DateRangeFilters 
+        label="Дата назначения" 
+        fromKey="appointmentDateFrom" toKey="appointmentDateTo" 
+        filters={filters} updateFilters={updateFilters} 
       />
     </FilterSidebar>
   );

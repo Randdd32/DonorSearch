@@ -39,8 +39,15 @@ export interface ExternalDeviceDto {
   ownerFullName: string;
   departmentName: string;
   locationPath: string;
-  dateReceived: string; // ISO 8601 string
-  isWorking: boolean;
+  dateReceived: string | null; 
+  isWorking: boolean | null;
+  cost: number | null;
+  pcComposition: string | null;
+  ownershipNote: string | null;
+  dateInquiry: string | null;
+  appointmentDate: string | null;
+  dateAnnuled: string | null;
+  organizationName: string | null;
   components: ExternalComponentDto[];
 }
 

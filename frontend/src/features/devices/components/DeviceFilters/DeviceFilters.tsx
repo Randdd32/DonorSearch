@@ -3,7 +3,8 @@ import type { CommonFilters } from '../../../../hooks/useUrlFilters';
 import type { DeviceFiltersType } from '../../../../pages/DevicesPage/devicesParser';
 import { FilterSidebar } from '../../../../components/ui/FilterSidebar/FilterSidebar';
 import { useDictionaryFetchers } from '../../../filters/hooks/useDictionaryFetchers';
-import { MultiSelectFilter, ManufacturerModelFilters, LocationFilters, StaticSelectFilter, DateRangeFilters } from '../../../filters/components/FilterBlocks/FilterBlocks';
+import { MultiSelectFilter, ManufacturerModelFilters, LocationFilters, 
+  StaticSelectFilter, DateRangeFilters, NumberRangeFilter } from '../../../filters/components/FilterBlocks/FilterBlocks';
 import { dictionaryService } from '../../../../services/dictionary.service';
 
 interface DeviceFiltersProps {
@@ -58,9 +59,25 @@ export const DeviceFilters = ({ isOpen, onClose, filters, updateFilters, resetFi
         updateFilters={updateFilters} 
         fetchers={fetchers} 
       />
+      <NumberRangeFilter 
+        label="Стоимость (₽)" 
+        minKey="minCost" maxKey="maxCost" 
+        filters={filters} updateFilters={updateFilters} 
+      />
       <DateRangeFilters 
-        filters={filters} 
-        updateFilters={updateFilters} 
+        label="Дата поступления" 
+        fromKey="dateReceivedFrom" toKey="dateReceivedTo" 
+        filters={filters} updateFilters={updateFilters} 
+      />
+      <DateRangeFilters 
+        label="Дата последнего опроса" 
+        fromKey="dateInquiryFrom" toKey="dateInquiryTo" 
+        filters={filters} updateFilters={updateFilters} 
+      />
+      <DateRangeFilters 
+        label="Дата назначения" 
+        fromKey="appointmentDateFrom" toKey="appointmentDateTo" 
+        filters={filters} updateFilters={updateFilters} 
       />
     </FilterSidebar>
   );
