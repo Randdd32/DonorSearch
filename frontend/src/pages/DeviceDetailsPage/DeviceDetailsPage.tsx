@@ -87,6 +87,12 @@ export const DeviceDetailsPage = () => {
             <span className={styles.infoLabel}>Серийный номер</span>
             <span className={styles.infoValue}>{device.serialNumber || 'Н/Д'}</span>
           </div>
+          {device.modelProductNumber && (
+             <div className={styles.infoItem}>
+               <span className={styles.infoLabel}>Номер продукта (Product Number)</span>
+               <span className={styles.infoValue}>{device.modelProductNumber}</span>
+             </div>
+          )}
           {device.assetTag && (
              <div className={styles.infoItem}>
                <span className={styles.infoLabel}>Тег имущества (Asset Tag)</span>
@@ -118,7 +124,7 @@ export const DeviceDetailsPage = () => {
         </div>
       </Card>
 
-      {(device.note || device.description) && (
+      {(device.note || device.description || device.modelNote) && (
         <Card className={styles.notesCard}>
           <h3 className={styles.cardTitle}>Дополнительная информация</h3>
           {device.description && (
@@ -129,8 +135,14 @@ export const DeviceDetailsPage = () => {
           )}
           {device.note && (
             <div className={styles.noteBlock}>
-              <span className={styles.noteLabel}>Примечание:</span>
+              <span className={styles.noteLabel}>Примечание к устройству:</span>
               <p className={styles.noteText}>{device.note}</p>
+            </div>
+          )}
+          {device.modelNote && (
+            <div className={styles.noteBlock}>
+              <span className={styles.noteLabel}>Примечание к модели:</span>
+              <p className={styles.noteText}>{device.modelNote}</p>
             </div>
           )}
         </Card>

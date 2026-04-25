@@ -31,6 +31,8 @@ export interface ExternalDeviceDto {
   code: string | null;
   description: string | null;
   modelName: string;
+  modelProductNumber: string | null;
+  modelNote: string | null;
   manufacturerName: string;
   typeName: string;
   lifeCycleState: ExternalDeviceState;
