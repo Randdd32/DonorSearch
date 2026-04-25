@@ -1,38 +1,53 @@
 package com.github.randdd32.donor_search_backend.web.dto.integration.enums;
 
-import lombok.Getter;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
-@Getter
 public enum ExternalComponentCategory {
-    CPU("Процессор"),
-    CPU_COOLER("Кулер"),
-    MOTHERBOARD("Материнская плата"),
-    VIDEO_CARD("Видеоадаптер"),
-    MEMORY("Память"),
-    STORAGE("Жесткий диск"),
-    OPTICAL_DRIVE("DVD привод"),
-    POWER_SUPPLY("Блок питания"),
-    CASE("Корпус"),
-    CASE_FAN("Корпусной вентилятор"),
-    EXPANSION_CARD("Сетевой адаптер"),
-    MONITOR("Монитор"),
-    UNKNOWN("Неизвестно");
+    CPU, CPU_COOLER, MOTHERBOARD, VIDEO_CARD, MEMORY, STORAGE,
+    OPTICAL_DRIVE, POWER_SUPPLY, CASE, CASE_FAN, EXPANSION_CARD,
+    MONITOR, UNKNOWN;
 
-    private final String infraName;
+    private static final Map<String, ExternalComponentCategory> EXACT_MATCH_MAP = Map.ofEntries(
+            Map.entry("процессор", CPU),
+            Map.entry("материнская плата", MOTHERBOARD),
+            Map.entry("жесткий диск", STORAGE),
+            Map.entry("cd/dvd привод", OPTICAL_DRIVE),
+            Map.entry("сетевая карта", EXPANSION_CARD),
+            Map.entry("звуковая карта", EXPANSION_CARD),
+            Map.entry("видеоадаптер", VIDEO_CARD),
+            Map.entry("модуль оперативной памяти", MEMORY),
+            Map.entry("монитор", MONITOR)
+    );
 
-    ExternalComponentCategory(String infraName) {
-        this.infraName = infraName;
+    private static final Map<ExternalComponentCategory, List<String>> REVERSE_MAP;
+
+    static {
+        Map<ExternalComponentCategory, List<String>> temp = new EnumMap<>(ExternalComponentCategory.class);
+
+        for (var entry : EXACT_MATCH_MAP.entrySet()) {
+            temp.computeIfAbsent(entry.getValue(), k -> new ArrayList<>())
+                    .add(entry.getKey());
+        }
+
+        REVERSE_MAP = temp.entrySet().stream()
+                .collect(Collectors.toUnmodifiableMap(
+                        Map.Entry::getKey,
+                        e -> List.copyOf(e.getValue())
+                ));
     }
 
     public static ExternalComponentCategory fromInfraName(String infraName) {
         if (infraName == null || infraName.isBlank()) {
             return UNKNOWN;
         }
-        for (ExternalComponentCategory category : values()) {
-            if (infraName.toLowerCase().contains(category.infraName.toLowerCase())) {
-                return category;
-            }
-        }
-        return UNKNOWN;
+        return EXACT_MATCH_MAP.getOrDefault(infraName.trim().toLowerCase(), UNKNOWN);
+    }
+
+    public List<String> getInfraNames() {
+        return REVERSE_MAP.getOrDefault(this, List.of());
     }
 }

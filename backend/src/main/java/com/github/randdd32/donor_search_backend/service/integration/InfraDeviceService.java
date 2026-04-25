@@ -1,5 +1,6 @@
 package com.github.randdd32.donor_search_backend.service.integration;
 
+import com.github.randdd32.donor_search_backend.core.configuration.Constants;
 import com.github.randdd32.donor_search_backend.core.error.NotFoundException;
 import com.github.randdd32.donor_search_backend.core.util.QueryUtils;
 import com.github.randdd32.donor_search_backend.service.IntegrationMappingService;
@@ -48,7 +49,10 @@ public class InfraDeviceService {
             NULLIF(LTRIM(RTRIM(pc.[AssetTag])), '') AS asset_tag,
             NULLIF(LTRIM(RTRIM(pc.[Code])), '') AS code,
             NULLIF(LTRIM(RTRIM(pc.[Description])), '') AS description,
-            too.[Идентификатор] AS model_id, too.[Название] AS model_name, 
+            too.[Идентификатор] AS model_id, 
+            NULLIF(LTRIM(RTRIM(too.[Название])), '') AS model_name,
+            NULLIF(LTRIM(RTRIM(too.[ProductNumber])), '') AS model_product_number,
+            NULLIF(LTRIM(RTRIM(too.[Note])), '') AS model_note,
             manuf.[Идентификатор] AS manuf_id, manuf.[Название] AS manuf_name, 
             pct.[ID] AS type_id, pct.[Name] AS type_name, 
             state.[ID] AS state_id, state.[Name] AS state_name,
@@ -84,8 +88,14 @@ public class InfraDeviceService {
         int page = pageable.getPageNumber();
         int size = pageable.getPageSize();
 
-        StringBuilder where = new StringBuilder(" WHERE pc.[Removed] = 0 ");
+        StringBuilder where = new StringBuilder(
+                " WHERE pc.[Removed] = 0 " +
+                        " AND pct.[ID] IN (:allowedTypes) " +
+                        " AND (too.[Removed] = 0 OR too.[Removed] IS NULL) " +
+                        " AND (pct.[Removed] = 0 OR pct.[Removed] IS NULL) "
+        );
         MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("allowedTypes", Constants.ALLOWED_PC_TYPE_UUIDS);
 
         String cleanSearch = QueryUtils.cleanSearchToken(filter.search());
         if (cleanSearch != null) {
@@ -153,11 +163,19 @@ public class InfraDeviceService {
     }
 
     public ExternalDeviceDto getDeviceDetails(Long externalDeviceId) {
-        String deviceSql = BASE_DEVICE_SELECT + BASE_DEVICE_FROM_JOINS + " WHERE pc.[Идентификатор] = :id AND pc.[Removed] = 0";
+        String deviceSql = BASE_DEVICE_SELECT + BASE_DEVICE_FROM_JOINS + """
+             WHERE pc.[Идентификатор] = :id 
+               AND pc.[Removed] = 0 
+               AND pct.[ID] IN (:allowedTypes) 
+               AND (too.[Removed] = 0 OR too.[Removed] IS NULL) 
+               AND (pct.[Removed] = 0 OR pct.[Removed] IS NULL)
+            """;
 
         List<ExternalDeviceDto> devices = jdbcTemplate.query(
                 deviceSql,
-                new MapSqlParameterSource("id", externalDeviceId),
+                new MapSqlParameterSource()
+                        .addValue("id", externalDeviceId)
+                        .addValue("allowedTypes", Constants.ALLOWED_PC_TYPE_UUIDS),
                 this::mapDeviceRow
         );
         if (devices.isEmpty()) {
@@ -231,6 +249,11 @@ public class InfraDeviceService {
     }
 
     public List<ExternalDeviceDto> getPotentialDonors(Long excludeDeviceId, ExternalComponentCategory category) {
+        List<String> infraNames = category.getInfraNames();
+        if (infraNames.isEmpty()) {
+            return Collections.emptyList();
+        }
+
         String sql = BASE_DEVICE_SELECT + """
             ,
             ad.[AdapterID] AS adapter_id,
@@ -247,13 +270,17 @@ public class InfraDeviceService {
             LEFT JOIN dbo.[Производители] comp_manuf ON at.[VendorID] = comp_manuf.[Идентификатор]
             
             WHERE pc.[Идентификатор] != :excludeId
-              AND pc.[Removed] = 0
-              AND LOWER(pct_comp.[Name]) LIKE '%' + LOWER(:categoryName) + '%'
+                AND pc.[Removed] = 0
+                AND pct.[ID] IN (:allowedTypes)
+                AND (too.[Removed] = 0 OR too.[Removed] IS NULL)
+                AND (pct.[Removed] = 0 OR pct.[Removed] IS NULL)
+                AND pct_comp.[Name] IN (:categoryNames)
         """;
 
         MapSqlParameterSource params = new MapSqlParameterSource()
                 .addValue("excludeId", excludeDeviceId)
-                .addValue("categoryName", category.getInfraName());
+                .addValue("allowedTypes", Constants.ALLOWED_PC_TYPE_UUIDS)
+                .addValue("categoryNames", infraNames);
 
         List<ExternalDeviceDto> devices = jdbcTemplate.query(sql, params, rs -> {
             Map<Long, ExternalDeviceDto> deviceMap = new LinkedHashMap<>();
@@ -326,7 +353,10 @@ public class InfraDeviceService {
                 rs.getString("asset_tag"),
                 rs.getString("code"),
                 rs.getString("description"),
-                rs.getLong("model_id"), rs.getString("model_name"),
+                rs.getLong("model_id"),
+                rs.getString("model_name") != null ? rs.getString("model_name") : "Неизвестно",
+                rs.getString("model_product_number"),
+                rs.getString("model_note"),
                 rs.getLong("manuf_id"), rs.getString("manuf_name"),
                 rs.getLong("type_id"), rs.getString("type_name"),
                 rs.getLong("state_id"), ExternalDeviceState.fromInfraName(rs.getString("state_name")),

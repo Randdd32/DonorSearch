@@ -25,18 +25,25 @@ public abstract class AbstractInfraDictionaryService {
     protected abstract String getParentColumn();
     protected abstract String getSortColumn();
 
+    protected String getAdditionalWhere() { return ""; }
+    protected void addAdditionalParameters(MapSqlParameterSource params) {}
+    protected String getSearchCondition() {
+        return " AND " + getDisplayColumn() + " LIKE '%' + :search + '%' ";
+    }
+
     public PageDto<NamedDictionaryDto> search(String search, List<Long> parentIds, Pageable pageable) {
         int page = pageable.getPageNumber();
         int size = pageable.getPageSize();
 
-        String cleanSearch = QueryUtils.cleanSearchToken(search);
         StringBuilder where = new StringBuilder("WHERE 1=1 ");
         MapSqlParameterSource params = new MapSqlParameterSource();
 
+        where.append(getAdditionalWhere());
+        addAdditionalParameters(params);
+
+        String cleanSearch = QueryUtils.cleanSearchToken(search);
         if (cleanSearch != null) {
-            where.append(" AND LOWER(")
-                    .append(getDisplayColumn())
-                    .append(") LIKE '%' + :search + '%' ");
+            where.append(getSearchCondition());
             params.addValue("search", cleanSearch);
         }
 

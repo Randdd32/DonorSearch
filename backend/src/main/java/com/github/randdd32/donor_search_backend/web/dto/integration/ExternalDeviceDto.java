@@ -17,6 +17,8 @@ public record ExternalDeviceDto(
         String description,
         @JsonIgnore Long modelId,
         String modelName,
+        String modelProductNumber,
+        String modelNote,
         @JsonIgnore Long manufacturerId,
         String manufacturerName,
         @JsonIgnore Long typeId,
@@ -34,3 +36,4 @@ public record ExternalDeviceDto(
         Boolean isWorking,
         List<ExternalComponentDto> components
 ) {}
+
