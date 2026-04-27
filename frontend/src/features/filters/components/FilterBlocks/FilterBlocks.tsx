@@ -9,10 +9,10 @@ type UpdateFiltersFn = (updates: Record<string, FilterValue>) => void;
 
 interface MultiSelectProps {
   label: string;
-  value: FilterValue;
-  onChange: (val: number[]) => void;
+  value: (string | number)[];
+  onChange: (val: (string | number)[]) => void;
   fetchOptions: (s?: string) => Promise<SelectOption[]>;
-  fetchByIds: (ids: number[]) => Promise<SelectOption[]>;
+  fetchByIds: (ids: (string | number)[]) => Promise<SelectOption[]>;
   placeholder?: string;
 }
 
@@ -21,8 +21,8 @@ export const MultiSelectFilter = ({ label, value, onChange, fetchOptions, fetchB
     <label className={styles.label}>{label}</label>
     <SearchableSelect
       isMulti
-      value={value as number[]}
-      onChange={(val) => onChange((val as number[]) ?? [])} 
+      value={value}
+      onChange={(val) => onChange((val as (string | number)[]) ??[])} 
       fetchOptions={fetchOptions}
       fetchByIds={fetchByIds}
       placeholder={placeholder}

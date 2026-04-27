@@ -2,26 +2,26 @@ import { apiClient } from '../config/api';
 import type { PageDto } from '../types/pagination';
 
 interface NamedDictionaryDto {
-  id: number;
+  id: number | string;
   name: string;
 }
 
 export interface SelectOption {
-  value: number;
+  value: number | string;
   label: string;
 }
 
 const createDictService = (basePath: string, isInfra = false) => {
   const prefix = isInfra ? '/infra/dictionaries' : '/dictionaries';
   return {
-    fetchOptions: async (search?: string, parentIds?: number[]): Promise<SelectOption[]> => {
+    fetchOptions: async (search?: string, parentIds?: (number | string)[]): Promise<SelectOption[]> => {
       const { data } = await apiClient.get<PageDto<NamedDictionaryDto>>(`${prefix}/${basePath}`, {
         params: { search, parentIds: parentIds?.join(',') || undefined, size: 50 }
       });
       return data.items.map(i => ({ value: i.id, label: i.name }));
     },
-    fetchByIds: async (ids: number[]): Promise<SelectOption[]> => {
-      if (!ids.length) return[];
+    fetchByIds: async (ids: (number | string)[]): Promise<SelectOption[]> => {
+      if (!ids.length) return [];
       const { data } = await apiClient.get<NamedDictionaryDto[]>(`${prefix}/${basePath}/ids`, {
         params: { ids: ids.join(',') }
       });

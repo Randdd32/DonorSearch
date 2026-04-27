@@ -1,14 +1,14 @@
-import { getNumberArray, getBoolean, getString, getNumber } from '../../hooks/useUrlFilters';
+import { getNumberArray, getStringArray, getBoolean, getString, getNumber } from '../../hooks/useUrlFilters';
 
 export const parseDeviceFilters = (params: URLSearchParams) => ({
-  stateIds: getNumberArray(params, 'stateIds'),
-  departmentIds: getNumberArray(params, 'departmentIds'),
-  manufacturerIds: getNumberArray(params, 'manufacturerIds'),
-  typeIds: getNumberArray(params, 'typeIds'),
-  modelIds: getNumberArray(params, 'modelIds'),
-  buildingIds: getNumberArray(params, 'buildingIds'),
-  floorIds: getNumberArray(params, 'floorIds'),
-  roomIds: getNumberArray(params, 'roomIds'),
+  stateIds: getStringArray(params, 'stateIds'),          
+  departmentIds: getStringArray(params, 'departmentIds'),
+  typeIds: getStringArray(params, 'typeIds'),            
+  manufacturerIds: getNumberArray(params, 'manufacturerIds'), 
+  modelIds: getNumberArray(params, 'modelIds'),               
+  buildingIds: getNumberArray(params, 'buildingIds'),         
+  floorIds: getNumberArray(params, 'floorIds'),               
+  roomIds: getNumberArray(params, 'roomIds'),                 
   isWorking: getBoolean(params, 'isWorking'),
   dateReceivedFrom: getString(params, 'dateReceivedFrom'),
   dateReceivedTo: getString(params, 'dateReceivedTo'),

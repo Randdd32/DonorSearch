@@ -1,17 +1,17 @@
-import { getNumberArray, getBoolean, getString, getNumber } from '../../hooks/useUrlFilters';
+import { getNumberArray, getStringArray, getBoolean, getString, getNumber } from '../../hooks/useUrlFilters';
 
 export const parseDonorFilters = (params: URLSearchParams) => ({
-  maxTotalPenalty: params.get('maxTotalPenalty') ? Number(params.get('maxTotalPenalty')) : undefined,
+  maxTotalPenalty: getNumber(params, 'maxTotalPenalty'),
   componentManufacturerIds: getNumberArray(params, 'componentManufacturerIds'),
-  stateIds: getNumberArray(params, 'stateIds'),
-  isWorking: getBoolean(params, 'isWorking'),
-  typeIds: getNumberArray(params, 'typeIds'),
-  departmentIds: getNumberArray(params, 'departmentIds'),
+  stateIds: getStringArray(params, 'stateIds'),
+  typeIds: getStringArray(params, 'typeIds'),
+  departmentIds: getStringArray(params, 'departmentIds'),
   deviceManufacturerIds: getNumberArray(params, 'deviceManufacturerIds'),
-  modelIds: getNumberArray(params, 'modelIds'), 
+  modelIds: getNumberArray(params, 'modelIds'),
   buildingIds: getNumberArray(params, 'buildingIds'),
   floorIds: getNumberArray(params, 'floorIds'),
   roomIds: getNumberArray(params, 'roomIds'),
+  isWorking: getBoolean(params, 'isWorking'),
   dateReceivedFrom: getString(params, 'dateReceivedFrom'),
   dateReceivedTo: getString(params, 'dateReceivedTo'),
   minCost: getNumber(params, 'minCost'),
