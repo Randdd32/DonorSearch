@@ -22,6 +22,15 @@ public final class Constants {
             "3E1E48C8-D9D3-4B89-8C8F-39A76EAC779D"  // Промышленный ПК
     );
 
+    // TODO: Заменить на UUID, когда посмотрю нужные
+    public static final List<String> ALLOWED_STATE_NAMES = List.of(
+            "Неучтенное",
+            "Хранение",
+            "Использование",
+            "Ремонт",
+            "Списано"
+    );
+
     private Constants() {
         throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
     }

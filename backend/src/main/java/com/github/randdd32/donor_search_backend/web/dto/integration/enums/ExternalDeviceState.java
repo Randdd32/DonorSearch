@@ -3,6 +3,11 @@ package com.github.randdd32.donor_search_backend.web.dto.integration.enums;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Arrays;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 @Getter
 @RequiredArgsConstructor
 public enum ExternalDeviceState {
@@ -16,14 +21,17 @@ public enum ExternalDeviceState {
     private final String infraName;
     private final int penaltyWeight;
 
+    private static final Map<String, ExternalDeviceState> EXACT_MATCH_MAP =
+            Arrays.stream(values())
+                    .collect(Collectors.toMap(
+                            s -> s.getInfraName().toLowerCase(),
+                            Function.identity()
+                    ));
+
     public static ExternalDeviceState fromInfraName(String infraName) {
-        if (infraName == null || infraName.isBlank()) return UNKNOWN;
-        String lower = infraName.toLowerCase();
-        if (lower.contains("списан")) return WRITTEN_OFF;
-        if (lower.contains("хранен")) return STORAGE;
-        if (lower.contains("неучтен")) return UNACCOUNTED;
-        if (lower.contains("ремонт")) return REPAIR;
-        if (lower.contains("использов")) return IN_USE;
-        return UNKNOWN;
+        if (infraName == null || infraName.isBlank()) {
+            return UNKNOWN;
+        }
+        return EXACT_MATCH_MAP.getOrDefault(infraName.trim().toLowerCase(), UNKNOWN);
     }
 }
