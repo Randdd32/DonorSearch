@@ -7,10 +7,10 @@ import type { MultiValue, SingleValue } from 'react-select';
 import type { SelectOption } from '../../../services/dictionary.service';
 
 interface SearchableSelectProps {
-  value: number | number[] | null;
-  onChange: (value: number | number[] | null) => void;
+  value: number | string | (number | string)[] | null;
+  onChange: (value: number | string | (number | string)[] | null) => void;
   fetchOptions: (search?: string) => Promise<SelectOption[]>;
-  fetchByIds: (ids: number[]) => Promise<SelectOption[]>;
+  fetchByIds: (ids: (number | string)[]) => Promise<SelectOption[]>;
   isMulti?: boolean;
   placeholder?: string;
   className?: string;
@@ -26,14 +26,18 @@ export const SearchableSelect = ({
 
   useEffect(() => {
     const loadInitial = async () => {
-      const isValueEmpty = isMulti ? (!value || (value as number[]).length === 0) : (!value && value !== 0);
+      const isValueEmpty = isMulti 
+        ? (!value || (value as (number | string)[]).length === 0) 
+        : (!value && value !== 0 && value !== '');
+        
       if (isValueEmpty) {
         setSelectedOptions(isMulti ?[] : null);
         return;
       }
+      
       setIsLoadingInitial(true);
       try {
-        const idsToFetch = isMulti ? (value as number[]) :[value as number];
+        const idsToFetch = isMulti ? (value as (number | string)[]) :[value as number | string];
         const fetched = await fetchByIds(idsToFetch);
         setSelectedOptions(isMulti ? fetched : (fetched.length > 0 ? fetched[0] : null));
       } catch (error) {
