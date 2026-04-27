@@ -22,7 +22,7 @@ public class InfraManufacturerService extends AbstractInfraDictionaryService {
 
     @Override
     protected String getDisplayColumn() {
-        return "m.[Название]";
+        return "COALESCE(NULLIF(LTRIM(RTRIM(m.[Название])), ''), 'Без названия')";
     }
 
     @Override

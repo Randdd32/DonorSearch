@@ -27,6 +27,8 @@ public record ExternalDeviceDto(
         @JsonIgnore Long stateId,
         ExternalDeviceState lifeCycleState,
         String ownerFullName,
+        String ownerPhone,
+        String ownerPosition,
         @JsonIgnore Long departmentId,
         String departmentName,
         @JsonIgnore Long buildingId,

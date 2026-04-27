@@ -60,7 +60,9 @@ public class InfraDeviceService {
             NULLIF(LTRIM(RTRIM(pct.[Name])), '') AS type_name, 
             state.[ID] AS state_id, 
             NULLIF(LTRIM(RTRIM(state.[Name])), '') AS state_name,
-            NULLIF(LTRIM(RTRIM(ISNULL(u.[Фамилия], '') + ' ' + ISNULL(u.[Имя], '') + ' ' + ISNULL(u.[Отчество], ''))), '') AS owner_name,
+            NULLIF(LTRIM(RTRIM(u.[FullName])), '') AS owner_name,
+            NULLIF(LTRIM(RTRIM(u.[Телефон])), '') AS owner_phone,
+            NULLIF(LTRIM(RTRIM(pos.[Название])), '') AS owner_position,
             dep.[Идентификатор] AS dept_id, 
             NULLIF(LTRIM(RTRIM(dep.[Название])), '') AS dept_name,
             b.[Идентификатор] AS building_id, 
@@ -91,9 +93,10 @@ public class InfraDeviceService {
         ) a
         LEFT JOIN dbo.[LifeCycleState] state ON a.[LifeCycleStateID] = state.[ID]
         LEFT JOIN dbo.[Типы оконечного оборудования] too ON NULLIF(pc.[ИД типа ОО], 0) = too.[Идентификатор]
-        LEFT JOIN dbo.[Производители] manuf ON too.[ИД производителя] = manuf.[Идентификатор]
+        LEFT JOIN dbo.[Производители] manuf ON NULLIF(too.[ИД производителя], 0) = manuf.[Идентификатор]
         LEFT JOIN dbo.[ProductCatalogType] pct ON too.[ProductCatalogTypeID] = pct.[ID]
         LEFT JOIN dbo.[Пользователи] u ON a.[UtilizerID] = u.[IMObjID] AND a.[UtilizerClassID] = 9
+        LEFT JOIN dbo.[Должности] pos ON NULLIF(u.[ИД должности], 0) = pos.[Идентификатор]
         LEFT JOIN dbo.[Подразделение] dep ON dep.[Идентификатор] = CASE
             WHEN a.[UtilizerClassID] = 102 THEN a.[UtilizerID]
             WHEN a.[UtilizerClassID] = 9 THEN u.[ИД подразделения]
@@ -390,6 +393,8 @@ public class InfraDeviceService {
                 rs.getLong("state_id"),
                 ExternalDeviceState.fromInfraName(rs.getString("state_name")),
                 rs.getString("owner_name") != null ? rs.getString("owner_name") : "Неизвестно",
+                rs.getString("owner_phone"),
+                rs.getString("owner_position"),
                 rs.getLong("dept_id"),
                 rs.getString("dept_name") != null ? rs.getString("dept_name") : "Без отдела",
                 rs.getLong("building_id"),
