@@ -15,12 +15,12 @@ public class InfraDepartmentService extends AbstractInfraDictionaryService {
         return """
             WITH DepCTE AS (
                 SELECT [Идентификатор], [Название], [ИД подразделения], 
-                       CAST(LTRIM(RTRIM([Название])) AS NVARCHAR(MAX)) AS FullPath
+                       CAST(COALESCE(NULLIF(LTRIM(RTRIM([Название])), ''), 'Без названия') AS NVARCHAR(MAX)) AS FullPath
                 FROM dbo.[Подразделение]
                 WHERE [ИД подразделения] IS NULL
                 UNION ALL
                 SELECT d.[Идентификатор], d.[Название], d.[ИД подразделения], 
-                       c.FullPath + ' -> ' + LTRIM(RTRIM(d.[Название]))
+                       c.FullPath + ' -> ' + COALESCE(NULLIF(LTRIM(RTRIM(d.[Название])), ''), 'Без названия')
                 FROM dbo.[Подразделение] d
                 INNER JOIN DepCTE c ON d.[ИД подразделения] = c.[Идентификатор]
             )
