@@ -37,6 +37,8 @@ export interface ExternalDeviceDto {
   typeName: string;
   lifeCycleState: ExternalDeviceState;
   ownerFullName: string;
+  ownerPhone: string | null;
+  ownerPosition: string | null;
   departmentName: string;
   locationPath: string;
   dateReceived: string | null; 

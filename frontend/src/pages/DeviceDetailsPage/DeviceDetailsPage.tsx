@@ -28,6 +28,11 @@ export const DeviceDetailsPage = () => {
 
   const { mutate: runSearch, isPending: isSearching } = useRunSearch();
 
+  const formatPosition = (pos: string | null) => {
+    if (!pos) return null;
+    return pos.charAt(0).toUpperCase() + pos.slice(1);
+  };
+
   if (isLoading) return <Spinner fullPage size={40} />;
   if (isError || !device) {
     return (
@@ -39,6 +44,11 @@ export const DeviceDetailsPage = () => {
       />
     );
   }
+
+  const position = formatPosition(device.ownerPosition);
+  const ownerDisplay = device.ownerFullName !== 'Неизвестно' 
+    ? `${device.ownerFullName}${position ? ` (${position})` : ''}` 
+    : 'Неизвестно';
 
   const stateConfig = getStateConfig(device.lifeCycleState);
 
@@ -122,8 +132,14 @@ export const DeviceDetailsPage = () => {
           </div>
           <div className={styles.infoItem}>
             <span className={styles.infoLabel}>Пользователь</span>
-            <span className={styles.infoValue}>{device.ownerFullName}</span>
+            <span className={styles.infoValue}>{ownerDisplay}</span>
           </div>
+          {device.ownerPhone && (
+            <div className={styles.infoItem}>
+              <span className={styles.infoLabel}>Телефон пользователя</span>
+              <span className={styles.infoValue}>{device.ownerPhone}</span>
+            </div>
+          )}
           <div className={styles.infoItem}>
             <span className={styles.infoLabel}>Отдел</span>
             <span className={styles.infoValue}>{device.departmentName || 'Н/Д'}</span>
