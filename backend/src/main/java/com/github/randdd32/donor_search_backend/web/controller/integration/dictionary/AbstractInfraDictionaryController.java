@@ -2,7 +2,7 @@ package com.github.randdd32.donor_search_backend.web.controller.integration.dict
 
 import com.github.randdd32.donor_search_backend.core.configuration.Constants;
 import com.github.randdd32.donor_search_backend.service.integration.dictionary.AbstractInfraDictionaryService;
-import com.github.randdd32.donor_search_backend.web.dto.dictionary.NamedDictionaryDto;
+import com.github.randdd32.donor_search_backend.web.dto.dictionary.InfraDictionaryDto;
 import com.github.randdd32.donor_search_backend.web.dto.pagination.PageDto;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -19,15 +19,15 @@ public abstract class AbstractInfraDictionaryController {
     }
 
     @GetMapping
-    public PageDto<NamedDictionaryDto> getAll(
+    public PageDto<InfraDictionaryDto> getAll(
             @RequestParam(required = false) String search,
-            @RequestParam(required = false) List<Long> parentIds,
+            @RequestParam(required = false) List<String> parentIds,
             @PageableDefault(size = Constants.DEFAULT_PAGE_SIZE) Pageable pageable) {
         return service.search(search, parentIds, pageable);
     }
 
     @GetMapping("/ids")
-    public List<NamedDictionaryDto> getByIds(@RequestParam(required = false) List<Long> ids) {
+    public List<InfraDictionaryDto> getByIds(@RequestParam(required = false) List<String> ids) {
         return service.getByIds(ids);
     }
 }

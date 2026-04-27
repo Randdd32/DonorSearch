@@ -40,6 +40,18 @@ public class InfraDeviceService {
         this.mappingService = mappingService;
     }
 
+    private static final String DEP_CTE = """
+        WITH DepCTE AS (
+            SELECT [Идентификатор], [Название], [ИД подразделения], CAST(LTRIM(RTRIM([Название])) AS NVARCHAR(MAX)) AS FullPath
+            FROM dbo.[Подразделение]
+            WHERE [ИД подразделения] IS NULL
+            UNION ALL
+            SELECT d.[Идентификатор], d.[Название], d.[ИД подразделения], c.FullPath + ' -> ' + LTRIM(RTRIM(d.[Название]))
+            FROM dbo.[Подразделение] d
+            INNER JOIN DepCTE c ON d.[ИД подразделения] = c.[Идентификатор]
+        )
+    """;
+
     private static final String BASE_DEVICE_SELECT = """
         SELECT 
             pc.[Идентификатор] AS id, 
@@ -64,7 +76,7 @@ public class InfraDeviceService {
             NULLIF(LTRIM(RTRIM(u.[Телефон])), '') AS owner_phone,
             NULLIF(LTRIM(RTRIM(pos.[Название])), '') AS owner_position,
             dep.[Идентификатор] AS dept_id, 
-            NULLIF(LTRIM(RTRIM(dep.[Название])), '') AS dept_name,
+            NULLIF(LTRIM(RTRIM(dep.FullPath)), '') AS dept_name,
             b.[Идентификатор] AS building_id, 
             f.[Идентификатор] AS floor_id, 
             r.[Идентификатор] AS room_id,
@@ -97,7 +109,7 @@ public class InfraDeviceService {
         LEFT JOIN dbo.[ProductCatalogType] pct ON too.[ProductCatalogTypeID] = pct.[ID]
         LEFT JOIN dbo.[Пользователи] u ON a.[UtilizerID] = u.[IMObjID] AND a.[UtilizerClassID] = 9
         LEFT JOIN dbo.[Должности] pos ON NULLIF(u.[ИД должности], 0) = pos.[Идентификатор]
-        LEFT JOIN dbo.[Подразделение] dep ON dep.[Идентификатор] = CASE
+        LEFT JOIN DepCTE dep ON dep.[Идентификатор] = CASE
             WHEN a.[UtilizerClassID] = 102 THEN a.[UtilizerID]
             WHEN a.[UtilizerClassID] = 9 THEN u.[ИД подразделения]
         END
@@ -156,7 +168,7 @@ public class InfraDeviceService {
             params.addValue("maxCost", filter.maxCost());
         }
 
-        String countSql = "SELECT COUNT(1) " + BASE_DEVICE_FROM_JOINS + where;
+        String countSql = DEP_CTE + " SELECT COUNT(1) " + BASE_DEVICE_FROM_JOINS + where;
         Long totalCountObj = jdbcTemplate.queryForObject(countSql, params, Long.class);
         long totalCount = totalCountObj != null ? totalCountObj : 0L;
         if (totalCount == 0) {
@@ -179,7 +191,7 @@ public class InfraDeviceService {
             orderSql = " ORDER BY " + dbColumn + " " + direction + " ";
         }
 
-        String fetchSql = BASE_DEVICE_SELECT + " " +
+        String fetchSql = DEP_CTE + " " + BASE_DEVICE_SELECT + " " +
                 BASE_DEVICE_FROM_JOINS + where + orderSql +
                 " OFFSET :offset ROWS FETCH NEXT :limit ROWS ONLY";
 
@@ -192,7 +204,7 @@ public class InfraDeviceService {
     }
 
     public ExternalDeviceDto getDeviceDetails(Long externalDeviceId) {
-        String deviceSql = BASE_DEVICE_SELECT + BASE_DEVICE_FROM_JOINS + """
+        String deviceSql = DEP_CTE + " " + BASE_DEVICE_SELECT + BASE_DEVICE_FROM_JOINS + """
              WHERE pc.[Идентификатор] = :id 
                AND pc.[Removed] = 0 
                AND pct.[ID] IN (:allowedTypes) 
@@ -283,7 +295,7 @@ public class InfraDeviceService {
             return Collections.emptyList();
         }
 
-        String sql = BASE_DEVICE_SELECT + """
+        String sql = DEP_CTE + " " + BASE_DEVICE_SELECT + """
             ,
             ad.[AdapterID] AS adapter_id,
             pct_comp.[ID] AS category_id,
@@ -388,14 +400,14 @@ public class InfraDeviceService {
                 rs.getString("model_note"),
                 rs.getLong("manuf_id"),
                 rs.getString("manuf_name"),
-                rs.getLong("type_id"),
+                rs.getString("type_id"),
                 rs.getString("type_name"),
-                rs.getLong("state_id"),
+                rs.getString("state_id"),
                 ExternalDeviceState.fromInfraName(rs.getString("state_name")),
                 rs.getString("owner_name") != null ? rs.getString("owner_name") : "Неизвестно",
                 rs.getString("owner_phone"),
                 rs.getString("owner_position"),
-                rs.getLong("dept_id"),
+                rs.getString("dept_id"),
                 rs.getString("dept_name") != null ? rs.getString("dept_name") : "Без отдела",
                 rs.getLong("building_id"),
                 rs.getLong("floor_id"),
@@ -414,7 +426,7 @@ public class InfraDeviceService {
         );
     }
 
-    private void addListFilter(StringBuilder where, MapSqlParameterSource params, String column, String paramName, List<Long> values) {
+    private void addListFilter(StringBuilder where, MapSqlParameterSource params, String column, String paramName, List<?> values) {
         if (!CollectionUtils.isEmpty(values)) {
             where.append(" AND ").append(column).append(" IN (:").append(paramName).append(") ");
             params.addValue(paramName, values);

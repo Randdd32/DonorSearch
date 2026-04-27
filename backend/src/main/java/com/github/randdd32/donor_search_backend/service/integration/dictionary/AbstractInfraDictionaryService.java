@@ -1,7 +1,7 @@
 package com.github.randdd32.donor_search_backend.service.integration.dictionary;
 
 import com.github.randdd32.donor_search_backend.core.util.QueryUtils;
-import com.github.randdd32.donor_search_backend.web.dto.dictionary.NamedDictionaryDto;
+import com.github.randdd32.donor_search_backend.web.dto.dictionary.InfraDictionaryDto;
 import com.github.randdd32.donor_search_backend.web.dto.pagination.PageDto;
 import com.github.randdd32.donor_search_backend.web.mapper.pagination.PageDtoMapper;
 import org.springframework.data.domain.Pageable;
@@ -26,12 +26,13 @@ public abstract class AbstractInfraDictionaryService {
     protected abstract String getSortColumn();
 
     protected String getAdditionalWhere() { return ""; }
+    protected String getCteSql() { return ""; }
     protected void addAdditionalParameters(MapSqlParameterSource params) {}
     protected String getSearchCondition() {
         return " AND " + getDisplayColumn() + " LIKE '%' + :search + '%' ";
     }
 
-    public PageDto<NamedDictionaryDto> search(String search, List<Long> parentIds, Pageable pageable) {
+    public PageDto<InfraDictionaryDto> search(String search, List<String> parentIds, Pageable pageable) {
         int page = pageable.getPageNumber();
         int size = pageable.getPageSize();
 
@@ -52,7 +53,7 @@ public abstract class AbstractInfraDictionaryService {
             params.addValue("parentIds", parentIds);
         }
 
-        String countSql = "SELECT COUNT(1) " + getBaseSql() + " " + where;
+        String countSql = getCteSql() + " SELECT COUNT(1) " + getBaseSql() + " " + where;
         Long totalCountObj = jdbcTemplate.queryForObject(countSql, params, Long.class);
         long totalCount = totalCountObj != null ? totalCountObj : 0L;
         if (totalCount == 0) {
@@ -63,27 +64,27 @@ public abstract class AbstractInfraDictionaryService {
         params.addValue("limit", size);
 
         String fetchSql = String.format(
-                "SELECT %s AS id, %s AS name %s %s ORDER BY %s ASC OFFSET :offset ROWS FETCH NEXT :limit ROWS ONLY",
-                getIdColumn(), getDisplayColumn(), getBaseSql(), where, getSortColumn()
+                "%s SELECT %s AS id, %s AS name %s %s ORDER BY %s ASC OFFSET :offset ROWS FETCH NEXT :limit ROWS ONLY",
+                getCteSql(), getIdColumn(), getDisplayColumn(), getBaseSql(), where, getSortColumn()
         );
 
-        List<NamedDictionaryDto> items = jdbcTemplate.query(fetchSql, params,
-                (rs, rowNum) -> new NamedDictionaryDto(rs.getLong("id"), rs.getString("name")));
+        List<InfraDictionaryDto> items = jdbcTemplate.query(fetchSql, params,
+                (rs, rowNum) -> new InfraDictionaryDto(rs.getString("id"), rs.getString("name")));
 
         return PageDtoMapper.toDto(items, totalCount, page, size);
     }
 
-    public List<NamedDictionaryDto> getByIds(List<Long> ids) {
+    public List<InfraDictionaryDto> getByIds(List<String> ids) {
         if (CollectionUtils.isEmpty(ids)) {
             return Collections.emptyList();
         }
 
         String sql = String.format(
-                "SELECT %s AS id, %s AS name %s WHERE %s IN (:ids)",
-                getIdColumn(), getDisplayColumn(), getBaseSql(), getIdColumn()
+                "%s SELECT %s AS id, %s AS name %s WHERE %s IN (:ids)",
+                getCteSql(), getIdColumn(), getDisplayColumn(), getBaseSql(), getIdColumn()
         );
 
         return jdbcTemplate.query(sql, new MapSqlParameterSource("ids", ids),
-                (rs, rowNum) -> new NamedDictionaryDto(rs.getLong("id"), rs.getString("name")));
+                (rs, rowNum) -> new InfraDictionaryDto(rs.getString("id"), rs.getString("name")));
     }
 }

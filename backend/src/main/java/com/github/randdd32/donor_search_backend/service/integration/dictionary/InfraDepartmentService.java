@@ -11,28 +11,44 @@ public class InfraDepartmentService extends AbstractInfraDictionaryService {
     }
 
     @Override
+    protected String getCteSql() {
+        return """
+            WITH DepCTE AS (
+                SELECT [Идентификатор], [Название], [ИД подразделения], 
+                       CAST(LTRIM(RTRIM([Название])) AS NVARCHAR(MAX)) AS FullPath
+                FROM dbo.[Подразделение]
+                WHERE [ИД подразделения] IS NULL
+                UNION ALL
+                SELECT d.[Идентификатор], d.[Название], d.[ИД подразделения], 
+                       c.FullPath + ' -> ' + LTRIM(RTRIM(d.[Название]))
+                FROM dbo.[Подразделение] d
+                INNER JOIN DepCTE c ON d.[ИД подразделения] = c.[Идентификатор]
+            )
+        """;
+    }
+
+    @Override
     protected String getBaseSql() {
-        return "FROM dbo.[Подразделение] d";
+        return "FROM DepCTE dep";
     }
 
     @Override
     protected String getIdColumn() {
-        return "d.[Идентификатор]";
+        return "dep.[Идентификатор]";
     }
 
     @Override
     protected String getDisplayColumn() {
-        return "d.[Название]";
+        return "COALESCE(NULLIF(LTRIM(RTRIM(dep.FullPath)), ''), 'Без названия')";
     }
 
     @Override
     protected String getParentColumn() {
-        return null;
+        return "dep.[ИД подразделения]";
     }
 
     @Override
     protected String getSortColumn() {
-        return "d.[Название]";
+        return "dep.FullPath";
     }
 }
-
