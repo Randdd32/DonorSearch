@@ -5,10 +5,10 @@ import type { ExternalComponentCategory } from '../types/integration';
 import type { CommonFilters } from '../hooks/useUrlFilters';
 
 export interface GetSearchResultsParams extends CommonFilters {
-  stateIds?: number[];
-  departmentIds?: number[];
+  stateIds?: string[];      
+  departmentIds?: string[]; 
   deviceManufacturerIds?: number[];
-  typeIds?: number[];
+  typeIds?: string[];       
   modelIds?: number[];
   buildingIds?: number[];
   floorIds?: number[];
@@ -16,8 +16,14 @@ export interface GetSearchResultsParams extends CommonFilters {
   isWorking?: boolean;
   dateReceivedFrom?: string;
   dateReceivedTo?: string;
+  dateInquiryFrom?: string;
+  dateInquiryTo?: string;
+  appointmentDateFrom?: string;
+  appointmentDateTo?: string;
   componentManufacturerIds?: number[];
   maxTotalPenalty?: number;
+  minCost?: number;
+  maxCost?: number;
 }
 
 const mapFiltersToQueryParams = (params: GetSearchResultsParams) => ({
@@ -32,9 +38,15 @@ const mapFiltersToQueryParams = (params: GetSearchResultsParams) => ({
   roomIds: params.roomIds?.join(','),
   componentManufacturerIds: params.componentManufacturerIds?.join(','),
   maxTotalPenalty: params.maxTotalPenalty,
+  minCost: params.minCost,
+  maxCost: params.maxCost,
   isWorking: params.isWorking,
   dateReceivedFrom: params.dateReceivedFrom ? new Date(params.dateReceivedFrom).toISOString() : undefined,
-  dateReceivedTo: params.dateReceivedTo ? new Date(params.dateReceivedTo).toISOString() : undefined
+  dateReceivedTo: params.dateReceivedTo ? new Date(params.dateReceivedTo).toISOString() : undefined,
+  dateInquiryFrom: params.dateInquiryFrom ? new Date(params.dateInquiryFrom).toISOString() : undefined,
+  dateInquiryTo: params.dateInquiryTo ? new Date(params.dateInquiryTo).toISOString() : undefined,
+  appointmentDateFrom: params.appointmentDateFrom ? new Date(params.appointmentDateFrom).toISOString() : undefined,
+  appointmentDateTo: params.appointmentDateTo ? new Date(params.appointmentDateTo).toISOString() : undefined,
 });
 
 export const searchService = {

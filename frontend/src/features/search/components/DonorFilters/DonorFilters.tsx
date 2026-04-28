@@ -35,18 +35,18 @@ export const DonorFilters = ({ isOpen, onClose, filters, updateFilters, resetFil
         </div>
         <MultiSelectFilter 
           label="Производитель искомой детали" 
-          value={filters.componentManufacturerIds} 
-          onChange={(v) => updateFilters({ componentManufacturerIds: v })} 
+          value={filters.componentManufacturerIds as number[]} 
+          onChange={(v) => updateFilters({ componentManufacturerIds: v as number[] })} 
           fetchOptions={fetchers.fetchManufacturers} 
-          fetchByIds={(ids) => dictionaryService.infraManufacturers.fetchByIds(ids)} 
+          fetchByIds={(ids) => dictionaryService.infraManufacturers.fetchByIds(ids as number[])} 
         />
       </div>
       <MultiSelectFilter 
         label="Статус ПК-донора" 
-        value={filters.stateIds} 
-        onChange={(v) => updateFilters({ stateIds: v })} 
+        value={filters.stateIds as string[]} 
+        onChange={(v) => updateFilters({ stateIds: v as string[] })} 
         fetchOptions={fetchers.fetchStates} 
-        fetchByIds={(ids) => dictionaryService.states.fetchByIds(ids)} 
+        fetchByIds={(ids) => dictionaryService.states.fetchByIds(ids as string[])} 
       />
       <StaticSelectFilter 
         label="Работоспособность ПК-донора" 
@@ -56,17 +56,17 @@ export const DonorFilters = ({ isOpen, onClose, filters, updateFilters, resetFil
       />
       <MultiSelectFilter 
         label="Тип ПК-донора" 
-        value={filters.typeIds} 
-        onChange={(v) => updateFilters({ typeIds: v })} 
+        value={filters.typeIds as string[]} 
+        onChange={(v) => updateFilters({ typeIds: v as string[] })} 
         fetchOptions={fetchers.fetchDeviceTypes} 
-        fetchByIds={(ids) => dictionaryService.deviceTypes.fetchByIds(ids)} 
+        fetchByIds={(ids) => dictionaryService.deviceTypes.fetchByIds(ids as string[])} 
       />
       <MultiSelectFilter 
         label="Отдел" 
-        value={filters.departmentIds} 
-        onChange={(v) => updateFilters({ departmentIds: v })} 
+        value={filters.departmentIds as string[]} 
+        onChange={(v) => updateFilters({ departmentIds: v as string[] })} 
         fetchOptions={fetchers.fetchDepartments} 
-        fetchByIds={(ids) => dictionaryService.departments.fetchByIds(ids)} 
+        fetchByIds={(ids) => dictionaryService.departments.fetchByIds(ids as string[])} 
       />
       <ManufacturerModelFilters 
         title="Производитель и Модель ПК" 

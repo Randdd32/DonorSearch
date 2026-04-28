@@ -4,10 +4,10 @@ import type { ExternalDeviceDto } from '../types/integration';
 import type { CommonFilters } from '../hooks/useUrlFilters';
 
 export interface GetDevicesParams extends CommonFilters {
-  stateIds?: number[];
-  departmentIds?: number[];
+  stateIds?: string[];      
+  departmentIds?: string[]; 
+  typeIds?: string[];      
   manufacturerIds?: number[];
-  typeIds?: number[];
   modelIds?: number[];
   buildingIds?: number[];
   floorIds?: number[];
@@ -15,6 +15,12 @@ export interface GetDevicesParams extends CommonFilters {
   isWorking?: boolean;
   dateReceivedFrom?: string;
   dateReceivedTo?: string;
+  dateInquiryFrom?: string;
+  dateInquiryTo?: string;
+  appointmentDateFrom?: string;
+  appointmentDateTo?: string;
+  minCost?: number;
+  maxCost?: number;
 }
 
 export const devicesService = {
@@ -33,8 +39,14 @@ export const devicesService = {
       floorIds: params.floorIds?.join(','),
       roomIds: params.roomIds?.join(','),
       isWorking: params.isWorking,
+      minCost: params.minCost,
+      maxCost: params.maxCost,
       dateReceivedFrom: params.dateReceivedFrom ? new Date(params.dateReceivedFrom).toISOString() : undefined,
       dateReceivedTo: params.dateReceivedTo ? new Date(params.dateReceivedTo).toISOString() : undefined,
+      dateInquiryFrom: params.dateInquiryFrom ? new Date(params.dateInquiryFrom).toISOString() : undefined,
+      dateInquiryTo: params.dateInquiryTo ? new Date(params.dateInquiryTo).toISOString() : undefined,
+      appointmentDateFrom: params.appointmentDateFrom ? new Date(params.appointmentDateFrom).toISOString() : undefined,
+      appointmentDateTo: params.appointmentDateTo ? new Date(params.appointmentDateTo).toISOString() : undefined,
     };
 
     const { data } = await apiClient.get<PageDto<ExternalDeviceDto>>('/infra/devices', {

@@ -23,10 +23,10 @@ export const DeviceFilters = ({ isOpen, onClose, filters, updateFilters, resetFi
     <FilterSidebar title="Фильтры" isOpen={isOpen} onClose={onClose} onReset={resetFilters}>
       <MultiSelectFilter 
         label="Статус (Жизненный цикл)" 
-        value={filters.stateIds} 
-        onChange={(v) => updateFilters({ stateIds: v })} 
+        value={filters.stateIds as string[]} 
+        onChange={(v) => updateFilters({ stateIds: v as string[] })} 
         fetchOptions={fetchers.fetchStates} 
-        fetchByIds={(ids) => dictionaryService.states.fetchByIds(ids)} 
+        fetchByIds={(ids) => dictionaryService.states.fetchByIds(ids as string[])} 
       />
       <StaticSelectFilter 
         label="Работоспособность" 
@@ -36,17 +36,17 @@ export const DeviceFilters = ({ isOpen, onClose, filters, updateFilters, resetFi
       />
       <MultiSelectFilter 
         label="Тип оборудования" 
-        value={filters.typeIds} 
-        onChange={(v) => updateFilters({ typeIds: v })} 
+        value={filters.typeIds as string[]} 
+        onChange={(v) => updateFilters({ typeIds: v as string[] })} 
         fetchOptions={fetchers.fetchDeviceTypes} 
-        fetchByIds={(ids) => dictionaryService.deviceTypes.fetchByIds(ids)} 
+        fetchByIds={(ids) => dictionaryService.deviceTypes.fetchByIds(ids as string[])} 
       />
       <MultiSelectFilter 
         label="Отдел" 
-        value={filters.departmentIds} 
-        onChange={(v) => updateFilters({ departmentIds: v })} 
+        value={filters.departmentIds as string[]} 
+        onChange={(v) => updateFilters({ departmentIds: v as string[] })} 
         fetchOptions={fetchers.fetchDepartments} 
-        fetchByIds={(ids) => dictionaryService.departments.fetchByIds(ids)} 
+        fetchByIds={(ids) => dictionaryService.departments.fetchByIds(ids as string[])} 
       />
       <ManufacturerModelFilters 
         manufacturerKey="manufacturerIds" 

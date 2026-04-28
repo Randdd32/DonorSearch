@@ -4,7 +4,7 @@ import { dictionaryService } from '../../../../services/dictionary.service';
 import type { FilterDef } from './ComponentTableConfig';
 import styles from './ComponentSelectionModal.module.css';
 
-type FilterValueType = string | number | boolean | number[] | null | undefined;
+type FilterValueType = string | number | boolean | (string | number)[] | null | undefined;
 
 interface DynamicFilterFieldProps {
   filterDef: FilterDef;
