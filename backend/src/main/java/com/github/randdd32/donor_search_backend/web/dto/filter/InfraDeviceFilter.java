@@ -6,10 +6,10 @@ import java.util.List;
 
 public record InfraDeviceFilter(
         String search,
-        List<Long> stateIds,
-        List<Long> departmentIds,
+        List<String> stateIds,
+        List<String> departmentIds,
+        List<String> typeIds,
         List<Long> manufacturerIds,
-        List<Long> typeIds,
         List<Long> modelIds,
         List<Long> buildingIds,
         List<Long> floorIds,

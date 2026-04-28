@@ -232,29 +232,37 @@ public class InfraDeviceService {
             SELECT 
                 ad.[AdapterID] AS adapter_id,
                 pct.[ID] AS category_id,
-                NULLIF(LTRIM(RTRIM(ad.[Name])), '') AS external_name,
+                NULLIF(LTRIM(RTRIM(at.[Name])), '') AS external_name,
                 NULLIF(LTRIM(RTRIM(pct.[Name])), '') AS category_name_ru,
                 m.[Идентификатор] AS manufacturer_id,
                 NULLIF(LTRIM(RTRIM(m.[Название])), '') AS manufacturer_name,
-                NULLIF(LTRIM(RTRIM(ad.[SerialNo])), '') AS serial_number
+                NULLIF(LTRIM(RTRIM(ad.[SerialNo])), '') AS serial_number,
+                NULLIF(LTRIM(RTRIM(ad.[Note])), '') AS note,
+                NULLIF(LTRIM(RTRIM(at.[Parameters])), '') AS parameters,
+                NULLIF(LTRIM(RTRIM(at.[Note])), '') AS model_note,
+                NULLIF(LTRIM(RTRIM(at.[ProductNumber])), '') AS product_number
             FROM dbo.[Adapter] ad
             JOIN dbo.[AdapterType] at ON ad.[AdapterTypeID] = at.[AdapterTypeID]
             JOIN dbo.[ProductCatalogType] pct ON at.[ProductCatalogTypeID] = pct.[ID]
-            LEFT JOIN dbo.[Производители] m ON at.[VendorID] = m.[Идентификатор]
-            WHERE ad.[TerminalDeviceID] = :id
+            LEFT JOIN dbo.[Производители] m ON NULLIF(at.[VendorID], 0) = m.[Идентификатор]
+            WHERE ad.[TerminalDeviceID] = :id AND at.[Removed] = 0
         """;
 
         List<ExternalComponentDto> rawComponents = jdbcTemplate.query(
                 componentsSql,
                 new MapSqlParameterSource("id", externalDeviceId),
                 (rs, rowNum) -> new ExternalComponentDto(
-                        rs.getLong("adapter_id"),
-                        rs.getLong("category_id"),
+                        rs.getString("adapter_id"),
+                        rs.getString("category_id"),
                         rs.getString("external_name"),
                         ExternalComponentCategory.fromInfraName(rs.getString("category_name_ru")),
                         rs.getLong("manufacturer_id"),
                         rs.getString("manufacturer_name"),
                         rs.getString("serial_number"),
+                        rs.getString("note"),
+                        rs.getString("parameters"),
+                        rs.getString("model_note"),
+                        rs.getString("product_number"),
                         null
                 )
         );
@@ -272,19 +280,11 @@ public class InfraDeviceService {
         Map<String, Long> mappedIdsCache = mappingService.getMappedComponentIds(extNamesToFetch);
 
         List<ExternalComponentDto> enrichedComponents = rawComponents.stream().map(comp -> {
-            Long mappedId = null;
-            if (comp.externalName() != null) {
-                mappedId = mappedIdsCache.get(comp.externalName().toLowerCase());
-            }
-
+            Long mappedId = comp.externalName() != null ? mappedIdsCache.get(comp.externalName().toLowerCase()) : null;
             return new ExternalComponentDto(
-                    comp.adapterId(),
-                    comp.categoryId(),
-                    comp.externalName(),
-                    comp.category(),
-                    comp.manufacturerId(),
-                    comp.manufacturerName(),
-                    comp.serialNumber(),
+                    comp.adapterId(), comp.categoryId(), comp.externalName(), comp.category(),
+                    comp.manufacturerId(), comp.manufacturerName(), comp.serialNumber(),
+                    comp.note(), comp.modelParameters(), comp.modelNote(), comp.modelProductNumber(),
                     mappedId
             );
         }).toList();
@@ -303,22 +303,27 @@ public class InfraDeviceService {
             ,
             ad.[AdapterID] AS adapter_id,
             pct_comp.[ID] AS category_id,
-            NULLIF(LTRIM(RTRIM(ad.[Name])), '') AS external_name,
+            NULLIF(LTRIM(RTRIM(at.[Name])), '') AS external_name,
             NULLIF(LTRIM(RTRIM(pct_comp.[Name])), '') AS category_name_ru,
             comp_manuf.[Идентификатор] AS comp_manufacturer_id,
             NULLIF(LTRIM(RTRIM(comp_manuf.[Название])), '') AS comp_manufacturer_name,
-            NULLIF(LTRIM(RTRIM(ad.[SerialNo])), '') AS comp_serial_number
+            NULLIF(LTRIM(RTRIM(ad.[SerialNo])), '') AS comp_serial_number,
+            NULLIF(LTRIM(RTRIM(ad.[Note])), '') AS comp_note,
+            NULLIF(LTRIM(RTRIM(at.[Parameters])), '') AS comp_parameters,
+            NULLIF(LTRIM(RTRIM(at.[Note])), '') AS comp_model_note,
+            NULLIF(LTRIM(RTRIM(at.[ProductNumber])), '') AS comp_product_number
             """ + BASE_DEVICE_FROM_JOINS + """
             JOIN dbo.[Adapter] ad ON pc.[Идентификатор] = ad.[TerminalDeviceID]
             JOIN dbo.[AdapterType] at ON ad.[AdapterTypeID] = at.[AdapterTypeID]
             JOIN dbo.[ProductCatalogType] pct_comp ON at.[ProductCatalogTypeID] = pct_comp.[ID]
-            LEFT JOIN dbo.[Производители] comp_manuf ON at.[VendorID] = comp_manuf.[Идентификатор]
+            LEFT JOIN dbo.[Производители] comp_manuf ON NULLIF(at.[VendorID], 0) = comp_manuf.[Идентификатор]
             
             WHERE pc.[Идентификатор] != :excludeId
               AND pc.[Removed] = 0
               AND pct.[ID] IN (:allowedTypes)
               AND (too.[Removed] = 0 OR too.[Removed] IS NULL)
               AND (pct.[Removed] = 0 OR pct.[Removed] IS NULL)
+              AND at.[Removed] = 0
               AND pct_comp.[Name] IN (:categoryNames)
         """;
 
@@ -342,13 +347,17 @@ public class InfraDeviceService {
                 });
 
                 ExternalComponentDto component = new ExternalComponentDto(
-                        rs.getLong("adapter_id"),
-                        rs.getLong("category_id"),
+                        rs.getString("adapter_id"),
+                        rs.getString("category_id"),
                         rs.getString("external_name"),
                         ExternalComponentCategory.fromInfraName(rs.getString("category_name_ru")),
                         rs.getLong("comp_manufacturer_id"),
                         rs.getString("comp_manufacturer_name"),
                         rs.getString("comp_serial_number"),
+                        rs.getString("comp_note"),
+                        rs.getString("comp_parameters"),
+                        rs.getString("comp_model_note"),
+                        rs.getString("comp_product_number"),
                         null
                 );
 
@@ -376,7 +385,9 @@ public class InfraDeviceService {
                     Long mappedId = c.externalName() != null ? mappedIdsCache.get(c.externalName().toLowerCase()) : null;
                     return new ExternalComponentDto(
                             c.adapterId(), c.categoryId(), c.externalName(), c.category(),
-                            c.manufacturerId(),c.manufacturerName(), c.serialNumber(), mappedId
+                            c.manufacturerId(), c.manufacturerName(), c.serialNumber(),
+                            c.note(), c.modelParameters(), c.modelNote(), c.modelProductNumber(),
+                            mappedId
                     );
                 }).toList();
 

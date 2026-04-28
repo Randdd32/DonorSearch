@@ -36,7 +36,7 @@ public class DonorSearchController {
     @PostMapping("/run")
     public Map<String, String> runSearch(
             @RequestParam Long targetDeviceId,
-            @RequestParam(required = false) Long targetAdapterId,
+            @RequestParam(required = false) String targetAdapterId,
             @RequestParam(required = false) ExternalComponentCategory category) {
         String sessionId = searchService.runSearch(targetDeviceId, targetAdapterId, category);
         return Map.of("sessionId", sessionId);

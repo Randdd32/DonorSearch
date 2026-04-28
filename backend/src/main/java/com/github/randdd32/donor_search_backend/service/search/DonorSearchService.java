@@ -50,13 +50,13 @@ public class DonorSearchService {
     private final Cache<@NonNull  String, List<DonorResultDto>> searchCache;
 
     @Transactional
-    public String runSearch(Long targetDeviceId, Long targetAdapterId, ExternalComponentCategory category) {
+    public String runSearch(Long targetDeviceId, String targetAdapterId, ExternalComponentCategory category) {
         ExternalDeviceDto targetDevice = infraDeviceService.getDeviceDetails(targetDeviceId);
 
         ExternalComponentCategory targetCategory;
         if (targetAdapterId != null) {
             ExternalComponentDto targetComponent = targetDevice.components().stream()
-                    .filter(c -> c.adapterId().equals(targetAdapterId))
+                    .filter(c -> targetAdapterId.equals(c.adapterId()))
                     .findFirst()
                     .orElseThrow(() -> new IllegalArgumentException("Target adapter not found in device"));
             targetCategory = targetComponent.category();
@@ -74,7 +74,7 @@ public class DonorSearchService {
 
         PcBuildContext targetContext = new PcBuildContext();
         for (ExternalComponentDto comp : targetDevice.components()) {
-            if (comp.adapterId().equals(targetAdapterId)) {
+            if (targetAdapterId != null && targetAdapterId.equals(comp.adapterId())) {
                 continue;
             }
             ComponentEntity internalEntity = resolveTargetComponent(comp.externalName(), ComponentType.valueOf(comp.category().name()));
