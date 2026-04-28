@@ -20,8 +20,9 @@ public class InfraBuildingService extends AbstractInfraDictionaryService {
         return "z.[Идентификатор]";
     }
 
-    @Override protected String getDisplayColumn() {
-        return "z.[Название]";
+    @Override
+    protected String getDisplayColumn() {
+        return "COALESCE(NULLIF(LTRIM(RTRIM(z.[Название])), ''), 'Без названия')";
     }
 
     @Override

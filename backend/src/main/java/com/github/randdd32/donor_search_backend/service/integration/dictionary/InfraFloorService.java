@@ -12,7 +12,10 @@ public class InfraFloorService extends AbstractInfraDictionaryService {
 
     @Override
     protected String getBaseSql() {
-        return "FROM dbo.[Этаж] f JOIN dbo.[Здание] z ON f.[ИД здания] = z.[Идентификатор]";
+        return """
+            FROM dbo.[Этаж] f 
+            LEFT JOIN dbo.[Здание] z ON NULLIF(f.[ИД здания], 0) = z.[Идентификатор]
+        """;
     }
 
     @Override
@@ -22,7 +25,10 @@ public class InfraFloorService extends AbstractInfraDictionaryService {
 
     @Override
     protected String getDisplayColumn() {
-        return "f.[Название] + ' (' + z.[Название] + ')'";
+        return """
+            COALESCE(NULLIF(LTRIM(RTRIM(f.[Название])), ''), 'Без названия') + 
+            ' (' + COALESCE(NULLIF(LTRIM(RTRIM(z.[Название])), ''), 'Без здания') + ')'
+        """;
     }
 
     @Override
