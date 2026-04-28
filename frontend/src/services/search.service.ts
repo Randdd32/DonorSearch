@@ -38,7 +38,7 @@ const mapFiltersToQueryParams = (params: GetSearchResultsParams) => ({
 });
 
 export const searchService = {
-  async runSearch(params: { targetDeviceId: number; targetAdapterId?: number; category?: ExternalComponentCategory })
+  async runSearch(params: { targetDeviceId: number; targetAdapterId?: string; category?: ExternalComponentCategory })
   : Promise<{ sessionId: string }> {
     const { data } = await apiClient.post<{ sessionId: string }>('/search/run', null, { params });
     return data;

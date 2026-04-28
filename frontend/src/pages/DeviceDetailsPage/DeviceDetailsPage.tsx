@@ -28,11 +28,6 @@ export const DeviceDetailsPage = () => {
 
   const { mutate: runSearch, isPending: isSearching } = useRunSearch();
 
-  const formatPosition = (pos: string | null) => {
-    if (!pos) return null;
-    return pos.charAt(0).toUpperCase() + pos.slice(1);
-  };
-
   if (isLoading) return <Spinner fullPage size={40} />;
   if (isError || !device) {
     return (
@@ -44,6 +39,11 @@ export const DeviceDetailsPage = () => {
       />
     );
   }
+
+  const formatPosition = (pos: string | null) => {
+    if (!pos) return null;
+    return pos.charAt(0).toUpperCase() + pos.slice(1);
+  };
 
   const position = formatPosition(device.ownerPosition);
   const ownerDisplay = device.ownerFullName !== 'Неизвестно' 
@@ -58,7 +58,7 @@ export const DeviceDetailsPage = () => {
     return acc;
   }, {} as Record<ExternalComponentCategory, ExternalComponentDto[]>);
 
-  const handleSearchDonor = (adapterId?: number, category?: ExternalComponentCategory) => {
+  const handleSearchDonor = (adapterId?: string, category?: ExternalComponentCategory) => {
     runSearch(
       { deviceId: device.externalId, adapterId, category },
       { onSuccess: (data) => navigate(`/search/results/${data.sessionId}`) }
@@ -240,8 +240,30 @@ export const DeviceDetailsPage = () => {
                             )}
                           </div>
                           <span className={styles.compSub}>
-                            SN: {comp.serialNumber || 'Н/Д'} • {comp.manufacturerName || 'Неизвестный производитель'}
+                            SN: {comp.serialNumber || 'Н/Д'} 
+                            {comp.modelProductNumber ? ` • PN: ${comp.modelProductNumber}` : ''} 
+                            {` • ${comp.manufacturerName || 'Неизвестный производитель'}`}
                           </span>
+
+                          {(comp.modelParameters || comp.note || comp.modelNote) && (
+                            <div className={styles.compExtraInfo}>
+                              {comp.modelParameters && (
+                                <span className={styles.compExtraText}>
+                                  <strong>Параметры:</strong> {comp.modelParameters}
+                                </span>
+                              )}
+                              {comp.modelNote && (
+                                <span className={styles.compExtraText}>
+                                  <strong>Прим. к модели:</strong> {comp.modelNote}
+                                </span>
+                              )}
+                              {comp.note && (
+                                <span className={styles.compExtraText}>
+                                  <strong>Примечание:</strong> {comp.note}
+                                </span>
+                              )}
+                            </div>
+                          )}
                         </div>
 
                         <div className={styles.compActions}>

@@ -4,7 +4,7 @@ import type { ExternalComponentCategory } from '../../../types/integration';
 
 interface RunSearchParams {
   deviceId: number;
-  adapterId?: number;
+  adapterId?: string;
   category?: ExternalComponentCategory;
 }
 

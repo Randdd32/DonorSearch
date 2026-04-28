@@ -12,12 +12,16 @@ export type ExternalComponentCategory =
   | 'CASE_FAN' | 'EXPANSION_CARD' | 'MONITOR' | 'UNKNOWN';
 
 export interface ExternalComponentDto {
-  adapterId: number;
-  categoryId: number;
+  adapterId: string;
+  categoryId: string;
   externalName: string;
   category: ExternalComponentCategory;
   manufacturerName: string;
-  serialNumber: string;
+  serialNumber: string | null;
+  note: string | null;
+  modelParameters: string | null;
+  modelNote: string | null;
+  modelProductNumber: string | null;
   mappedComponentId: number | null;
 }
 
