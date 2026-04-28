@@ -12,7 +12,12 @@ public class InfraRoomService extends AbstractInfraDictionaryService {
 
     @Override
     protected String getBaseSql() {
-        return "FROM dbo.[Комната] r JOIN dbo.[Этаж] f ON r.[ИД этажа] = f.[Идентификатор] JOIN dbo.[Здание] z ON f.[ИД здания] = z.[Идентификатор]";
+        return """
+            FROM dbo.[Комната] r 
+            LEFT JOIN dbo.[Этаж] f ON NULLIF(r.[ИД этажа], 0) = f.[Идентификатор] 
+            LEFT JOIN dbo.[Здание] z ON NULLIF(f.[ИД здания], 0) = z.[Идентификатор]
+            LEFT JOIN dbo.[Типы комнат] rt ON NULLIF(r.[ИД типа], 0) = rt.[Идентификатор]
+        """;
     }
 
     @Override
@@ -22,7 +27,12 @@ public class InfraRoomService extends AbstractInfraDictionaryService {
 
     @Override
     protected String getDisplayColumn() {
-        return "r.[Название] + ' (' + f.[Название] + ', ' + z.[Название] + ')'";
+        return """
+            '"' + COALESCE(NULLIF(LTRIM(RTRIM(r.[Название])), ''), 'Без названия') + '"' + 
+            ' (' + COALESCE(NULLIF(LTRIM(RTRIM(f.[Название])), ''), 'Без этажа') + ', ' + 
+            COALESCE(NULLIF(LTRIM(RTRIM(z.[Название])), ''), 'Без здания') + ')' + 
+            COALESCE(' - ' + NULLIF(LTRIM(RTRIM(rt.[Название])), ''), '')
+        """;
     }
 
     @Override

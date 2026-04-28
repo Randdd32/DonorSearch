@@ -84,7 +84,8 @@ public class InfraDeviceService {
             r.[Идентификатор] AS room_id,
             COALESCE(NULLIF(LTRIM(RTRIM(b.[Название])), ''), 'Без здания') + ' -> ' + 
             COALESCE(NULLIF(LTRIM(RTRIM(f.[Название])), ''), 'Без этажа') + ' -> ' + 
-            COALESCE(NULLIF(LTRIM(RTRIM(r.[Название])), ''), 'Без комнаты') + ' -> ' + 
+            COALESCE(NULLIF(LTRIM(RTRIM(r.[Название])), ''), 'Без комнаты') + 
+            COALESCE(' - ' + NULLIF(LTRIM(RTRIM(rt.[Название])), ''), '') + ' -> ' + 
             COALESCE(NULLIF(LTRIM(RTRIM(wp.[Название])), ''), 'Без РМ') AS location_path,
             a.[DateReceived] AS date_received, 
             a.[IsWorking] AS is_working,
@@ -118,6 +119,7 @@ public class InfraDeviceService {
         LEFT JOIN dbo.[Организация] org ON a.[UtilizerID] = org.[Идентификатор] AND a.[UtilizerClassID] = 101
         LEFT JOIN dbo.[Рабочее место] wp ON NULLIF(pc.[ИД рабочего места], 0) = wp.[Идентификатор]
         LEFT JOIN dbo.[Комната] r ON COALESCE(NULLIF(wp.[ИД комнаты], 0), NULLIF(pc.[ИД комнаты], 0)) = r.[Идентификатор]
+        LEFT JOIN dbo.[Типы комнат] rt ON NULLIF(r.[ИД типа], 0) = rt.[Идентификатор]
         LEFT JOIN dbo.[Этаж] f ON NULLIF(r.[ИД этажа], 0) = f.[Идентификатор]
         LEFT JOIN dbo.[Здание] b ON NULLIF(f.[ИД здания], 0) = b.[Идентификатор]
     """;
