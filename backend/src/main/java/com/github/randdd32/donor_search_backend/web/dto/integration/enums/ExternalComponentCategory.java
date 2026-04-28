@@ -20,7 +20,9 @@ public enum ExternalComponentCategory {
             Map.entry("звуковая карта", EXPANSION_CARD),
             Map.entry("видеоадаптер", VIDEO_CARD),
             Map.entry("модуль оперативной памяти", MEMORY),
-            Map.entry("монитор", MONITOR)
+            Map.entry("монитор", MONITOR),
+            Map.entry("блок питания", POWER_SUPPLY),
+            Map.entry("корпус", CASE)
     );
 
     private static final Map<ExternalComponentCategory, List<String>> REVERSE_MAP;

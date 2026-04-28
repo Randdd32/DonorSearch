@@ -77,6 +77,9 @@ public class DonorSearchService {
             if (targetAdapterId != null && targetAdapterId.equals(comp.adapterId())) {
                 continue;
             }
+            if (comp.category() == ExternalComponentCategory.UNKNOWN) {
+                continue;
+            }
             ComponentEntity internalEntity = resolveTargetComponent(comp.externalName(), ComponentType.valueOf(comp.category().name()));
             if (internalEntity != null) {
                 ComponentEntity realEntity = (ComponentEntity) Hibernate.unproxy(internalEntity);
