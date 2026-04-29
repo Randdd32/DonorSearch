@@ -3,8 +3,8 @@ import {
   Monitor, 
   Laptop, 
   Box, 
-  SquareTerminal, 
-  Computer 
+  Computer, 
+  MonitorSmartphone 
 } from 'lucide-react';
 
 interface DeviceIconProps {
@@ -23,11 +23,11 @@ export const DeviceIcon = ({ typeName, size = 24, className }: DeviceIconProps) 
     case 'Моноблок':
       return <Monitor {...iconProps} />;
     case 'Терминал':
-      return <SquareTerminal {...iconProps} />;
+      return <Computer {...iconProps} />;
     case 'Сервер':
       return <Server {...iconProps} />;
     case 'Промышленный ПК':
-      return <Computer {...iconProps} />;
+      return <MonitorSmartphone {...iconProps} />;
     default:
       return <Box {...iconProps} />;
   }
