@@ -20,7 +20,7 @@ export const RuleFilters = ({ isOpen, onClose, filters, updateFilters, resetFilt
   const isActiveValue = filters.isActive === undefined ? '' : filters.isActive ? 'true' : 'false';
 
   return (
-    <FilterSidebar title="Фильтры правил" isOpen={isOpen} onClose={onClose} onReset={resetFilters}>
+    <FilterSidebar title="Фильтры" isOpen={isOpen} onClose={onClose} onReset={resetFilters}>
       <StaticSelectFilter 
         label="Статус активности"
         value={isActiveValue}
