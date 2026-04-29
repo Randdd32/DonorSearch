@@ -1,4 +1,11 @@
-import { Server, Monitor, Laptop, Box } from 'lucide-react';
+import { 
+  Server, 
+  Monitor, 
+  Laptop, 
+  Box, 
+  SquareTerminal, 
+  Computer 
+} from 'lucide-react';
 
 interface DeviceIconProps {
   typeName?: string;
@@ -7,12 +14,21 @@ interface DeviceIconProps {
 }
 
 export const DeviceIcon = ({ typeName, size = 24, className }: DeviceIconProps) => {
-  const lower = typeName?.toLowerCase() || '';
   const iconProps = { size, className };
   
-  if (lower.includes('ноутбук')) return <Laptop {...iconProps} />;
-  if (lower.includes('монитор')) return <Monitor {...iconProps} />;
-  if (lower.includes('сервер') || lower.includes('системный блок') || lower.includes('пк')) return <Server {...iconProps} />;
-  
-  return <Box {...iconProps} />;
+  switch (typeName) {
+    case 'Ноутбук':
+    case 'Нетбук':
+      return <Laptop {...iconProps} />;
+    case 'Моноблок':
+      return <Monitor {...iconProps} />;
+    case 'Терминал':
+      return <SquareTerminal {...iconProps} />;
+    case 'Сервер':
+      return <Server {...iconProps} />;
+    case 'Промышленный ПК':
+      return <Computer {...iconProps} />;
+    default:
+      return <Box {...iconProps} />;
+  }
 };
