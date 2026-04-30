@@ -82,7 +82,7 @@ public class CompatibilityEngineService {
                     log.debug("Missing data for rule [{}]: {}", rule.getRuleCode(), e.getMessage());
                     warnings.add(buildMissingDataWarning(rule, "нет данных о характеристиках оборудования"));
                 } else {
-                    log.error("CRITICAL CONFIGURATION ERROR in rule [{}]: {}", rule.getRuleCode(), e.getMessage());
+                    log.error("Critical configuration error in rule [{}]: {}", rule.getRuleCode(), e.getMessage());
                     warnings.add(new DonorWarningDto(
                             String.format("Синтаксическая или логическая ошибка в формуле правила «%s». Обратитесь к администратору.",
                                     rule.getRuleName()),

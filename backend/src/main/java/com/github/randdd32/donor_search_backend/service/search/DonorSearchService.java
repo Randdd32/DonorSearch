@@ -111,7 +111,7 @@ public class DonorSearchService {
     public PageDto<DonorResultDto> getResults(String sessionId, DonorSearchFilter filter, Pageable pageable) {
         List<DonorResultDto> cachedResults = searchCache.getIfPresent(sessionId);
         if (cachedResults == null) {
-            throw new NotFoundException(String.format("Сессия поиска [%s] истекла или не найдена. Запустите поиск заново.", sessionId));
+            throw new NotFoundException(String.format("Search session [%s] has expired or not found. Please start a new search.", sessionId));
         }
 
         List<DonorResultDto> filtered = cachedResults.stream()
@@ -124,8 +124,10 @@ public class DonorSearchService {
             comparator = switch (order.getProperty()) {
                 case "id" -> Comparator.comparingLong(d -> d.donorDevice().externalId());
                 case "name" -> Comparator.comparing(d -> d.donorDevice().name());
-                case "inventoryNumber" -> Comparator.comparing(d -> d.donorDevice().inventoryNumber(), Comparator.nullsLast(String::compareTo));
-                case "dateReceived" -> Comparator.comparing(d -> d.donorDevice().dateReceived(), Comparator.nullsLast(java.time.Instant::compareTo));
+                case "inventoryNumber" -> Comparator.comparing(d -> d.donorDevice().inventoryNumber(),
+                        Comparator.nullsLast(String::compareTo));
+                case "dateReceived" -> Comparator.comparing(d -> d.donorDevice().dateReceived(),
+                        Comparator.nullsLast(java.time.Instant::compareTo));
                 default -> Comparator.comparingInt(DonorResultDto::totalPenalty);
             };
             if (order.getDirection() == Sort.Direction.DESC) {

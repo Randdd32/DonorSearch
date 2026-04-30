@@ -342,7 +342,7 @@ public class InfraDeviceService {
                     try {
                         return mapDeviceRow(rs, 0);
                     } catch (java.sql.SQLException e) {
-                        throw new RuntimeException("Ошибка маппинга базовой строки устройства", e);
+                        throw new RuntimeException("Error mapping base device row", e);
                     }
                 });
 

@@ -40,7 +40,7 @@ public class PdfExportService {
                 return os.toByteArray();
             }
         } catch (Exception e) {
-            throw new PdfGenerationException("Ошибка при генерации PDF документа", e);
+            throw new PdfGenerationException("Error during PDF document generation", e);
         }
     }
 
@@ -54,7 +54,7 @@ public class PdfExportService {
                 try {
                     return fontResource.getInputStream();
                 } catch (Exception e) {
-                    throw new PdfGenerationException("Не удалось прочитать файл шрифта", e);
+                    throw new PdfGenerationException("Failed to read font file", e);
                 }
             }, "Roboto");
         }
