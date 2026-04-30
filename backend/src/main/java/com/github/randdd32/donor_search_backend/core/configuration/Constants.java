@@ -13,6 +13,8 @@ public final class Constants {
 
     public static final int DEFAULT_PAGE_SIZE = 20;
 
+    public static final String PASSWORD_PATTERN = "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*_=+\\\\-]).{8,60}$";
+
     public static final List<String> ALLOWED_PC_TYPE_UUIDS = List.of(
             "99BAEB7D-7E92-43ED-A18F-B98B31B8299B", // Терминал
             "3D2E3D02-7D8D-40BA-8902-EB9B949A4529", // Сервер

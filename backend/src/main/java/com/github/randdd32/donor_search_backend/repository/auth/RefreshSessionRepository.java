@@ -9,5 +9,6 @@ import java.util.Optional;
 public interface RefreshSessionRepository extends JpaRepository<RefreshSessionEntity, Long> {
     Optional<RefreshSessionEntity> findByRefreshToken(String refreshToken);
     List<RefreshSessionEntity> findAllByUserIdOrderByCreatedAtAsc(Long userId);
+    void deleteByUserIdAndFingerprint(Long userId, String fingerprint);
     void deleteAllByUserId(Long userId);
 }
