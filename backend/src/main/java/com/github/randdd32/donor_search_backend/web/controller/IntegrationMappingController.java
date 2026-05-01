@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(Constants.API_URL + "/mappings")
+@PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
 public class IntegrationMappingController extends AbstractCrudController<IntegrationMappingEntity, IntegrationMappingDto,
         IntegrationMappingService> {
     public IntegrationMappingController(IntegrationMappingService service, IntegrationMappingMapper mapper) {
@@ -38,7 +40,6 @@ public class IntegrationMappingController extends AbstractCrudController<Integra
 
         return PageDtoMapper.toDto(service.getAll(filter, pageable), toDtoMapper);
     }
-
 
     @Override
     @PostMapping

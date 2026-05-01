@@ -2,6 +2,7 @@ package com.github.randdd32.donor_search_backend.core.setup;
 
 import com.github.randdd32.donor_search_backend.model.compatibility.CompatibilityRuleEntity;
 import com.github.randdd32.donor_search_backend.model.enums.ComponentType;
+import com.github.randdd32.donor_search_backend.service.auth.UserService;
 import com.github.randdd32.donor_search_backend.service.compatibility.CompatibilityRuleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,10 +17,13 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class DatabaseInitializer implements CommandLineRunner {
     private final CompatibilityRuleService ruleService;
+    private final UserService userService;
 
     @Override
     @Transactional
     public void run(String... args) {
+        userService.initSuperAdmin();
+
         if (ruleService.count() == 0) {
             log.info("Initializing compatibility rules...");
             initializeRules();
