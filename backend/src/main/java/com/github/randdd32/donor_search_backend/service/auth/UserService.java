@@ -89,15 +89,22 @@ public class UserService extends AbstractReadService<UserEntity, UserRepository>
     }
 
     @Transactional
-    public UserEntity updateUser(Long id, UserUpdateDto dto, UserRole currentUserRole) {
+    public UserEntity updateUser(Long id, UserUpdateDto dto, UserRole currentUserRole, String currentUsername) {
         if (dto.role() == null) {
             throw new IllegalArgumentException("Role must not be null");
         }
 
         UserEntity user = getById(id);
+        boolean isSelf = user.getUsername().equalsIgnoreCase(currentUsername);
 
-        checkRoleHierarchy(currentUserRole, user.getRole(), "update");
-        checkRoleHierarchy(currentUserRole, dto.role(), "assign");
+        if (!isSelf) {
+            checkRoleHierarchy(currentUserRole, user.getRole(), "update");
+            checkRoleHierarchy(currentUserRole, dto.role(), "assign");
+        } else {
+            if (user.getRole() != dto.role()) {
+                throw new IllegalArgumentException("You cannot change your own role");
+            }
+        }
 
         user.setRole(dto.role());
 

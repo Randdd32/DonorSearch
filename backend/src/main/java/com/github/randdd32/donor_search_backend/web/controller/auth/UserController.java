@@ -60,7 +60,8 @@ public class UserController {
     @PutMapping("/{id}")
     public UserDto updateUser(@PathVariable Long id, @Valid @RequestBody UserUpdateDto dto, Authentication authentication) {
         UserRole currentUserRole = extractRole(authentication);
-        return userMapper.toDto(userService.updateUser(id, dto, currentUserRole));
+        String currentUsername = authentication.getName();
+        return userMapper.toDto(userService.updateUser(id, dto, currentUserRole, currentUsername));
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
