@@ -1,41 +1,120 @@
-import axios from 'axios';
+import axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios';
 import toast from 'react-hot-toast';
+import { useAuthStore } from '../store/authStore';
+import { getBrowserFingerprint } from '../utils/fingerprint';
+import { API_BASE_URL, API_ENDPOINTS } from './constants';
+import type { ApiErrorResponse, AuthResponseDto } from '../types/auth';
 
 export const apiClient = axios.create({
-  baseURL: '/api/v1',
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
   timeout: 30000,
+  withCredentials: true,
   paramsSerializer: (params) => {
     const searchParams = new URLSearchParams();
-    
     Object.entries(params).forEach(([key, value]) => {
       if (value === undefined || value === null || value === '') return;
-
       if (Array.isArray(value)) {
         value.forEach((v) => searchParams.append(key, String(v)));
       } else {
         searchParams.append(key, String(value));
       }
     });
-    
     return searchParams.toString();
   }
 });
 
+let isRefreshing = false;
+let failedQueue: Array<{ resolve: (value: string | null) => void; reject: (reason?: unknown) => void }> =[];
+
+const silentStatuses = [401, 403];
+
+const processQueue = (error: unknown, token: string | null = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue =[];
+};
+
+apiClient.interceptors.request.use((config) => {
+  const token = useAuthStore.getState().accessToken;
+  if (token && config.headers) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+interface RetryConfig extends InternalAxiosRequestConfig {
+  _retry?: boolean;
+}
+
 apiClient.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (axios.isCancel(error)) return Promise.reject(error);
+  async (error: AxiosError<ApiErrorResponse>) => {
+    const originalRequest = error.config as RetryConfig | undefined;
 
-    if (error.config?.url?.includes('/validate-expression')) {
-      return Promise.reject(error);
+    if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
+      if (originalRequest.url?.includes(API_ENDPOINTS.AUTH.REFRESH)) {
+        useAuthStore.getState().logout();
+        return Promise.reject(error);
+      }
+
+      if (isRefreshing) {
+        return new Promise<string | null>((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        })
+          .then((token) => {
+            if (token && originalRequest.headers) {
+              originalRequest.headers.Authorization = `Bearer ${token}`;
+            }
+            return apiClient(originalRequest);
+          })
+          .catch((err: unknown) => Promise.reject(err));
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      try {
+        const fingerprint = getBrowserFingerprint();
+        const { data } = await axios.post<AuthResponseDto>(
+          `${API_BASE_URL}${API_ENDPOINTS.AUTH.REFRESH}`, 
+          { fingerprint }, 
+          { withCredentials: true }
+        );
+        
+        useAuthStore.getState().setAuth(data.accessToken, { username: data.username, role: data.role });
+        
+        processQueue(null, data.accessToken);
+        
+        if (originalRequest.headers) {
+          originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
+        }
+        
+        return apiClient(originalRequest);
+      } catch (refreshError: unknown) {
+        processQueue(refreshError, null);
+        useAuthStore.getState().logout();
+        return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
+      }
     }
 
-    const message = error.response?.data?.message || 'Произошла непредвиденная ошибка сервера';
-    toast.error(message);
-    
+    if (
+      !silentStatuses.includes(error.response?.status ?? 0) &&
+      !error.config?.url?.includes('/validate-expression')
+    ) {
+      const message = error.response?.data?.message || 'An unexpected server error occurred';
+      toast.error(message);
+    }
+
     return Promise.reject(error);
   }
 );

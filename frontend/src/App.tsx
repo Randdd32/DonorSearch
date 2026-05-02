@@ -1,9 +1,12 @@
 import { useEffect } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
-import { DashboardLayout } from './layouts/DashboardLayout/DashboardLayout';
 import { useUiStore } from './store/uiStore';
+import { useAuthStore } from './store/authStore';
+import { Spinner } from './components/ui/Spinner/Spinner';
+import { DashboardLayout } from './layouts/DashboardLayout/DashboardLayout';
+import { ProtectedRoute } from './components/ProtectedRoute/ProtectedRoute';
 import { DevicesPage } from './pages/DevicesPage/DevicesPage';
 import { DeviceDetailsPage } from './pages/DeviceDetailsPage/DeviceDetailsPage';
 import { ProfilePage } from './pages/ProfilePage/ProfilePage';
@@ -25,25 +28,44 @@ const queryClient = new QueryClient({
 
 export const App = () => {
   const theme = useUiStore((state) => state.theme);
+  const { isInitialized, checkAuth } = useAuthStore();
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
 
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
+
+  if (!isInitialized) {
+    return <Spinner fullPage size={48} />;
+  }
+
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<DashboardLayout />}>
-            <Route index element={<DevicesPage />} />
-            <Route path="devices/:id" element={<DeviceDetailsPage />} /> 
-            <Route path="search/results/:sessionId" element={<SearchResultsPage />} />
-            <Route path="profile" element={<ProfilePage />} />
-            <Route path="compatibility" element={<RulesPage />} />
-            <Route path="compatibility/:id" element={<RuleEditPage />} />
-            <Route path="mappings" element={<MappingsPage />} />
-            <Route path="mappings/:id" element={<MappingEditPage />} />
+          {/* <Route path="/login" element={<LoginPage />} /> */}
+
+          <Route element={<ProtectedRoute />}>
+            <Route path="/" element={<DashboardLayout />}>
+              <Route index element={<DevicesPage />} />
+              <Route path="devices/:id" element={<DeviceDetailsPage />} /> 
+              <Route path="search/results/:sessionId" element={<SearchResultsPage />} />
+              <Route path="profile" element={<ProfilePage />} />
+
+              <Route element={<ProtectedRoute allowedRoles={['ADMIN', 'SUPERADMIN']} />}>
+                <Route path="compatibility" element={<RulesPage />} />
+                <Route path="compatibility/:id" element={<RuleEditPage />} />
+                <Route path="mappings" element={<MappingsPage />} />
+                <Route path="mappings/:id" element={<MappingEditPage />} />
+                {/* <Route path="users" element={<UsersPage />} /> В будущем */}
+              </Route>
+            </Route>
           </Route>
+          
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
       

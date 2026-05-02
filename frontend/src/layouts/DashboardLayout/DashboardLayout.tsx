@@ -3,10 +3,13 @@ import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { clsx } from 'clsx';
 import { Server, ListChecks, Link as LinkIcon, LogOut, Sun, Moon, Menu, Monitor, ChevronDown, User } from 'lucide-react';
 import { useUiStore } from '../../store/uiStore';
+import { useAuthStore } from '../../store/authStore';
+import { authService } from '../../services/auth.service';
 import styles from './DashboardLayout.module.css';
 
 export const DashboardLayout = () => {
   const { theme, toggleTheme, isSidebarOpen, toggleSidebar } = useUiStore();
+  const { user, isAdmin, logout } = useAuthStore();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -23,9 +26,19 @@ export const DashboardLayout = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   },[]);
 
-  const handleLogout = () => {
-    setIsProfileOpen(false);
-    navigate('/');
+  const handleClick = () => {
+    if (window.innerWidth <= 630) {
+      toggleSidebar();
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await authService.logout();
+    } finally {
+      logout();
+      navigate('/login');
+    }
   };
 
   return (
@@ -43,24 +56,35 @@ export const DashboardLayout = () => {
         </div>
         
         <nav className={styles.nav}>
-          {[
-            { path: '/', label: 'Учетные единицы', icon: Server },
-            { path: '/compatibility', label: 'Правила совместимости', icon: ListChecks },
-            { path: '/mappings', label: 'Таблица сопоставления', icon: LinkIcon }
-          ].map((item) => {
-            const Icon = item.icon;
-            return (
-              <Link 
-                key={item.path}
-                to={item.path} 
-                className={clsx(styles.navItem, { [styles.active]: location.pathname === item.path })}
-                onClick={() => window.innerWidth <= 630 && toggleSidebar()}
-              >
-                <Icon size={20} className={styles.navIcon} />
-                {isSidebarOpen && <span>{item.label}</span>}
-              </Link>
-            );
-          })}
+          <Link 
+            to="/" 
+            className={clsx(styles.navItem, { [styles.active]: location.pathname === '/' })}
+            onClick={handleClick}
+          >
+            <Server size={20} className={styles.navIcon} />
+            {isSidebarOpen && <span>Учетные единицы</span>}
+          </Link>
+
+          {isAdmin && (
+            [
+              { path: '/compatibility', label: 'Правила совместимости', icon: ListChecks },
+              { path: '/mappings', label: 'Таблица сопоставления', icon: LinkIcon },
+
+            ].map((item) => {
+              const Icon = item.icon;
+              return (
+                <Link 
+                  key={item.path}
+                  to={item.path} 
+                  className={clsx(styles.navItem, { [styles.active]: location.pathname === item.path })}
+                  onClick={handleClick}
+                >
+                  <Icon size={20} className={styles.navIcon} />
+                  {isSidebarOpen && <span>{item.label}</span>}
+                </Link>
+              );
+            })
+          )}
         </nav>
       </aside>
 
@@ -80,10 +104,12 @@ export const DashboardLayout = () => {
             
             <div className={styles.profileWrapper} ref={profileRef}>
               <div className={styles.userProfile} onClick={() => setIsProfileOpen(!isProfileOpen)}>
-                <div className={styles.avatar}>A</div>
+                <div className={styles.avatar}>{user?.username.charAt(0).toUpperCase()}</div>
                 <div className={styles.userInfo}>
-                  <span className={styles.userName}>Admin</span>
-                  <span className={styles.userRole}>Суперадминистратор</span>
+                  <span className={styles.userName}>{user?.username}</span>
+                  <span className={styles.userRole}>
+                    {user?.role === 'SUPERADMIN' ? 'Суперадминистратор' : user?.role === 'ADMIN' ? 'Администратор' : 'Пользователь'}
+                  </span>
                 </div>
                 <ChevronDown size={16} className={clsx(styles.chevron, { [styles.rotated]: isProfileOpen })} />
               </div>
