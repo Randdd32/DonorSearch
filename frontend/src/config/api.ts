@@ -109,8 +109,9 @@ apiClient.interceptors.response.use(
 
     if (
       !silentStatuses.includes(error.response?.status ?? 0) &&
-      !error.config?.url?.includes(API_ENDPOINTS.COMPATIBILITY_RULES.VALIDATE_EXPRESSION) &&
-      !error.config?.url?.includes(API_ENDPOINTS.AUTH.LOGIN)
+      originalRequest &&
+      !originalRequest.url?.includes(API_ENDPOINTS.COMPATIBILITY_RULES.VALIDATE_EXPRESSION) &&
+      !originalRequest.url?.includes(API_ENDPOINTS.AUTH.LOGIN)
     ) {
       const message = error.response?.data?.message || 'An unexpected server error occurred';
       toast.error(message);
