@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { clsx } from 'clsx';
 import { Server, ListChecks, Link as LinkIcon, LogOut, Sun, Moon, Menu, Monitor, ChevronDown, User } from 'lucide-react';
+import { ROLE_LABELS } from '../../types/auth';
 import { useUiStore } from '../../store/uiStore';
 import { useAuthStore } from '../../store/authStore';
 import { authService } from '../../services/auth.service';
@@ -108,7 +109,7 @@ export const DashboardLayout = () => {
                 <div className={styles.userInfo}>
                   <span className={styles.userName}>{user?.username}</span>
                   <span className={styles.userRole}>
-                    {user?.role === 'SUPERADMIN' ? 'Суперадминистратор' : user?.role === 'ADMIN' ? 'Администратор' : 'Пользователь'}
+                    {user ? ROLE_LABELS[user.role] : ''}
                   </span>
                 </div>
                 <ChevronDown size={16} className={clsx(styles.chevron, { [styles.rotated]: isProfileOpen })} />

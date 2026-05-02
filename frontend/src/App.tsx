@@ -15,6 +15,7 @@ import { MappingsPage } from './pages/MappingsPage/MappingsPage';
 import { MappingEditPage } from './pages/MappingEditPage/MappingEditPage';
 import { RulesPage } from './pages/RulesPage/RulesPage';
 import { RuleEditPage } from './pages/RuleEditPage/RuleEditPage';
+import { LoginPage } from './pages/LoginPage/LoginPage';
 import './styles/globals.css';
 
 const queryClient = new QueryClient({
@@ -46,7 +47,7 @@ export const App = () => {
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Routes>
-          {/* <Route path="/login" element={<LoginPage />} /> */}
+          <Route path="/login" element={<LoginPage />} />
 
           <Route element={<ProtectedRoute />}>
             <Route path="/" element={<DashboardLayout />}>
