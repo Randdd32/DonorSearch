@@ -1,4 +1,5 @@
 import { apiClient } from '../config/api';
+import { API_ENDPOINTS } from '../config/constants';
 import type { PageDto } from '../types/pagination';
 import type { IntegrationMappingDto, CreateMappingDto, MappingConfidence, ExternalComponentCategory } from '../types/integration';
 import type { CommonFilters } from '../hooks/useUrlFilters';
@@ -27,26 +28,26 @@ export const mappingsService = {
       updatedBefore: params.updatedBefore ? new Date(params.updatedBefore).toISOString() : undefined,
     };
 
-    const { data } = await apiClient.get<PageDto<IntegrationMappingDto>>('/mappings', { params: queryParams });
+    const { data } = await apiClient.get<PageDto<IntegrationMappingDto>>(API_ENDPOINTS.MAPPINGS.BASE, { params: queryParams });
     return data;
   },
 
   async getById(id: number): Promise<IntegrationMappingDto> {
-    const { data } = await apiClient.get<IntegrationMappingDto>(`/mappings/${id}`);
+    const { data } = await apiClient.get<IntegrationMappingDto>(API_ENDPOINTS.MAPPINGS.DETAILS(id));
     return data;
   },
 
   async create(dto: CreateMappingDto): Promise<IntegrationMappingDto> {
-    const { data } = await apiClient.post<IntegrationMappingDto>('/mappings', dto);
+    const { data } = await apiClient.post<IntegrationMappingDto>(API_ENDPOINTS.MAPPINGS.BASE, dto);
     return data;
   },
 
   async update(id: number, dto: IntegrationMappingDto): Promise<IntegrationMappingDto> {
-    const { data } = await apiClient.put<IntegrationMappingDto>(`/mappings/${id}`, dto);
+    const { data } = await apiClient.put<IntegrationMappingDto>(API_ENDPOINTS.MAPPINGS.DETAILS(id), dto);
     return data;
   },
 
   async delete(id: number): Promise<void> {
-    await apiClient.delete(`/mappings/${id}`);
+    await apiClient.delete(API_ENDPOINTS.MAPPINGS.DETAILS(id));
   }
 };

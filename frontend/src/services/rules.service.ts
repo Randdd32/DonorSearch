@@ -1,4 +1,5 @@
 import { apiClient } from '../config/api';
+import { API_ENDPOINTS } from '../config/constants';
 import type { PageDto } from '../types/pagination';
 import type { CompatibilityRuleDto, RuleBuilderMetadataDto } from '../types/compatibility';
 import type { CommonFilters } from '../hooks/useUrlFilters';
@@ -14,7 +15,7 @@ export interface GetRulesParams extends CommonFilters {
 
 export const rulesService = {
   async getRules(params: GetRulesParams): Promise<PageDto<CompatibilityRuleDto>> {
-    const { data } = await apiClient.get<PageDto<CompatibilityRuleDto>>('/compatibility-rules', { 
+    const { data } = await apiClient.get<PageDto<CompatibilityRuleDto>>(API_ENDPOINTS.COMPATIBILITY_RULES.BASE, { 
       params: {
         ...params,
         targetTypes: params.targetTypes?.join(','),
@@ -28,30 +29,30 @@ export const rulesService = {
   },
 
   async getById(id: number): Promise<CompatibilityRuleDto> {
-    const { data } = await apiClient.get<CompatibilityRuleDto>(`/compatibility-rules/${id}`);
+    const { data } = await apiClient.get<CompatibilityRuleDto>(API_ENDPOINTS.COMPATIBILITY_RULES.DETAILS(id));
     return data;
   },
 
   async create(dto: Partial<CompatibilityRuleDto>): Promise<CompatibilityRuleDto> {
-    const { data } = await apiClient.post<CompatibilityRuleDto>('/compatibility-rules', dto);
+    const { data } = await apiClient.post<CompatibilityRuleDto>(API_ENDPOINTS.COMPATIBILITY_RULES.BASE, dto);
     return data;
   },
 
   async update(id: number, dto: Partial<CompatibilityRuleDto>): Promise<CompatibilityRuleDto> {
-    const { data } = await apiClient.put<CompatibilityRuleDto>(`/compatibility-rules/${id}`, dto);
+    const { data } = await apiClient.put<CompatibilityRuleDto>(API_ENDPOINTS.COMPATIBILITY_RULES.DETAILS(id), dto);
     return data;
   },
 
   async delete(id: number): Promise<void> {
-    await apiClient.delete(`/compatibility-rules/${id}`);
+    await apiClient.delete(API_ENDPOINTS.COMPATIBILITY_RULES.DETAILS(id));
   },
 
   async getBuilderMetadata(): Promise<RuleBuilderMetadataDto> {
-    const { data } = await apiClient.get<RuleBuilderMetadataDto>('/compatibility-rules/builder-metadata');
+    const { data } = await apiClient.get<RuleBuilderMetadataDto>(API_ENDPOINTS.COMPATIBILITY_RULES.BUILDER_METADATA);
     return data;
   },
 
   async validateExpression(expression: string): Promise<void> {
-    await apiClient.post('/compatibility-rules/validate-expression', { expression });
+    await apiClient.post(API_ENDPOINTS.COMPATIBILITY_RULES.VALIDATE_EXPRESSION, { expression });
   }
 };

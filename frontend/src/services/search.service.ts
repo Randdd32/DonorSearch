@@ -1,4 +1,5 @@
 import { apiClient } from '../config/api';
+import { API_ENDPOINTS } from '../config/constants';
 import type { PageDto } from '../types/pagination';
 import type { DonorResultDto } from '../types/search';
 import type { ExternalComponentCategory } from '../types/integration';
@@ -52,7 +53,7 @@ const mapFiltersToQueryParams = (params: GetSearchResultsParams) => ({
 export const searchService = {
   async runSearch(params: { targetDeviceId: number; targetAdapterId?: string; category?: ExternalComponentCategory })
   : Promise<{ sessionId: string }> {
-    const { data } = await apiClient.post<{ sessionId: string }>('/search/run', null, { params });
+    const { data } = await apiClient.post<{ sessionId: string }>(API_ENDPOINTS.SEARCH.RUN, null, { params });
     return data;
   },
 
@@ -64,7 +65,7 @@ export const searchService = {
       ...mapFiltersToQueryParams(params)
     };
 
-    const { data } = await apiClient.get<PageDto<DonorResultDto>>(`/search/results/${sessionId}`, {
+    const { data } = await apiClient.get<PageDto<DonorResultDto>>(API_ENDPOINTS.SEARCH.RESULTS(sessionId), {
       params: queryParams
     });
     return data;
@@ -73,7 +74,7 @@ export const searchService = {
   async exportPdf(sessionId: string, params: GetSearchResultsParams): Promise<Blob> {
     const queryParams = mapFiltersToQueryParams(params);
 
-    const { data } = await apiClient.get<Blob>(`/search/results/${sessionId}/export/pdf`, {
+    const { data } = await apiClient.get<Blob>(API_ENDPOINTS.SEARCH.EXPORT_PDF(sessionId), {
       params: queryParams,
       responseType: 'blob'
     });

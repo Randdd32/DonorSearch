@@ -1,4 +1,5 @@
 import { apiClient } from '../config/api';
+import { API_ENDPOINTS } from '../config/constants';
 import type { PageDto } from '../types/pagination';
 import type { ExternalDeviceDto } from '../types/integration';
 import type { CommonFilters } from '../hooks/useUrlFilters';
@@ -49,14 +50,14 @@ export const devicesService = {
       appointmentDateTo: params.appointmentDateTo ? new Date(params.appointmentDateTo).toISOString() : undefined,
     };
 
-    const { data } = await apiClient.get<PageDto<ExternalDeviceDto>>('/infra/devices', {
+    const { data } = await apiClient.get<PageDto<ExternalDeviceDto>>(API_ENDPOINTS.INFRA.DEVICES, {
       params: queryParams
     });
     return data;
   },
 
   async getDeviceDetails(id: number): Promise<ExternalDeviceDto> {
-    const { data } = await apiClient.get<ExternalDeviceDto>(`/infra/devices/${id}`);
+    const { data } = await apiClient.get<ExternalDeviceDto>(API_ENDPOINTS.INFRA.DEVICE_DETAILS(id));
     return data;
   }
 };

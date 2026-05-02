@@ -1,4 +1,5 @@
 import { apiClient } from '../config/api';
+import { API_ENDPOINTS } from '../config/constants';
 import type { PageDto } from '../types/pagination';
 
 interface NamedDictionaryDto {
@@ -12,7 +13,7 @@ export interface SelectOption {
 }
 
 const createDictService = (basePath: string, isInfra = false) => {
-  const prefix = isInfra ? '/infra/dictionaries' : '/dictionaries';
+  const prefix = isInfra ? API_ENDPOINTS.INFRA.DICTIONARIES : API_ENDPOINTS.DICTIONARIES.BASE;
   return {
     fetchOptions: async (search?: string, parentIds?: (number | string)[]): Promise<SelectOption[]> => {
       const { data } = await apiClient.get<PageDto<NamedDictionaryDto>>(`${prefix}/${basePath}`, {
@@ -39,7 +40,7 @@ export const dictionaryService = {
   deviceModels: createDictService('device-models', true),
   departments: createDictService('departments', true),
   states: createDictService('states', true),
-
+  
   hwManufacturers: createDictService('manufacturers', false),
   colors: createDictService('colors', false),
   cpuSockets: createDictService('cpu-sockets', false),
@@ -65,7 +66,7 @@ export const dictionaryService = {
   opticalDriveFormFactors: createDictService('optical-drive-form-factors', false),
   expansionInterfaces: createDictService('expansion-interfaces', false),
   audioChipsets: createDictService('audio-chipsets', false),
-  wirelessProtocols: createDictService('wireless-protocols', false),
+  wirelessProtocols: createDictService('wireless-protocols', false)
 };
 
 export type DictionaryName = keyof typeof dictionaryService;
