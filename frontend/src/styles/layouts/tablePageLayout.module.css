@@ -116,6 +116,10 @@
   background-color: var(--bg-hover);
 }
 
+.selfRow {
+  background-color: color-mix(in srgb, var(--primary-color) 8%, transparent);
+}
+
 .iconSuccess:hover { color: var(--status-info); }
 .iconEdit:hover { color: var(--primary-color); }
 .iconDanger:hover { color: var(--status-critical); }

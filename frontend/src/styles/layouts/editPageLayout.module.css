@@ -234,6 +234,19 @@
   gap: 12px;
 }
 
+.warningBanner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background-color: color-mix(in srgb, var(--status-medium) 15%, transparent);
+  color: var(--status-medium);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 500;
+  margin-top: 8px;
+}
+
 @media (max-width: 1000px) {
   .rightColumnWide, .leftColumn {
     flex: auto;

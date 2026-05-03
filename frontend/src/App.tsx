@@ -15,6 +15,8 @@ import { MappingsPage } from './pages/MappingsPage/MappingsPage';
 import { MappingEditPage } from './pages/MappingEditPage/MappingEditPage';
 import { RulesPage } from './pages/RulesPage/RulesPage';
 import { RuleEditPage } from './pages/RuleEditPage/RuleEditPage';
+import { UsersPage } from './pages/UsersPage/UsersPage';
+import { UserEditPage } from './pages/UserEditPage/UserEditPage';
 import { LoginPage } from './pages/LoginPage/LoginPage';
 import './styles/globals.css';
 
@@ -61,7 +63,8 @@ export const App = () => {
                 <Route path="compatibility/:id" element={<RuleEditPage />} />
                 <Route path="mappings" element={<MappingsPage />} />
                 <Route path="mappings/:id" element={<MappingEditPage />} />
-                {/* <Route path="users" element={<UsersPage />} /> В будущем */}
+                <Route path="users" element={<UsersPage />} />
+                <Route path="users/:id" element={<UserEditPage />} />
               </Route>
             </Route>
           </Route>

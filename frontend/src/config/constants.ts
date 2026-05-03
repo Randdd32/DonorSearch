@@ -20,6 +20,7 @@ export const API_ENDPOINTS = {
   USERS: {
     BASE: USERS_BASE,
     ME: `${USERS_BASE}/me`,
+    DETAILS: (id: number | string) => `${USERS_BASE}/${id}`,
     REVOKE_SESSIONS: (id: number | string) => `${USERS_BASE}/${id}/revoke-sessions`,
   },
   COMPONENTS: {
