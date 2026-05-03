@@ -89,7 +89,7 @@ export const LoginPage = () => {
             <label className={styles.label}>Пароль</label>
             <Input 
               type="password" 
-              placeholder="••••••••" 
+              placeholder="•••••••••••••••••••" 
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               disabled={isLoading}
