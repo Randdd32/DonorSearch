@@ -42,6 +42,25 @@ const processQueue = (error: unknown, token: string | null = null) => {
   failedQueue =[];
 };
 
+const translateErrorMessage = (msg: string): string => {
+  if (msg.includes('Username already exists')) {
+    return 'Пользователь с таким логином уже существует.';
+  }
+  if (msg.includes('Mapping for external name') && msg.includes('already exists')) {
+    return 'Связь для такого внешнего названия уже существует.';
+  }
+  if (msg.includes('Compatibility rule with code') && msg.includes('already exists')) {
+    return 'Правило с таким кодом уже существует.';
+  }
+  if (msg.includes('Validation failed')) {
+    return 'Ошибка валидации. Проверьте правильность заполнения полей.';
+  }
+  if (msg.includes('Database constraint violation')) {
+    return 'Нарушение уникальности данных (запись уже существует).';
+  }
+  return msg;
+};
+
 apiClient.interceptors.request.use((config) => {
   const token = useAuthStore.getState().accessToken;
   if (token && config.headers) {
@@ -114,7 +133,7 @@ apiClient.interceptors.response.use(
       !originalRequest.url?.includes(API_ENDPOINTS.AUTH.LOGIN)
     ) {
       const message = error.response?.data?.message || 'An unexpected server error occurred';
-      toast.error(message);
+      toast.error(translateErrorMessage(message));
     }
 
     return Promise.reject(error);

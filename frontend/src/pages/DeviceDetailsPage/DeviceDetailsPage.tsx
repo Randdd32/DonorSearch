@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, ShieldAlert, CheckCircle2, Search } from 'lucide-react';
+import { useAuthStore } from '../../store/authStore';
 import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 import { useDeviceDetails } from '../../features/devices/hooks/useDeviceDetails';
 import { useRunSearch } from '../../features/search/hooks/useRunSearch';
@@ -21,6 +22,8 @@ const ALL_CATEGORIES: ExternalComponentCategory[] =[
 export const DeviceDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+
+  const { isAdmin } = useAuthStore();
   
   const { data: device, isLoading, isError } = useDeviceDetails(Number(id));
   
@@ -267,7 +270,7 @@ export const DeviceDetailsPage = () => {
                         </div>
 
                         <div className={styles.compActions}>
-                          {!isMapped && (
+                          {!isMapped && isAdmin && (
                             <Button 
                               variant="secondary" 
                               onClick={() => {

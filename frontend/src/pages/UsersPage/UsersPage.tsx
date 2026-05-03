@@ -129,7 +129,10 @@ export const UsersPage = () => {
                 >
                   <TableCell className={styles.muted}>{row.id}</TableCell>
                   <TableCell className={styles.bold}>
-                    {row.username} {isSelf && <Badge variant="info">Вы</Badge>}
+                    <div className={styles.nameWithBadge}>
+                      {row.username}
+                      {isSelf && <Badge variant="info">Вы</Badge>}
+                    </div>
                   </TableCell>
                   <TableCell>
                     <Badge variant={row.role === 'SUPERADMIN' ? 'danger' : row.role === 'ADMIN' ? 'warning' : 'default'}>

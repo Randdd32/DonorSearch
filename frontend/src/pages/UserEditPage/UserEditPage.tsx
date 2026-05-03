@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Save, AlertTriangle } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { isAxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import toast from 'react-hot-toast';
 import { useAuthStore } from '../../store/authStore';
 import { usersService } from '../../services/users.service';
@@ -83,12 +83,9 @@ const UserForm = ({ isNew, id, originalData }: UserFormProps) => {
         navigate('/users');
       }
     },
-    onError: (e: unknown) => {
-      if (isAxiosError(e)) {
-        const msg = e.response?.data?.message || 'Ошибка сервера';
-        toast.error(msg);
-      } else if (e instanceof Error) {
-        toast.error(e.message);
+    onError: (e: Error | AxiosError<{ message: string }>) => {
+      if (!(e instanceof AxiosError)) {
+        toast.error(e.message || 'Ошибка валидации');
       }
     }
   });
