@@ -3,17 +3,19 @@
   align-items: center;
   justify-content: center;
   min-height: 100vh;
+  width: 100%;
+  flex: 1;
   background-color: var(--bg-primary);
   padding: 20px;
 }
 
 .card {
   width: 100%;
-  max-width: 400px;
+  max-width: 480px;
   display: flex;
   flex-direction: column;
   gap: 24px;
-  padding: 32px;
+  padding: 40px;
 }
 
 .header {
@@ -55,4 +57,11 @@
 .submitBtn {
   margin-top: 8px;
   height: 44px;
+}
+
+@media (max-width: 480px) {
+  .card {
+    padding: 24px;
+    gap: 20px;
+  }
 }
