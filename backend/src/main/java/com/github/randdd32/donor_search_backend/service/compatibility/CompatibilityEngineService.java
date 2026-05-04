@@ -18,7 +18,8 @@ import org.springframework.expression.spel.SpelEvaluationException;
 import org.springframework.expression.spel.SpelMessage;
 import org.springframework.expression.spel.SpelParserConfiguration;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
-import org.springframework.expression.spel.support.StandardEvaluationContext;
+import org.springframework.expression.spel.support.DataBindingMethodResolver;
+import org.springframework.expression.spel.support.SimpleEvaluationContext;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -43,7 +44,9 @@ public class CompatibilityEngineService {
 
         List<CompatibilityRuleEntity> rules = ruleService.getActiveRulesByComponentType(targetType);
 
-        StandardEvaluationContext context = new StandardEvaluationContext();
+        SimpleEvaluationContext context = SimpleEvaluationContext.forReadOnlyDataBinding()
+                .withInstanceMethods()
+                .build();
         context.setVariable("ctx", buildContext);
 
         for (CompatibilityRuleEntity rule : rules) {
