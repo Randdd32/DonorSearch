@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, SearchX, Filter, Search, Download, Printer } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { isAxiosError } from 'axios';
 import { searchService } from '../../services/search.service';
 import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 import { useSearchResults } from '../../features/search/hooks/useSearchResults';
@@ -53,8 +54,10 @@ export const SearchResultsPage = () => {
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
-    } catch {
-      toast.error('Ошибка при скачивании PDF отчета');
+    } catch (e) {
+      if (!isAxiosError(e)) {
+        toast.error('Внутренняя ошибка при скачивании PDF отчета');
+      }
     } finally {
       setIsExporting(false);
     }
@@ -63,22 +66,19 @@ export const SearchResultsPage = () => {
   const handlePrint = async () => {
     try {
       setIsPrinting(true);
-
       const blob = await searchService.exportPdf(sessionId!, filters);
       const url = URL.createObjectURL(blob);
-
       const win = window.open(url);
-
       if (win) {
         win.onload = () => {
           win.focus();
           win.print();
         };
       }
-
     } catch (e) {
-      toast.error('Ошибка при подготовке документа к печати');
-      console.error(e);
+      if (!isAxiosError(e)) {
+        toast.error('Внутренняя ошибка при подготовке документа к печати');
+      }
     } finally {
       setIsPrinting(false);
     }
