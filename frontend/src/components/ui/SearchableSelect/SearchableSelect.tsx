@@ -1,7 +1,6 @@
 import AsyncSelect from 'react-select/async';
 import { useState, useEffect } from 'react';
 import debounce from 'lodash.debounce';
-import toast from 'react-hot-toast';
 import { getSelectStyles } from '../../../utils/selectStyles';
 import type { MultiValue, SingleValue } from 'react-select';
 import type { SelectOption } from '../../../services/dictionary.service';
@@ -40,9 +39,7 @@ export const SearchableSelect = ({
         const idsToFetch = isMulti ? (value as (number | string)[]) :[value as number | string];
         const fetched = await fetchByIds(idsToFetch);
         setSelectedOptions(isMulti ? fetched : (fetched.length > 0 ? fetched[0] : null));
-      } catch (error) {
-        const msg = error instanceof Error ? error.message : 'Неизвестная ошибка';
-        toast.error('Ошибка при загрузке значений: ' + msg);
+      } catch {
         setSelectedOptions(isMulti ?[] : null);
       } finally {
         setIsLoadingInitial(false);
@@ -54,8 +51,7 @@ export const SearchableSelect = ({
   const loadOptions = debounce((inputValue: string, callback: (options: SelectOption[]) => void) => {
     fetchOptions(inputValue)
       .then(options => callback(options))
-      .catch(e => {
-        toast.error('Ошибка поиска: ' + e?.message);
+      .catch(() => {
         callback([]);
       });
   }, 300);

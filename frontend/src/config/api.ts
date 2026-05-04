@@ -10,7 +10,7 @@ export const apiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 30000,
+  timeout: 15000,
   withCredentials: true,
   paramsSerializer: (params) => {
     const searchParams = new URLSearchParams();
@@ -25,6 +25,9 @@ export const apiClient = axios.create({
     return searchParams.toString();
   }
 });
+
+let lastNetworkErrorToastTime = 0;
+const NETWORK_ERROR_COOLDOWN_MS = 5000;
 
 let isRefreshing = false;
 let failedQueue: Array<{ resolve: (value: string | null) => void; reject: (reason?: unknown) => void }> =[];
@@ -78,7 +81,22 @@ apiClient.interceptors.response.use(
   async (error: AxiosError<ApiErrorResponse>) => {
     const originalRequest = error.config as RetryConfig | undefined;
 
-    if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
+    const status = error.response?.status;
+    const isNetworkError = !error.response && (error.code === 'ERR_NETWORK' || error.message === 'Network Error');
+    const isGatewayError = status === 502 || status === 503 || status === 504;
+
+    if (isNetworkError || isGatewayError) {
+      const now = Date.now();
+      if (now - lastNetworkErrorToastTime > NETWORK_ERROR_COOLDOWN_MS) {
+        toast.error('Сервер недоступен. Проверьте подключение к сети или обратитесь к администратору.', {
+          id: 'global-network-error'
+        });
+        lastNetworkErrorToastTime = now;
+      }
+      return Promise.reject(error);
+    }
+
+    if (status === 401 && originalRequest && !originalRequest._retry) {
       if (originalRequest.url?.includes(API_ENDPOINTS.AUTH.REFRESH)) {
         useAuthStore.getState().logout();
         return Promise.reject(error);
@@ -127,12 +145,12 @@ apiClient.interceptors.response.use(
     }
 
     if (
-      !silentStatuses.includes(error.response?.status ?? 0) &&
+      !silentStatuses.includes(status ?? 0) &&
       originalRequest &&
       !originalRequest.url?.includes(API_ENDPOINTS.COMPATIBILITY_RULES.VALIDATE_EXPRESSION) &&
       !originalRequest.url?.includes(API_ENDPOINTS.AUTH.LOGIN)
     ) {
-      const message = error.response?.data?.message || 'An unexpected server error occurred';
+      const message = error.response?.data?.message || 'Произошла непредвиденная ошибка сервера';
       toast.error(translateErrorMessage(message));
     }
 
