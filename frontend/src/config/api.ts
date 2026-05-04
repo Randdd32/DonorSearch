@@ -45,23 +45,39 @@ const processQueue = (error: unknown, token: string | null = null) => {
   failedQueue =[];
 };
 
-const translateErrorMessage = (msg: string): string => {
-  if (msg.includes('Username already exists')) {
-    return 'Пользователь с таким логином уже существует.';
+const translateErrorMessage = (errorCode?: string, msg?: string): string => {
+  const defaultMsg = 'Произошла непредвиденная ошибка сервера';
+  if (!msg && !errorCode) return defaultMsg;
+
+  switch (errorCode) {
+    case 'DATA_INTEGRITY_VIOLATION':
+      return 'Нарушение уникальности данных (запись уже существует или используется).';
+    case 'DTO_VALIDATION_FAILED':
+    case 'MALFORMED_JSON_OR_TYPE_MISMATCH':
+      return 'Ошибка валидации. Проверьте правильность заполнения полей.';
+    case 'RESOURCE_NOT_FOUND':
+    case 'ENDPOINT_NOT_FOUND':
+      return 'Запрашиваемый ресурс не найден.';
+    case 'METHOD_NOT_ALLOWED':
+      return 'Этот метод запроса не поддерживается сервером.';
   }
-  if (msg.includes('Mapping for external name') && msg.includes('already exists')) {
-    return 'Связь для такого внешнего названия уже существует.';
+
+  if (msg) {
+    if (msg.includes('Username already exists')) return 'Пользователь с таким логином уже существует.';
+    if (msg.includes('Mapping for external name') && msg.includes('already exists')) return 'Связь для такого внешнего названия уже существует.';
+    if (msg.includes('Compatibility rule with code') && msg.includes('already exists')) return 'Правило с таким кодом уже существует.';
+    
+    if (msg.includes('You cannot change your own role')) return 'Вы не можете изменить собственную системную роль.';
+    if (msg.includes('Password does not meet security requirements')) return 'Пароль не соответствует требованиям безопасности (8-60 символов, заглавные/строчные латинские буквы, цифра и спецсимвол).';
+    if (msg.includes('Nobody has permission to')) return 'У вас нет прав для выполнения действий над Суперадминистратором.';
+    if (msg.includes('You do not have permission to')) return 'Недостаточно прав для выполнения этого действия.';
+    if (msg.includes('Session has expired')) return 'Время сессии истекло. Пожалуйста, войдите заново.';
+    if (msg.includes('Invalid session (fingerprint mismatch)')) return 'Сессия недействительна (возможно, выполнен вход с другого устройства).';
+
+    return msg;
   }
-  if (msg.includes('Compatibility rule with code') && msg.includes('already exists')) {
-    return 'Правило с таким кодом уже существует.';
-  }
-  if (msg.includes('Validation failed')) {
-    return 'Ошибка валидации. Проверьте правильность заполнения полей.';
-  }
-  if (msg.includes('Database constraint violation')) {
-    return 'Нарушение уникальности данных (запись уже существует).';
-  }
-  return msg;
+
+  return defaultMsg;
 };
 
 apiClient.interceptors.request.use((config) => {
@@ -150,8 +166,9 @@ apiClient.interceptors.response.use(
       !originalRequest.url?.includes(API_ENDPOINTS.COMPATIBILITY_RULES.VALIDATE_EXPRESSION) &&
       !originalRequest.url?.includes(API_ENDPOINTS.AUTH.LOGIN)
     ) {
-      const message = error.response?.data?.message || 'Произошла непредвиденная ошибка сервера';
-      toast.error(translateErrorMessage(message));
+      const errorCode = error.response?.data?.error;
+      const message = error.response?.data?.message;
+      toast.error(translateErrorMessage(errorCode, message));
     }
 
     return Promise.reject(error);
