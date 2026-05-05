@@ -24,13 +24,12 @@ public final class Constants {
             "3E1E48C8-D9D3-4B89-8C8F-39A76EAC779D"  // Промышленный ПК
     );
 
-    // TODO: Заменить на UUID, когда посмотрю нужные
-    public static final List<String> ALLOWED_STATE_NAMES = List.of(
-            "Неучтенное",
-            "Хранение",
-            "Использование",
-            "Ремонт",
-            "Списано"
+    public static final List<String> ALLOWED_STATE_UUIDS = List.of(
+            "6FDB9CA8-5F27-44B7-B75B-A457801BA998", // Неучтенное
+            "9A1D33B2-01BF-4847-90F1-B5D6A5A9EDEB", // Хранение
+            "C101D9C1-E716-44D4-A7DE-C8BAEDD5EF02", // Использование
+            "D9AB971A-3008-4251-A5F0-E3E6463FFA18", // Ремонт
+            "FAEF7C1B-51F6-4DD8-A4AE-54DA2F2C6AA5"  // Списано
     );
 
     private Constants() {

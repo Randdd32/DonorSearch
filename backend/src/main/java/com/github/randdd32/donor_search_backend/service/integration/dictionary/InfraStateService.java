@@ -39,11 +39,11 @@ public class InfraStateService extends AbstractInfraDictionaryService {
 
     @Override
     protected String getAdditionalWhere() {
-        return " AND s.[Name] IN (:allowedStates) ";
+        return " AND s.[ID] IN (:allowedStates) ";
     }
 
     @Override
     protected void addAdditionalParameters(MapSqlParameterSource params) {
-        params.addValue("allowedStates", Constants.ALLOWED_STATE_NAMES);
+        params.addValue("allowedStates", Constants.ALLOWED_STATE_UUIDS);
     }
 }
