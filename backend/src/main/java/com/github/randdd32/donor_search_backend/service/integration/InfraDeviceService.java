@@ -104,7 +104,7 @@ public class InfraDeviceService {
             SELECT TOP 1 * 
             FROM dbo.[Asset] a_inner 
             WHERE a_inner.[DeviceID] = pc.[Идентификатор] 
-            ORDER BY a_inner.[DateInquiry] DESC, a_inner.[DateReceived] DESC
+            ORDER BY a_inner.[DateInquiry] DESC, a_inner.[DateReceived] DESC, a_inner.[ID] DESC
         ) a
         LEFT JOIN dbo.[LifeCycleState] state ON a.[LifeCycleStateID] = state.[ID]
         LEFT JOIN dbo.[Типы оконечного оборудования] too ON NULLIF(pc.[ИД типа ОО], 0) = too.[Идентификатор]
