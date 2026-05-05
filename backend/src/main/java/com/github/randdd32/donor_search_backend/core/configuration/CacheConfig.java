@@ -16,7 +16,8 @@ public class CacheConfig {
     public Cache<@NonNull String, List<DonorResultDto>> donorSearchCache() {
         return Caffeine.newBuilder()
                 .expireAfterWrite(30, TimeUnit.MINUTES)
-                .maximumSize(100)
+                .maximumWeight(100_000)
+                .weigher((@NonNull String key, @NonNull List<DonorResultDto> value) -> value.size())
                 .build();
     }
 }
