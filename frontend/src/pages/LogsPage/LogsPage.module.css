@@ -51,6 +51,17 @@
   margin-bottom: 2px;
 }
 
+.searchContainer {
+  width: 250px;
+}
+
+.highlight {
+  background-color: rgba(250, 204, 21, 0.3);
+  color: #fef08a;
+  border-radius: 2px;
+  padding: 0 2px;
+}
+
 .logInfo { color: #38bdf8; }
 .logWarn { color: #facc15; }
 .logError { color: #f87171; font-weight: bold; }

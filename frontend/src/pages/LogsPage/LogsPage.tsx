@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
-import { Download, RefreshCw } from 'lucide-react';
+import { useState, useEffect, useRef, useMemo } from 'react';
+import { Download, RefreshCw, Search } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { clsx } from 'clsx';
 import { isAxiosError } from 'axios';
@@ -9,6 +9,7 @@ import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 import { saveBlobAsFile } from '../../utils/downloadUtils';
 import { Button } from '../../components/ui/Button/Button';
 import { Select } from '../../components/ui/Select/Select';
+import { Input } from '../../components/ui/Input/Input';
 import { Spinner } from '../../components/ui/Spinner/Spinner';
 import styles from './LogsPage.module.css';
 
@@ -16,6 +17,7 @@ export const LogsPage = () => {
   useDocumentTitle('Системные логи');
   
   const [selectedFile, setSelectedFile] = useState<string>('');
+  const [searchTerm, setSearchTerm] = useState<string>('');
   const [isDownloading, setIsDownloading] = useState(false);
   const terminalRef = useRef<HTMLDivElement>(null);
 
@@ -27,14 +29,21 @@ export const LogsPage = () => {
   const { data: lines, isLoading, isFetching, refetch } = useQuery({
     queryKey: ['logTail', selectedFile],
     queryFn: () => logsService.getTail(selectedFile || undefined, 1000),
-    refetchInterval: selectedFile === '' || selectedFile === 'application.log' ? 5000 : false
+    refetchInterval: selectedFile === '' || selectedFile === 'application.log' ? 30000 : false
   });
 
+  const filteredLines = useMemo(() => {
+    if (!lines) return [];
+    if (!searchTerm.trim()) return lines;
+    const lowerSearch = searchTerm.toLowerCase();
+    return lines.filter(line => line.toLowerCase().includes(lowerSearch));
+  }, [lines, searchTerm]);
+
   useEffect(() => {
-    if (terminalRef.current) {
+    if (terminalRef.current && !searchTerm) {
       terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
     }
-  }, [lines]);
+  }, [lines, searchTerm]);
 
   const fileOptions = files?.map(f => {
     const sizeMb = (f.sizeBytes / 1024 / 1024).toFixed(2);
@@ -60,6 +69,16 @@ export const LogsPage = () => {
     }
   };
 
+  const highlightText = (text: string, highlight: string) => {
+    if (!highlight.trim()) return text;
+    const parts = text.split(new RegExp(`(${highlight})`, 'gi'));
+    return parts.map((part, i) => 
+      part.toLowerCase() === highlight.toLowerCase() ? (
+        <span key={i} className={styles.highlight}>{part}</span>
+      ) : part
+    );
+  };
+
   const getLineClass = (line: string) => {
     if (line.includes(' ERROR ')) return styles.logError;
     if (line.includes(' WARN ')) return styles.logWarn;
@@ -77,10 +96,23 @@ export const LogsPage = () => {
         </div>
         
         <div className={styles.controls}>
+          <div className={styles.searchContainer}>
+            <Input 
+              icon={<Search size={16} />}
+              placeholder="Поиск по тексту..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onClear={() => setSearchTerm('')}
+            />
+          </div>
+
           <div className={styles.fileSelect}>
             <Select 
               value={selectedFile}
-              onChange={(val) => setSelectedFile(val as string)}
+              onChange={(val) => {
+                setSelectedFile(val as string);
+                setSearchTerm('');
+              }}
               options={[{ value: '', label: 'Текущий лог (application.log)' }, ...fileOptions.filter(o => o.value !== 'application.log')]}
             />
           </div>
@@ -98,12 +130,14 @@ export const LogsPage = () => {
       <div className={styles.terminalWrapper} ref={terminalRef}>
         {isLoading ? (
           <Spinner fullPage />
-        ) : lines?.length === 0 ? (
-          <div className={styles.logDefault}>Файл логов пуст.</div>
+        ) : filteredLines.length === 0 ? (
+          <div className={styles.logDefault}>
+            {searchTerm ? 'По вашему запросу ничего не найдено.' : 'Файл логов пуст.'}
+          </div>
         ) : (
-          lines?.map((line, idx) => (
+          filteredLines.map((line, idx) => (
             <div key={idx} className={clsx(styles.logLine, getLineClass(line))}>
-              {line}
+              {highlightText(line, searchTerm)}
             </div>
           ))
         )}
