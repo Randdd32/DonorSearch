@@ -29,7 +29,7 @@ export const LogsPage = () => {
   const { data: lines, isLoading, isFetching, refetch } = useQuery({
     queryKey: ['logTail', selectedFile],
     queryFn: () => logsService.getTail(selectedFile || undefined, 1000),
-    refetchInterval: selectedFile === '' || selectedFile === 'application.log' ? 30000 : false
+    refetchInterval: selectedFile === '' || selectedFile === 'application.log' ? 60000 : false
   });
 
   const filteredLines = useMemo(() => {
