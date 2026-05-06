@@ -29,6 +29,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    volumes:
+      - app_logs:/app/logs
     environment:
       SPRING_PROFILES_ACTIVE: prod 
       SPRING_JPA_HIBERNATE_DDL_AUTO: ${DDL_AUTO:-validate} 
@@ -107,6 +109,7 @@ services:
 
 volumes:
   postgres_data:
+  app_logs:
 
 networks:
   internal:

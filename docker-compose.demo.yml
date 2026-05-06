@@ -56,6 +56,8 @@ services:
         condition: service_healthy
       infra-init:
         condition: service_completed_successfully
+    volumes:
+      - app_logs:/app/logs
     environment:
       SPRING_PROFILES_ACTIVE: prod 
       SPRING_JPA_HIBERNATE_DDL_AUTO: ${DDL_AUTO} 
@@ -127,6 +129,7 @@ services:
 
 volumes:
   postgres_data:
+  app_logs:
 
 networks:
   internal:
