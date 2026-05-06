@@ -60,6 +60,14 @@ const translateErrorMessage = (errorCode?: string, msg?: string): string => {
       return 'Запрашиваемый ресурс не найден.';
     case 'METHOD_NOT_ALLOWED':
       return 'Этот метод запроса не поддерживается сервером.';
+    case 'ACCESS_DENIED':
+      return 'Доступ запрещен. Недостаточно прав для выполнения операции.';
+    case 'UNSUPPORTED_MEDIA_TYPE':
+      return 'Неподдерживаемый формат данных. Требуется application/json.';
+    case 'SECURITY_VIOLATION':
+      return 'Нарушение безопасности: попытка доступа к защищенным файлам сервера.';
+    case 'IO_ERROR':
+      return 'Ошибка ввода-вывода при чтении файла на сервере.';
   }
 
   if (msg) {
@@ -74,6 +82,9 @@ const translateErrorMessage = (errorCode?: string, msg?: string): string => {
     if (msg.includes('Session has expired')) return 'Время сессии истекло. Пожалуйста, войдите заново.';
     if (msg.includes('Invalid session (fingerprint mismatch)')) return 'Сессия недействительна (возможно, выполнен вход с другого устройства).';
 
+    if (msg.includes('Log file not found')) return 'Запрашиваемый файл логов не найден на сервере.';
+    if (msg.includes('Lines count must be')) return 'Количество запрашиваемых строк должно быть от 1 до 5000.';
+    
     return msg;
   }
 

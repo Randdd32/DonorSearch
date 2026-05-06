@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { clsx } from 'clsx';
-import { Server, ListChecks, Link as LinkIcon, LogOut, Sun, Moon, Menu, Monitor, ChevronDown, User, Users } from 'lucide-react';
+import { Server, ListChecks, Link as LinkIcon, LogOut, 
+  Sun, Moon, Menu, Monitor, ChevronDown, User, Users, Terminal } from 'lucide-react';
 import { ROLE_LABELS } from '../../types/auth';
 import { useUiStore } from '../../store/uiStore';
 import { useAuthStore } from '../../store/authStore';
@@ -70,7 +71,8 @@ export const DashboardLayout = () => {
             [
               { path: '/compatibility', label: 'Правила совместимости', icon: ListChecks },
               { path: '/mappings', label: 'Таблица сопоставления', icon: LinkIcon },
-              { path: '/users', label: 'Управление доступом', icon: Users }
+              { path: '/users', label: 'Управление доступом', icon: Users },
+              { path: '/logs', label: 'Системные логи', icon: Terminal }
             ].map((item) => {
               const Icon = item.icon;
               return (

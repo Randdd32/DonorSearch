@@ -32,6 +32,14 @@
   src: url('/fonts/inter-700.woff2') format('woff2');
 }
 
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/jetbrains-mono-400.woff2') format('woff2');
+}
+
 * {
   box-sizing: border-box;
   margin: 0;

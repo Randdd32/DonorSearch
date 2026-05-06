@@ -10,6 +10,7 @@ const DICT_BASE = '/dictionaries';
 const MAPPINGS_BASE = '/mappings';
 const RULES_BASE = '/compatibility-rules';
 const SEARCH_BASE = '/search';
+const LOGS_BASE = '/logs';
 
 export const API_ENDPOINTS = {
   AUTH: {
@@ -59,5 +60,10 @@ export const API_ENDPOINTS = {
     RUN: `${SEARCH_BASE}/run`,
     RESULTS: (sessionId: string) => `${SEARCH_BASE}/results/${sessionId}`,
     EXPORT_PDF: (sessionId: string) => `${SEARCH_BASE}/results/${sessionId}/export/pdf`,
+  },
+  LOGS: {
+    FILES: `${LOGS_BASE}/files`,
+    TAIL: `${LOGS_BASE}/tail`,
+    DOWNLOAD: `${LOGS_BASE}/download`
   }
 } as const;

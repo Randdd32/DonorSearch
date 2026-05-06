@@ -18,6 +18,7 @@ import { RuleEditPage } from './pages/RuleEditPage/RuleEditPage';
 import { UsersPage } from './pages/UsersPage/UsersPage';
 import { UserEditPage } from './pages/UserEditPage/UserEditPage';
 import { LoginPage } from './pages/LoginPage/LoginPage';
+import { LogsPage } from './pages/LogsPage/LogsPage';
 import './styles/globals.css';
 
 const queryClient = new QueryClient({
@@ -65,6 +66,7 @@ export const App = () => {
                 <Route path="mappings/:id" element={<MappingEditPage />} />
                 <Route path="users" element={<UsersPage />} />
                 <Route path="users/:id" element={<UserEditPage />} />
+                <Route path="logs" element={<LogsPage />} />
               </Route>
             </Route>
           </Route>

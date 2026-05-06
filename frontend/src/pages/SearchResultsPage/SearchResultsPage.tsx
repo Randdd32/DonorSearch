@@ -6,6 +6,7 @@ import { isAxiosError } from 'axios';
 import { searchService } from '../../services/search.service';
 import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 import { useSearchResults } from '../../features/search/hooks/useSearchResults';
+import { saveBlobAsFile } from '../../utils/downloadUtils';
 import { DonorCard } from '../../features/search/components/DonorCard/DonorCard';
 import { Button } from '../../components/ui/Button/Button';
 import { Spinner } from '../../components/ui/Spinner/Spinner';
@@ -46,14 +47,7 @@ export const SearchResultsPage = () => {
     try {
       setIsExporting(true);
       const blob = await searchService.exportPdf(sessionId!, filters);
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `donor-report.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
+      saveBlobAsFile(blob, 'donor-report.pdf');
     } catch (e) {
       if (!isAxiosError(e)) {
         toast.error('Внутренняя ошибка при скачивании PDF отчета');
