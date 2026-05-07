@@ -22,10 +22,31 @@
   font-size: 14px;
 }
 
-.controls {
+.controlsArea {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  max-width: 650px;
+}
+
+.searchContainer {
+  width: 100%;
+}
+
+.actionRow {
   display: flex;
   gap: 12px;
   align-items: center;
+  width: 100%;
+}
+
+.actionRow > button {
+  height: 40px;
+}
+
+.fileSelect {
+  flex: 1;
 }
 
 .fileSelect {
@@ -49,10 +70,6 @@
   white-space: pre-wrap;
   word-break: break-all;
   margin-bottom: 2px;
-}
-
-.searchContainer {
-  width: 250px;
 }
 
 .highlight {

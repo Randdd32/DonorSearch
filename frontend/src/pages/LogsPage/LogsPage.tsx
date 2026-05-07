@@ -95,7 +95,7 @@ export const LogsPage = () => {
           <p>Мониторинг работы алгоритмов и состояния сервера</p>
         </div>
         
-        <div className={styles.controls}>
+        <div className={styles.controlsArea}>
           <div className={styles.searchContainer}>
             <Input 
               icon={<Search size={16} />}
@@ -106,24 +106,26 @@ export const LogsPage = () => {
             />
           </div>
 
-          <div className={styles.fileSelect}>
-            <Select 
-              value={selectedFile}
-              onChange={(val) => {
-                setSelectedFile(val as string);
-                setSearchTerm('');
-              }}
-              options={[{ value: '', label: 'Текущий лог (application.log)' }, ...fileOptions.filter(o => o.value !== 'application.log')]}
-            />
+          <div className={styles.actionRow}>
+            <div className={styles.fileSelect}>
+              <Select 
+                value={selectedFile}
+                onChange={(val) => {
+                  setSelectedFile(val as string);
+                  setSearchTerm('');
+                }}
+                options={[{ value: '', label: 'Текущий лог (application.log)' }, ...fileOptions.filter(o => o.value !== 'application.log')]}
+              />
+            </div>
+            
+            <Button variant="secondary" onClick={() => refetch()} isLoading={isFetching}>
+              <RefreshCw size={16} /> Обновить
+            </Button>
+            
+            <Button onClick={handleDownload} isLoading={isDownloading}>
+              <Download size={16} /> Скачать
+            </Button>
           </div>
-          
-          <Button variant="secondary" onClick={() => refetch()} isLoading={isFetching}>
-            <RefreshCw size={16} /> Обновить
-          </Button>
-          
-          <Button onClick={handleDownload} isLoading={isDownloading}>
-            <Download size={16} /> Скачать
-          </Button>
         </div>
       </div>
 
