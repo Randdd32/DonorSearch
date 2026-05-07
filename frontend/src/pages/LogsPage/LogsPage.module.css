@@ -13,15 +13,21 @@
   gap: 8px;
 }
 
-.titleBlock h1 {
+.titleBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.title {
   font-size: 24px;
   font-weight: 700;
   color: var(--text-primary);
 }
 
-.titleBlock p {
-  color: var(--text-secondary);
+.subtitle {
   font-size: 14px;
+  color: var(--text-secondary);
 }
 
 .controlsArea {

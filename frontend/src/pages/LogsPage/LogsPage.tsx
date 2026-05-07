@@ -91,8 +91,8 @@ export const LogsPage = () => {
     <div className={styles.container}>
       <div className={styles.header}>
         <div className={styles.titleBlock}>
-          <h1>События системы (логи)</h1>
-          <p>Мониторинг работы алгоритмов и состояния сервера</p>
+          <h1 className={styles.title}>События системы (логи)</h1>
+          <p className={styles.subtitle}>Мониторинг работы алгоритмов и состояния сервера</p>
         </div>
         
         <div className={styles.controlsArea}>
