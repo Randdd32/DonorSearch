@@ -84,29 +84,10 @@ public class IntegrationMappingService extends AbstractCrudService<IntegrationMa
 
         String cleanName = externalName.trim();
         Optional<IntegrationMappingEntity> existing = repository.findByExternalNameIgnoreCase(cleanName);
-        if (existing.isPresent()) {
-            return existing.get();
-        }
 
-        Optional<ComponentScoreProjection> matchOpt = componentService.findBestMatchWithScore(cleanName, expectedType);
-        if (matchOpt.isEmpty()) {
-            return null;
-        }
-
-        ComponentScoreProjection match = matchOpt.get();
-        double score = match.getScore();
-
-        MappingConfidence confidence;
-        if (score >= 0.90) confidence = MappingConfidence.AUTO;
-        else if (score >= 0.60) confidence = MappingConfidence.NEEDS_REVIEW;
-        else confidence = MappingConfidence.BAD_MATCH;
-
-        IntegrationMappingEntity mapping = new IntegrationMappingEntity();
-        mapping.setExternalName(cleanName);
-        mapping.setInternalComponent(componentService.getById(match.getId()));
-        mapping.setConfidence(confidence);
-
-        return repository.save(mapping);
+        return existing.orElseGet(() -> componentService.findBestMatchWithScore(cleanName, expectedType)
+                .map(match -> createMappingFromMatch(cleanName, match))
+                .orElse(null));
     }
 
     @Transactional
@@ -127,21 +108,11 @@ public class IntegrationMappingService extends AbstractCrudService<IntegrationMa
             String lowerName = originalName.toLowerCase().trim();
 
             if (!result.containsKey(lowerName)) {
-                Optional<ComponentScoreProjection> matchOpt = componentService.findBestMatchWithScore(lowerName, expectedType);
-
-                if (matchOpt.isPresent()) {
-                    double score = matchOpt.get().getScore();
-                    MappingConfidence confidence = (score >= 0.90) ? MappingConfidence.AUTO :
-                            (score >= 0.60) ? MappingConfidence.NEEDS_REVIEW : MappingConfidence.BAD_MATCH;
-
-                    IntegrationMappingEntity newMapping = new IntegrationMappingEntity();
-                    newMapping.setExternalName(originalName.trim());
-                    newMapping.setInternalComponent(componentService.getById(matchOpt.get().getId()));
-                    newMapping.setConfidence(confidence);
-
-                    repository.save(newMapping);
-                    result.put(lowerName, newMapping);
-                }
+                componentService.findBestMatchWithScore(lowerName, expectedType)
+                        .ifPresent(match -> {
+                            IntegrationMappingEntity newMapping = createMappingFromMatch(originalName, match);
+                            result.put(lowerName, newMapping);
+                        });
             }
         }
 
@@ -174,5 +145,21 @@ public class IntegrationMappingService extends AbstractCrudService<IntegrationMa
         if (existing.isPresent() && !existing.get().getId().equals(id)) {
             throw new IllegalArgumentException("Mapping for external name '" + entity.getExternalName() + "' already exists");
         }
+    }
+
+    private IntegrationMappingEntity createMappingFromMatch(String externalName, ComponentScoreProjection match) {
+        double score = match.getScore();
+        MappingConfidence confidence;
+
+        if (score >= 0.90) confidence = MappingConfidence.AUTO;
+        else if (score >= 0.60) confidence = MappingConfidence.NEEDS_REVIEW;
+        else confidence = MappingConfidence.BAD_MATCH;
+
+        IntegrationMappingEntity mapping = new IntegrationMappingEntity();
+        mapping.setExternalName(externalName.trim());
+        mapping.setInternalComponent(componentService.getById(match.getId()));
+        mapping.setConfidence(confidence);
+
+        return repository.save(mapping);
     }
 }
