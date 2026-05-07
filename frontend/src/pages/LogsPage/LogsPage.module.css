@@ -10,11 +10,13 @@
   justify-content: space-between;
   align-items: flex-start;
   flex-shrink: 0;
+  gap: 8px;
 }
 
 .titleBlock h1 {
   font-size: 24px;
   font-weight: 700;
+  color: var(--text-primary);
 }
 
 .titleBlock p {

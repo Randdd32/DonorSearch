@@ -22,13 +22,11 @@
   font-size: 24px;
   font-weight: 700;
   color: var(--text-primary);
-  line-height: 1;
 }
 
 .subtitle {
   font-size: 14px;
   color: var(--text-secondary);
-  line-height: 1;
 }
 
 .controlsArea {
