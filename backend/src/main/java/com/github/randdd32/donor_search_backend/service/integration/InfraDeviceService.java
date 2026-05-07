@@ -366,37 +366,7 @@ public class InfraDeviceService {
             return new ArrayList<>(deviceMap.values());
         });
 
-        if (devices == null || devices.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        List<String> extNamesToFetch = devices.stream()
-                .flatMap(device -> device.components().stream())
-                .map(ExternalComponentDto::externalName)
-                .filter(name -> name != null && !name.isBlank())
-                .distinct()
-                .toList();
-
-        if (!extNamesToFetch.isEmpty()) {
-            Map<String, Long> mappedIdsCache = mappingService.getMappedComponentIds(extNamesToFetch);
-
-            for (ExternalDeviceDto device : devices) {
-                List<ExternalComponentDto> enrichedComponents = device.components().stream().map(c -> {
-                    Long mappedId = c.externalName() != null ? mappedIdsCache.get(c.externalName().toLowerCase()) : null;
-                    return new ExternalComponentDto(
-                            c.adapterId(), c.categoryId(), c.externalName(), c.category(),
-                            c.manufacturerId(), c.manufacturerName(), c.serialNumber(),
-                            c.note(), c.modelParameters(), c.modelNote(), c.modelProductNumber(),
-                            mappedId
-                    );
-                }).toList();
-
-                device.components().clear();
-                device.components().addAll(enrichedComponents);
-            }
-        }
-
-        return devices;
+        return devices == null ? Collections.emptyList() : devices;
     }
 
     private ExternalDeviceDto mapDeviceRow(ResultSet rs, int rowNum) throws SQLException {
