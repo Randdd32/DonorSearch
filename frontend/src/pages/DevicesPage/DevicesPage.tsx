@@ -45,18 +45,19 @@ export const DevicesPage = () => {
         </div>
 
         <div className={styles.controlsArea}>
-          <div className={styles.toolbar}>
-            <div className={styles.searchBar}>
-              <Input 
-                icon={<Search size={18} />} 
-                placeholder="Поиск по названию, инв. номеру или SN..." 
-                value={filters.search as string}
-                onChange={handleSearchChange}
-                onClear={() => updateFilters({ search: '' })}
-              />
-            </div>
+          <div className={styles.searchBar}>
+            <Input 
+              icon={<Search size={18} />} 
+              placeholder="Поиск по названию, инв. номеру или SN..." 
+              value={filters.search as string}
+              onChange={handleSearchChange}
+              onClear={() => updateFilters({ search: '' })}
+            />
+          </div>
 
+          <div className={styles.actionRow}>
             <SortSelect 
+              className={styles.sortSelect}
               value={filters.sort[0] || ''} 
               onChange={(val) => updateFilters({ sort: [val] })} 
               options={[
@@ -66,12 +67,12 @@ export const DevicesPage = () => {
                 { value: 'inventoryNumber,asc', label: 'По инв. номеру' }
               ]}
             />
+            
+            <Button variant="secondary" onClick={() => setIsFiltersOpen(true)} className={styles.filterBtn}>
+              <Filter size={18} />
+              <span className={styles.filterBtnText}>Фильтры</span>
+            </Button>
           </div>
-
-          <Button variant="secondary" onClick={() => setIsFiltersOpen(true)} className={styles.filterBtn}>
-            <Filter size={18} />
-            <span className={styles.filterBtnText}>Фильтры</span>
-          </Button>
         </div>
       </div>
 

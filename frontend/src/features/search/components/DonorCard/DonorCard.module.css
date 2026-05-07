@@ -51,6 +51,10 @@
   max-width: 100%;
 }
 
+.subItem svg {
+  flex-shrink: 0;
+}
+
 .truncate {
   white-space: nowrap;
   overflow: hidden;

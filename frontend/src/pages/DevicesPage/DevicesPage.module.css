@@ -38,25 +38,38 @@
   max-width: 600px;
 }
 
-.toolbar {
+.controlsArea {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-end;
   gap: 12px;
-  width: 100%;
+  flex: 1;
+  max-width: 600px;
 }
 
 .searchBar {
-  flex: 1;
-  min-width: 280px;
+  width: 100%;
+}
+
+.actionRow {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.sortSelect {
+  width: auto;
 }
 
 .filterBtn {
-  align-self: flex-end;
+  height: 40px;
 }
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
   gap: 20px;
 }
 
@@ -64,28 +77,48 @@
   margin-top: 16px; 
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1065px) {
   .controlsArea {
     max-width: 100%;
-    align-items: stretch;
   }
 }
 
 @media (max-width: 600px) {
   .header {
     flex-direction: column;
+    gap: 16px;
   }
-  .toolbar {
-    flex-direction: column;
-    align-items: stretch;
+  .title {
+    font-size: 20px;
   }
-  .searchBar {
-    min-width: 100%;
+  .actionRow {
+    justify-content: flex-end;
+    gap: 8px;
+  }
+  .sortSelect {
+    width: auto;
+    flex: initial;
   }
   .filterBtnText {
     display: none;
   }
-  .filterBtn {
-    align-self: stretch;
+}
+
+@media (max-width: 400px) {
+  .actionRow {
+    justify-content: space-between;
+  }
+  .sortSelect {
+    flex: 1;
+    min-width: 0;
+  }
+  .title {
+    font-size: 18px;
+  }
+  .subtitle {
+    font-size: 12px;
+  }
+  .grid {
+    gap: 16px;
   }
 }

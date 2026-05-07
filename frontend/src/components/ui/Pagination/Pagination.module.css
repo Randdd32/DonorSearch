@@ -102,3 +102,11 @@
   font-weight: 500;
   color: var(--text-secondary);
 }
+
+@media (max-width: 430px) {
+  .infoRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+}

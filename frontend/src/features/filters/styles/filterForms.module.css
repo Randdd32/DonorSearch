@@ -47,3 +47,10 @@
   letter-spacing: 0.5px;
   margin-bottom: -4px;
 }
+
+@media (max-width: 480px) {
+  .hierarchyGroup {
+    padding: 12px;
+    gap: 12px;
+  }
+}

@@ -87,4 +87,14 @@
   .sidebar {
     width: 100%;
   }
+  .header {
+    padding: 16px;
+  }
+  .content {
+    padding: 16px;
+    gap: 16px;
+  }
+  .footer {
+    padding: 16px;
+  }
 }
