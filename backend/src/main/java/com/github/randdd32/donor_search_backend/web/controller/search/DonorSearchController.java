@@ -1,6 +1,7 @@
 package com.github.randdd32.donor_search_backend.web.controller.search;
 
 import com.github.randdd32.donor_search_backend.core.configuration.Constants;
+import com.github.randdd32.donor_search_backend.core.log.NoLogging;
 import com.github.randdd32.donor_search_backend.service.search.DonorSearchService;
 import com.github.randdd32.donor_search_backend.service.search.PdfExportService;
 import com.github.randdd32.donor_search_backend.web.dto.filter.DonorSearchFilter;
@@ -51,6 +52,7 @@ public class DonorSearchController {
         return searchService.getResults(sessionId, filter, pageable);
     }
 
+    @NoLogging
     @GetMapping(value = "/results/{sessionId}/export/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
     public ResponseEntity<byte[]> exportPdf(
             @PathVariable String sessionId,

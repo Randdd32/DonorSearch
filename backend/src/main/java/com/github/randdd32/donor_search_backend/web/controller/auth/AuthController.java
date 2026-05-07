@@ -1,6 +1,7 @@
 package com.github.randdd32.donor_search_backend.web.controller.auth;
 
 import com.github.randdd32.donor_search_backend.core.configuration.Constants;
+import com.github.randdd32.donor_search_backend.core.log.NoLogging;
 import com.github.randdd32.donor_search_backend.service.auth.AuthService;
 import com.github.randdd32.donor_search_backend.web.dto.auth.AuthResponseDto;
 import com.github.randdd32.donor_search_backend.web.dto.auth.LoginRequestDto;
@@ -30,6 +31,7 @@ public class AuthController {
     private static final String REFRESH_COOKIE_NAME = "refreshToken";
     private static final String AUTH_PATH = Constants.API_URL + "/auth";
 
+    @NoLogging
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDto> login(@Valid @RequestBody LoginRequestDto request, HttpServletRequest httpRequest) {
         String ip = httpRequest.getRemoteAddr();

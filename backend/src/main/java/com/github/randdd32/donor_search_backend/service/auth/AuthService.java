@@ -1,6 +1,7 @@
 package com.github.randdd32.donor_search_backend.service.auth;
 
 import com.github.randdd32.donor_search_backend.core.configuration.security.JwtProvider;
+import com.github.randdd32.donor_search_backend.core.log.NoLogging;
 import com.github.randdd32.donor_search_backend.model.auth.RefreshSessionEntity;
 import com.github.randdd32.donor_search_backend.model.auth.UserEntity;
 import com.github.randdd32.donor_search_backend.web.dto.auth.AuthResponseDto;
@@ -15,6 +16,7 @@ public class AuthService {
     private final RefreshSessionService sessionService;
     private final JwtProvider jwtProvider;
 
+    @NoLogging
     @Transactional
     public AuthResult login(String username, String password, String fingerprint, String ip, String userAgent) {
         UserEntity user = userService.validateAndGetUser(username, password);

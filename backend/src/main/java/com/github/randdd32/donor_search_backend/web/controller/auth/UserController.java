@@ -1,6 +1,7 @@
 package com.github.randdd32.donor_search_backend.web.controller.auth;
 
 import com.github.randdd32.donor_search_backend.core.configuration.Constants;
+import com.github.randdd32.donor_search_backend.core.log.NoLogging;
 import com.github.randdd32.donor_search_backend.model.enums.UserRole;
 import com.github.randdd32.donor_search_backend.service.auth.UserService;
 import com.github.randdd32.donor_search_backend.web.dto.auth.UserCreateDto;
@@ -48,6 +49,7 @@ public class UserController {
         return userMapper.toDto(userService.getById(id));
     }
 
+    @NoLogging
     @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -56,6 +58,7 @@ public class UserController {
         return userMapper.toDto(userService.createUser(dto, currentUserRole));
     }
 
+    @NoLogging
     @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @PutMapping("/{id}")
     public UserDto updateUser(@PathVariable Long id, @Valid @RequestBody UserUpdateDto dto, Authentication authentication) {

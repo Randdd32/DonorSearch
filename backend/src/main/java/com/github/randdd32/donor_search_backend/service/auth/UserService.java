@@ -2,6 +2,7 @@ package com.github.randdd32.donor_search_backend.service.auth;
 
 import com.github.randdd32.donor_search_backend.core.configuration.Constants;
 import com.github.randdd32.donor_search_backend.core.error.NotFoundException;
+import com.github.randdd32.donor_search_backend.core.log.NoLogging;
 import com.github.randdd32.donor_search_backend.model.auth.UserEntity;
 import com.github.randdd32.donor_search_backend.model.enums.UserRole;
 import com.github.randdd32.donor_search_backend.repository.auth.UserRepository;
@@ -65,6 +66,7 @@ public class UserService extends AbstractReadService<UserEntity, UserRepository>
         return repository.findAll(spec, pageable);
     }
 
+    @NoLogging
     @Transactional
     public UserEntity createUser(UserCreateDto dto, UserRole currentUserRole) {
         if (dto.username() == null || dto.username().isBlank()) {
@@ -88,6 +90,7 @@ public class UserService extends AbstractReadService<UserEntity, UserRepository>
         return repository.save(user);
     }
 
+    @NoLogging
     @Transactional
     public UserEntity updateUser(Long id, UserUpdateDto dto, UserRole currentUserRole, String currentUsername) {
         if (dto.role() == null) {

@@ -1,6 +1,7 @@
 package com.github.randdd32.donor_search_backend.service.search;
 
 import com.github.randdd32.donor_search_backend.core.error.PdfGenerationException;
+import com.github.randdd32.donor_search_backend.core.log.NoLogging;
 import com.github.randdd32.donor_search_backend.web.dto.search.DonorResultDto;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+@NoLogging
 @Service
 @RequiredArgsConstructor
 public class PdfExportService {
