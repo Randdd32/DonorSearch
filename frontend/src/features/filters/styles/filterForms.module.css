@@ -35,14 +35,14 @@
   padding: 16px;
   background-color: color-mix(in srgb, var(--bg-hover) 40%, transparent);
   border-radius: var(--radius-md);
-  border-left: 3px solid var(--primary-color);
+  border-left: 3px solid var(--border-color);
   margin: 4px 0;
 }
 
 .hierarchyTitle {
   font-size: 12px;
   font-weight: 700;
-  color: var(--primary-color);
+  color: var(--text-primary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: -4px;

@@ -1,4 +1,6 @@
 :root {
+  color-scheme: light;
+  
   --bg-primary: #f8fafc;     
   --bg-surface: #ffffff;     
   --bg-hover: #f1f5f9;
@@ -26,6 +28,8 @@
 }
 
 [data-theme='dark'] {
+  color-scheme: dark;
+
   --bg-primary: #0f0f0f;      
   --bg-surface: #181818;      
   --bg-hover: #222222;

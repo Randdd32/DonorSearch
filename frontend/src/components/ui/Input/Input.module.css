@@ -73,6 +73,11 @@
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 20%, transparent);
 }
 
+.input::placeholder {
+  color: var(--text-muted);
+  opacity: 1;
+}
+
 .input.hasError {
   border-color: var(--status-critical);
 }
