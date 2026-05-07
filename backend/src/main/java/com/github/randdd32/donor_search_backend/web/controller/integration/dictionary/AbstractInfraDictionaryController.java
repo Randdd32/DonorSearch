@@ -1,6 +1,7 @@
 package com.github.randdd32.donor_search_backend.web.controller.integration.dictionary;
 
 import com.github.randdd32.donor_search_backend.core.configuration.Constants;
+import com.github.randdd32.donor_search_backend.core.log.NoLogging;
 import com.github.randdd32.donor_search_backend.service.integration.dictionary.AbstractInfraDictionaryService;
 import com.github.randdd32.donor_search_backend.web.dto.dictionary.InfraDictionaryDto;
 import com.github.randdd32.donor_search_backend.web.dto.pagination.PageDto;
@@ -18,6 +19,7 @@ public abstract class AbstractInfraDictionaryController {
         this.service = service;
     }
 
+    @NoLogging
     @GetMapping
     public PageDto<InfraDictionaryDto> getAll(
             @RequestParam(required = false) String search,
@@ -26,6 +28,7 @@ public abstract class AbstractInfraDictionaryController {
         return service.search(search, parentIds, pageable);
     }
 
+    @NoLogging
     @GetMapping("/ids")
     public List<InfraDictionaryDto> getByIds(@RequestParam(required = false) List<String> ids) {
         return service.getByIds(ids);

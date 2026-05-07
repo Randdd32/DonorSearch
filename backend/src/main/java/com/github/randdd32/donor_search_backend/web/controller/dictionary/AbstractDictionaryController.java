@@ -1,6 +1,7 @@
 package com.github.randdd32.donor_search_backend.web.controller.dictionary;
 
 import com.github.randdd32.donor_search_backend.core.configuration.Constants;
+import com.github.randdd32.donor_search_backend.core.log.NoLogging;
 import com.github.randdd32.donor_search_backend.service.dictionary.AbstractDictionaryService;
 import com.github.randdd32.donor_search_backend.web.controller.AbstractReadController;
 import com.github.randdd32.donor_search_backend.web.dto.dictionary.NamedDictionaryDto;
@@ -20,6 +21,7 @@ public abstract class AbstractDictionaryController<E, S extends AbstractDictiona
         super(service, toDtoMapper);
     }
 
+    @NoLogging
     @GetMapping
     public PageDto<NamedDictionaryDto> getAll(
             @RequestParam(required = false) String search,
@@ -27,6 +29,7 @@ public abstract class AbstractDictionaryController<E, S extends AbstractDictiona
         return PageDtoMapper.toDto(service.getAll(search, pageable), toDtoMapper);
     }
 
+    @NoLogging
     @GetMapping("/ids")
     public List<NamedDictionaryDto> getByIds(@RequestParam(required = false) List<Long> ids) {
         return service.getByIds(ids).stream().map(toDtoMapper).toList();

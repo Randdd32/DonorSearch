@@ -1,5 +1,6 @@
 package com.github.randdd32.donor_search_backend.service.compatibility;
 
+import com.github.randdd32.donor_search_backend.core.log.NoLogging;
 import com.github.randdd32.donor_search_backend.web.dto.compatibility.ContextPropertyMetadataDto;
 import com.github.randdd32.donor_search_backend.web.dto.compatibility.FieldMetadataDto;
 import com.github.randdd32.donor_search_backend.web.dto.compatibility.MethodMetadataDto;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 
+@NoLogging
 @Service
 public class RuleBuilderMetadataService {
     public RuleBuilderMetadataDto getMetadata() {

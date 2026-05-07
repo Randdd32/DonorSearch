@@ -1,6 +1,7 @@
 package com.github.randdd32.donor_search_backend.web.controller.compatibility;
 
 import com.github.randdd32.donor_search_backend.core.configuration.Constants;
+import com.github.randdd32.donor_search_backend.core.log.NoLogging;
 import com.github.randdd32.donor_search_backend.model.compatibility.CompatibilityRuleEntity;
 import com.github.randdd32.donor_search_backend.service.compatibility.CompatibilityRuleService;
 import com.github.randdd32.donor_search_backend.service.compatibility.RuleBuilderMetadataService;
@@ -40,6 +41,7 @@ public class CompatibilityRuleController extends AbstractCrudController<Compatib
         this.metadataService = metadataService;
     }
 
+    @NoLogging
     @GetMapping
     public PageDto<CompatibilityRuleDto> getAll(
             @ModelAttribute CompatibilityRuleFilter filter,
@@ -48,6 +50,7 @@ public class CompatibilityRuleController extends AbstractCrudController<Compatib
         return PageDtoMapper.toDto(service.getAll(filter, pageable), toDtoMapper);
     }
 
+    @NoLogging
     @GetMapping("/builder-metadata")
     public RuleBuilderMetadataDto getBuilderMetadata() {
         return metadataService.getMetadata();

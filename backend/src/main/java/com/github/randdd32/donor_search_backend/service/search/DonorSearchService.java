@@ -3,6 +3,7 @@ package com.github.randdd32.donor_search_backend.service.search;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.randdd32.donor_search_backend.core.error.HardRejectException;
 import com.github.randdd32.donor_search_backend.core.error.NotFoundException;
+import com.github.randdd32.donor_search_backend.core.log.NoLogging;
 import com.github.randdd32.donor_search_backend.core.util.QueryUtils;
 import com.github.randdd32.donor_search_backend.model.IntegrationMappingEntity;
 import com.github.randdd32.donor_search_backend.model.enums.ComponentType;
@@ -108,6 +109,7 @@ public class DonorSearchService {
         return sessionId;
     }
 
+    @NoLogging
     public PageDto<DonorResultDto> getResults(String sessionId, DonorSearchFilter filter, Pageable pageable) {
         List<DonorResultDto> cachedResults = searchCache.getIfPresent(sessionId);
         if (cachedResults == null) {

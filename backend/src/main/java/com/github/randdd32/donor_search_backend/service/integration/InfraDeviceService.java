@@ -2,6 +2,7 @@ package com.github.randdd32.donor_search_backend.service.integration;
 
 import com.github.randdd32.donor_search_backend.core.configuration.Constants;
 import com.github.randdd32.donor_search_backend.core.error.NotFoundException;
+import com.github.randdd32.donor_search_backend.core.log.NoLogging;
 import com.github.randdd32.donor_search_backend.core.util.QueryUtils;
 import com.github.randdd32.donor_search_backend.service.IntegrationMappingService;
 import com.github.randdd32.donor_search_backend.web.dto.filter.InfraDeviceFilter;
@@ -124,6 +125,7 @@ public class InfraDeviceService {
         LEFT JOIN dbo.[Здание] b ON NULLIF(f.[ИД здания], 0) = b.[Идентификатор]
     """;
 
+    @NoLogging
     public PageDto<ExternalDeviceDto> getDevicesPage(InfraDeviceFilter filter, Pageable pageable) {
         int page = pageable.getPageNumber();
         int size = pageable.getPageSize();
@@ -293,6 +295,7 @@ public class InfraDeviceService {
         return device;
     }
 
+    @NoLogging
     public List<ExternalDeviceDto> getPotentialDonors(Long excludeDeviceId, ExternalComponentCategory category) {
         List<String> infraNames = category.getInfraNames();
         if (infraNames.isEmpty()) {

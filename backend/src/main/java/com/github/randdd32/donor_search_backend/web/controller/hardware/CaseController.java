@@ -1,6 +1,7 @@
 package com.github.randdd32.donor_search_backend.web.controller.hardware;
 
 import com.github.randdd32.donor_search_backend.core.configuration.Constants;
+import com.github.randdd32.donor_search_backend.core.log.NoLogging;
 import com.github.randdd32.donor_search_backend.model.hardware.CaseEntity;
 import com.github.randdd32.donor_search_backend.service.hardware.CaseService;
 import com.github.randdd32.donor_search_backend.web.controller.AbstractReadController;
@@ -23,6 +24,7 @@ public class CaseController extends AbstractReadController<CaseEntity, CaseDto, 
         super(service, mapper::toDto);
     }
 
+    @NoLogging
     @GetMapping
     public PageDto<CaseDto> getAll(
             @ModelAttribute CaseFilter filter,

@@ -1,5 +1,6 @@
 package com.github.randdd32.donor_search_backend.service.integration.dictionary;
 
+import com.github.randdd32.donor_search_backend.core.log.NoLogging;
 import com.github.randdd32.donor_search_backend.core.util.QueryUtils;
 import com.github.randdd32.donor_search_backend.web.dto.dictionary.InfraDictionaryDto;
 import com.github.randdd32.donor_search_backend.web.dto.pagination.PageDto;
@@ -32,6 +33,7 @@ public abstract class AbstractInfraDictionaryService {
         return " AND " + getDisplayColumn() + " LIKE '%' + :search + '%' ";
     }
 
+    @NoLogging
     public PageDto<InfraDictionaryDto> search(String search, List<String> parentIds, Pageable pageable) {
         int page = pageable.getPageNumber();
         int size = pageable.getPageSize();
@@ -74,6 +76,7 @@ public abstract class AbstractInfraDictionaryService {
         return PageDtoMapper.toDto(items, totalCount, page, size);
     }
 
+    @NoLogging
     public List<InfraDictionaryDto> getByIds(List<String> ids) {
         if (CollectionUtils.isEmpty(ids)) {
             return Collections.emptyList();

@@ -43,6 +43,7 @@ public class DonorSearchController {
         return Map.of("sessionId", sessionId);
     }
 
+    @NoLogging
     @GetMapping("/results/{sessionId}")
     public PageDto<DonorResultDto> getResults(
             @PathVariable String sessionId,

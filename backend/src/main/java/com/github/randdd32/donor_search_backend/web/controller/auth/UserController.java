@@ -34,6 +34,7 @@ public class UserController {
         return userMapper.toDto(userService.getByUsername(username));
     }
 
+    @NoLogging
     @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @GetMapping
     public PageDto<UserDto> getAllUsers(

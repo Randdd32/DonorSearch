@@ -1,6 +1,7 @@
 package com.github.randdd32.donor_search_backend.web.controller;
 
 import com.github.randdd32.donor_search_backend.core.configuration.Constants;
+import com.github.randdd32.donor_search_backend.core.log.NoLogging;
 import com.github.randdd32.donor_search_backend.model.IntegrationMappingEntity;
 import com.github.randdd32.donor_search_backend.service.IntegrationMappingService;
 import com.github.randdd32.donor_search_backend.web.dto.IntegrationMappingDto;
@@ -33,6 +34,7 @@ public class IntegrationMappingController extends AbstractCrudController<Integra
         super(service, mapper::toDto, mapper::toEntity);
     }
 
+    @NoLogging
     @GetMapping
     public PageDto<IntegrationMappingDto> getAll(
             @ModelAttribute IntegrationMappingFilter filter,

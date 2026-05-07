@@ -1,6 +1,7 @@
 package com.github.randdd32.donor_search_backend.web.controller.integration;
 
 import com.github.randdd32.donor_search_backend.core.configuration.Constants;
+import com.github.randdd32.donor_search_backend.core.log.NoLogging;
 import com.github.randdd32.donor_search_backend.service.integration.InfraDeviceService;
 import com.github.randdd32.donor_search_backend.web.dto.filter.InfraDeviceFilter;
 import com.github.randdd32.donor_search_backend.web.dto.integration.ExternalDeviceDto;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class InfraDeviceController {
     private final InfraDeviceService service;
 
+    @NoLogging
     @GetMapping
     public PageDto<ExternalDeviceDto> getDevices(
             @ModelAttribute InfraDeviceFilter filter,

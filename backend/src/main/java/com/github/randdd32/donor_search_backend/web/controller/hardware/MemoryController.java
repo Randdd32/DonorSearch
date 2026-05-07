@@ -1,6 +1,7 @@
 package com.github.randdd32.donor_search_backend.web.controller.hardware;
 
 import com.github.randdd32.donor_search_backend.core.configuration.Constants;
+import com.github.randdd32.donor_search_backend.core.log.NoLogging;
 import com.github.randdd32.donor_search_backend.model.hardware.MemoryEntity;
 import com.github.randdd32.donor_search_backend.service.hardware.MemoryService;
 import com.github.randdd32.donor_search_backend.web.controller.AbstractReadController;
@@ -23,6 +24,7 @@ public class MemoryController extends AbstractReadController<MemoryEntity, Memor
         super(service, mapper::toDto);
     }
 
+    @NoLogging
     @GetMapping
     public PageDto<MemoryDto> getAll(
             @ModelAttribute MemoryFilter filter,

@@ -1,6 +1,7 @@
 package com.github.randdd32.donor_search_backend.web.controller.hardware;
 
 import com.github.randdd32.donor_search_backend.core.configuration.Constants;
+import com.github.randdd32.donor_search_backend.core.log.NoLogging;
 import com.github.randdd32.donor_search_backend.model.hardware.VideoCardEntity;
 import com.github.randdd32.donor_search_backend.service.hardware.VideoCardService;
 import com.github.randdd32.donor_search_backend.web.controller.AbstractReadController;
@@ -24,6 +25,7 @@ public class VideoCardController extends AbstractReadController<VideoCardEntity,
         super(service, mapper::toDto);
     }
 
+    @NoLogging
     @GetMapping
     public PageDto<VideoCardDto> getAll(
             @ModelAttribute VideoCardFilter filter,
