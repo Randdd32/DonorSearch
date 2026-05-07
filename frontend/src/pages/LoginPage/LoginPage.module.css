@@ -65,3 +65,18 @@
     gap: 20px;
   }
 }
+
+@media (max-width: 360px) {
+  .container {
+    padding: 12px;
+  }
+  .card {
+    padding: 20px 16px;
+  }
+  .title {
+    font-size: 20px;
+  }
+  .subtitle {
+    font-size: 13px;
+  }
+}

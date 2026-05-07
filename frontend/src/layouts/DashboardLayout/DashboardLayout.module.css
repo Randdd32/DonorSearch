@@ -267,6 +267,34 @@
     width: 280px; 
   }
   .header {
-    padding: 0 12px;
+    padding: 0 16px;
+  }
+  .headerLeft, .headerRight {
+    gap: 8px;
+  }
+  .userProfile {
+    padding-left: 12px;
+  }
+  .pageTitle {
+    font-size: 15px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 160px;
+  }
+  .content {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 380px) {
+  .sidebar.closed {
+    width: 100vw;
+  }
+  .pageTitle {
+    display: none;
+  }
+  .content {
+    padding: 12px;
   }
 }

@@ -100,9 +100,18 @@
   .infoRow {
     flex-direction: column;
     align-items: flex-start;
-    gap: 8px;
+    gap: 4px;
   }
   .actions button {
     width: 100%;
+  }
+  .value {
+    word-break: break-all;
+    font-size: 14px;
+  }
+  .avatarLarge {
+    width: 56px;
+    height: 56px;
+    font-size: 20px;
   }
 }
