@@ -27,6 +27,7 @@ public class OpticalDriveController extends AbstractReadController<OpticalDriveE
     }
 
     @NoLogging
+    @GetMapping
     public PageDto<OpticalDriveDto> getAll(
             @RequestParam(required = false) String search,
             @RequestParam(required = false) List<Long> manufacturerIds,
