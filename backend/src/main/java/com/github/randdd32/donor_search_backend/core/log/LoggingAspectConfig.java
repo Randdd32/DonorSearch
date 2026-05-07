@@ -32,7 +32,12 @@ public class LoggingAspectConfig {
     public void loggableOperations() {
     }
 
-    @Around("loggableOperations()")
+    @Pointcut("@annotation(com.github.randdd32.donor_search_backend.core.log.NoLogging) || " +
+            "@within(com.github.randdd32.donor_search_backend.core.log.NoLogging)")
+    public void noLoggingOperations() {
+    }
+
+    @Around("loggableOperations() && !noLoggingOperations()")
     public Object logAround(ProceedingJoinPoint joinPoint) throws Throwable {
         log.debug("Enter: {}.{}() with argument[s] = {}",
                 joinPoint.getSignature().getDeclaringTypeName(),

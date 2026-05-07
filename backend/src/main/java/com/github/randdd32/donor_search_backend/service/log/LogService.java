@@ -1,6 +1,7 @@
 package com.github.randdd32.donor_search_backend.service.log;
 
 import com.github.randdd32.donor_search_backend.core.error.NotFoundException;
+import com.github.randdd32.donor_search_backend.core.log.NoLogging;
 import com.github.randdd32.donor_search_backend.web.dto.log.LogFileDto;
 import org.apache.commons.io.input.ReversedLinesFileReader;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
 
+@NoLogging
 @Service
 public class LogService {
     private static final Path LOG_DIR = Paths.get("logs").toAbsolutePath().normalize();

@@ -1,6 +1,7 @@
 package com.github.randdd32.donor_search_backend.web.controller.log;
 
 import com.github.randdd32.donor_search_backend.core.configuration.Constants;
+import com.github.randdd32.donor_search_backend.core.log.NoLogging;
 import com.github.randdd32.donor_search_backend.service.log.LogService;
 import com.github.randdd32.donor_search_backend.web.dto.log.LogFileDto;
 import jakarta.validation.constraints.Max;
@@ -24,6 +25,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
+@NoLogging
 @RestController
 @RequestMapping(Constants.API_URL + "/logs")
 @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
