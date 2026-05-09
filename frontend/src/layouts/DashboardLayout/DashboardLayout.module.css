@@ -235,9 +235,7 @@
   .userRole, .userName {
     display: none;
   }
-}
 
-@media (max-width: 630px) {
   .sidebarBackdrop {
     display: block;
     position: fixed;
@@ -266,6 +264,9 @@
     transform: translateX(-100%);
     width: 280px; 
   }
+}
+
+@media (max-width: 630px) {
   .header {
     padding: 0 16px;
   }
