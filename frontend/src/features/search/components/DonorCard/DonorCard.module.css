@@ -2,6 +2,7 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
+  min-width: 0;
 }
 
 .header {
@@ -11,6 +12,7 @@
   gap: 16px;
   border-bottom: 1px solid var(--border-color);
   padding-bottom: 16px;
+  min-width: 0;
 }
 
 .deviceInfo {
@@ -19,55 +21,6 @@
   gap: 12px;
   flex: 1;
   min-width: 0;
-}
-
-.deviceMeta {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-width: 0;
-}
-
-.deviceHeaderRow {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.deviceSubGrid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  row-gap: 6px;
-}
-
-.subItem {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 13px;
-  color: var(--text-secondary);
-  max-width: 100%;
-}
-
-.subItem svg {
-  flex-shrink: 0;
-}
-
-.truncate {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.deviceIcon {
-   min-width: 24px;
-   flex-shrink: 0;
-}
-
-.iconShrink {
-  flex-shrink: 0;
 }
 
 .iconWrapper {
@@ -81,19 +34,70 @@
   color: var(--primary-color);
 }
 
+.deviceIcon {
+  min-width: 24px;
+  flex-shrink: 0;
+}
+
+.deviceMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.deviceHeaderRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.deviceSubGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  row-gap: 6px;
+  min-width: 0;
+}
+
+.subItem {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  min-width: 0;
+  max-width: 100%;
+}
+
+.subItem svg {
+  flex-shrink: 0;
+}
+
+.iconShrink {
+  flex-shrink: 0;
+}
+
+.truncate {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .deviceName {
   font-size: 16px;
   font-weight: 600;
   color: var(--primary-color);
-}
-.deviceName:hover {
-  text-decoration: underline;
+  min-width: 0;
+  word-break: break-word;
 }
 
-.deviceSub {
-  font-size: 13px;
-  color: var(--text-secondary);
-  margin-top: 4px;
+.deviceName:hover {
+  text-decoration: underline;
 }
 
 .scoreSection {
@@ -126,6 +130,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  min-width: 0;
 }
 
 .componentItem {
@@ -135,18 +140,24 @@
   background-color: var(--bg-primary);
   padding: 12px;
   border-radius: var(--radius-md);
+  min-width: 0;
 }
 
 .compHeader {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+  min-width: 0;
 }
 
 .compName {
   font-size: 14px;
   font-weight: 600;
   color: var(--text-primary);
+  min-width: 0;
+  word-break: break-word;
 }
 
 .perfectMatch {
@@ -171,6 +182,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  min-width: 0;
 }
 
 .warningItem {
@@ -180,6 +192,7 @@
   padding: 10px;
   border-radius: 6px;
   border-left: 4px solid;
+  min-width: 0;
 }
 
 .warningIcon {
@@ -197,13 +210,17 @@
 .warningMessage {
   font-size: 13px;
   color: var(--text-primary);
+
+  min-width: 0;
+  word-break: break-word;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 700px) {
   .header {
     flex-direction: column;
     align-items: flex-start;
   }
+
   .scoreSection {
     align-items: flex-start;
     margin-top: 12px;
@@ -211,13 +228,37 @@
     padding-top: 12px;
     border-top: 1px dashed var(--border-color);
   }
+
   .compHeader {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
   }
+
   .warningItem {
     flex-direction: column;
     align-items: flex-start;
+  }
+}
+
+@media (max-width: 400px) {
+  .deviceHeaderRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .subItem {
+    font-size: 12px;
+  }
+
+  .deviceSubGrid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .iconShrink {
+    min-width: 14px;
   }
 }

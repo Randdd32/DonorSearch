@@ -2,9 +2,9 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
+  width: 100%;
   max-width: 1600px;
   margin: 0 auto;
-  width: 100%;
 }
 
 .header {
@@ -20,14 +20,16 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 8px;
+  min-width: 0;
 }
 
 .backButton {
   padding-left: 0;
   height: auto;
-  color: var(--text-secondary);
   margin-bottom: 12px;
+  color: var(--text-secondary);
 }
+
 .backButton:hover {
   background-color: transparent;
   color: var(--text-primary);
@@ -37,56 +39,60 @@
   font-size: 24px;
   font-weight: 700;
   color: var(--text-primary);
+  line-height: 1.2;
 }
 
 .subtitle {
   font-size: 14px;
   color: var(--text-secondary);
+  line-height: 1.4;
 }
 
 .controlsArea {
   display: flex;
   flex-direction: column;
+  align-items: flex-end;
   gap: 12px;
   flex: 1;
-  min-width: 420px;
+  max-width: 700px;
 }
 
-.toolbarTop {
+.searchRow {
   display: flex;
+  gap: 12px;
   align-items: center;
-  gap: 16px;
-}
-
-.toolbarBottom {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.sortSelect {
-  margin-left: auto;
+  width: 100%;
 }
 
 .searchBar {
-  width: 100%;
-  max-width: 700px;
-  margin-left: auto
+  flex: 1;
+  min-width: 0;
 }
 
 .actionButtons {
   display: flex;
   gap: 8px;
+  flex-shrink: 0;
 }
 
-.actionButtons button,
-.toolbarBottom button,
-.sortSelect {
+.actionButtons button {
   height: 40px;
 }
 
+.actionRow {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.sortSelect {
+  width: auto;
+}
+
 .filterBtn {
-  align-self: flex-end;
+  height: 40px;
 }
 
 .resultsWrapper {
@@ -97,56 +103,106 @@
 
 .resultsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(520px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 520px), 1fr));
   gap: 24px;
 }
 
 .paginationSpacing {
-  margin-top: 16px; 
+  margin-top: 16px;
 }
 
-@media (max-width: 1500px) {
+@media (max-width: 1580px) {
   .outputBtnText {
     display: none;
   }
-}
 
-@media (max-width: 1200px) {
-  .resultsGrid {
-    grid-template-columns: 1fr;
+  .actionButtons button {
+    width: 40px;
+    padding: 0;
+    justify-content: center;
   }
 }
 
-@media (max-width: 800px) {
-  .header {
-    flex-direction: column;
-    align-items: stretch;
-  }
+@media (max-width: 1400px) {
   .controlsArea {
-    min-width: 100%;
-    align-items: stretch;
-  }
-  .toolbar {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .searchBar {
     max-width: 100%;
-  }
-  .filterBtn {
-    align-self: stretch;
-  }
-  .filterBtnText {
-    display: none;
   }
 }
 
 @media (max-width: 600px) {
-  .actionButtons {
+  .header {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .title {
+    font-size: 20px;
+  }
+
+  .controlsArea {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: 14px 8px;
     width: 100%;
   }
-  
+
+  .searchRow {
+    display: contents;
+  }
+
+  .actionRow {
+    display: contents;
+  }
+
+  .searchBar {
+    order: 1;
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+
+  .actionButtons {
+    order: 2;
+    flex: 2;
+    gap: 8px;
+  }
+
   .actionButtons button {
     flex: 1;
+    width: auto;
+    padding: 0;
+    justify-content: center;
+  }
+
+  .filterBtn {
+    order: 2;
+    flex: 1;
+    justify-content: center;
+  }
+
+  .filterBtnText {
+    display: none;
+  }
+
+  .sortSelect {
+    order: 3;
+    flex: 0 0 100%;
+    min-width: 0;
+    width: 100%;
+  }
+}
+
+@media (max-width: 400px) {
+  .title {
+    font-size: 18px;
+  }
+
+  .subtitle {
+    font-size: 12px;
+  }
+
+  .resultsGrid {
+    gap: 16px;
   }
 }

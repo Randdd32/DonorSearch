@@ -103,11 +103,11 @@ export const SearchResultsPage = () => {
         </div>
 
         <div className={styles.controlsArea}>
-          <div className={styles.toolbarTop}>
+          <div className={styles.searchRow}>
             <div className={styles.searchBar}>
-              <Input 
-                icon={<Search size={18} />} 
-                placeholder="Поиск по названию донора, инв. номеру или SN..." 
+              <Input
+                icon={<Search size={18} />}
+                placeholder="Поиск по названию донора, инв. номеру или SN..."
                 value={filters.search as string}
                 onChange={handleSearchChange}
                 onClear={() => updateFilters({ search: '' })}
@@ -115,32 +115,21 @@ export const SearchResultsPage = () => {
             </div>
 
             <div className={styles.actionButtons}>
-              <Button 
-                variant="secondary" 
-                onClick={handleExportPdf} 
-                isLoading={isExporting}
-                title="Скачать PDF отчет"
-              >
+              <Button variant="secondary" onClick={handleExportPdf} isLoading={isExporting} title="Скачать PDF отчет">
                 <Download size={18} />
                 <span className={styles.outputBtnText}>PDF</span>
               </Button>
-
-              <Button 
-                variant="secondary" 
-                onClick={handlePrint} 
-                isLoading={isPrinting}
-                title="Распечатать результаты"
-              >
+              <Button variant="secondary" onClick={handlePrint} isLoading={isPrinting} title="Распечатать результаты">
                 <Printer size={18} />
                 <span className={styles.outputBtnText}>Печать</span>
               </Button>
             </div>
           </div>
 
-          <div className={styles.toolbarBottom}>
+          <div className={styles.actionRow}>
             <SortSelect
               className={styles.sortSelect}
-              value={filters.sort[0] || ''}  
+              value={filters.sort[0] || ''}
               onChange={(val) => updateFilters({ sort: [val] })}
               options={[
                 { value: 'totalPenalty,asc', label: 'По релевантности (лучшие)' },
@@ -151,8 +140,7 @@ export const SearchResultsPage = () => {
                 { value: 'inventoryNumber,asc', label: 'По инв. номеру' }
               ]}
             />
-
-            <Button variant="secondary" onClick={() => setIsFiltersOpen(true)}>
+            <Button variant="secondary" onClick={() => setIsFiltersOpen(true)} className={styles.filterBtn}>
               <Filter size={18} />
               <span className={styles.filterBtnText}>Фильтры</span>
             </Button>

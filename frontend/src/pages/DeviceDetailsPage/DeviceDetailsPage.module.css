@@ -146,13 +146,13 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
-  flex: 1;
-  min-width: 200px;
+  flex: 1 1 65%;
+  min-width: 65%;
 }
 
 .compNameRow {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
 }
 
@@ -160,6 +160,7 @@
   font-size: 15px;
   font-weight: 600;
   color: var(--text-primary);
+  word-break: break-word;
 }
 
 .iconSuccess {
@@ -179,6 +180,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  flex-wrap: wrap;
 }
 
 .missingComponentCard {
@@ -223,23 +225,16 @@
   color: var(--text-primary);
 }
 
-@media (max-width: 500px) {
-  .headerTop {
-    flex-direction: column;
-    gap: 12px;
-  }
-  .badgesWrapper {
-    align-self: flex-start;
-    flex-wrap: wrap;
-  }
+@media (max-width: 600px) {
   .componentCard {
     flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
+    align-items: stretch;
+    gap: 16px;
   }
   .compActions {
     width: 100%;
     flex-direction: column;
+    gap: 12px;
   }
   .compActions button {
     width: 100%;
@@ -247,6 +242,47 @@
   .missingComponentCard {
     flex-direction: column;
     align-items: stretch;
+    text-align: center;
+    gap: 16px;
+  }
+  .missingText {
+    padding-bottom: 16px;
+    border-bottom: 1px dashed var(--border-color);
+    width: 100%;
+    display: block;
+  }
+  .missingComponentCard button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 500px) {
+  .headerTop {
+    flex-direction: column;
     gap: 12px;
+  }
+  .title {
+    font-size: 20px;
+  }
+  .badgesWrapper {
+    align-self: flex-start;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .infoGrid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 400px) {
+  .title {
+    font-size: 18px;
+  }
+  .sectionTitle {
+    font-size: 18px;
+  }
+  .compName {
+    font-size: 14px;
   }
 }
