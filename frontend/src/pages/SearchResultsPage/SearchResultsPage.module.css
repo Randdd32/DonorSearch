@@ -115,7 +115,6 @@
   .outputBtnText {
     display: none;
   }
-
   .actionButtons button {
     width: 40px;
     padding: 0;
@@ -134,11 +133,9 @@
     flex-direction: column;
     gap: 16px;
   }
-
   .title {
     font-size: 20px;
   }
-
   .controlsArea {
     display: flex;
     flex-direction: row;
@@ -147,44 +144,36 @@
     gap: 14px 8px;
     width: 100%;
   }
-
   .searchRow {
     display: contents;
   }
-
   .actionRow {
     display: contents;
   }
-
   .searchBar {
     order: 1;
     flex: 0 0 100%;
     max-width: 100%;
   }
-
   .actionButtons {
     order: 2;
     flex: 2;
     gap: 8px;
   }
-
   .actionButtons button {
     flex: 1;
     width: auto;
     padding: 0;
     justify-content: center;
   }
-
   .filterBtn {
     order: 2;
     flex: 1;
     justify-content: center;
   }
-
   .filterBtnText {
     display: none;
   }
-
   .sortSelect {
     order: 3;
     flex: 0 0 100%;
@@ -197,11 +186,9 @@
   .title {
     font-size: 18px;
   }
-
   .subtitle {
     font-size: 12px;
   }
-
   .resultsGrid {
     gap: 16px;
   }
