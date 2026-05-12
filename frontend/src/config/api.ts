@@ -10,7 +10,7 @@ export const apiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 15000,
+  timeout: 60000,
   withCredentials: true,
   paramsSerializer: (params) => {
     const searchParams = new URLSearchParams();
@@ -109,13 +109,20 @@ apiClient.interceptors.response.use(
     const originalRequest = error.config as RetryConfig | undefined;
 
     const status = error.response?.status;
-    const isNetworkError = !error.response && (error.code === 'ERR_NETWORK' || error.message === 'Network Error');
+
+    const isTimeout = error.code === 'ECONNABORTED';
+    const isNetworkError = !error.response && (error.code === 'ERR_NETWORK' || error.message === 'Network Error' || isTimeout);
+
     const isGatewayError = status === 502 || status === 503 || status === 504;
 
     if (isNetworkError || isGatewayError) {
       const now = Date.now();
       if (now - lastNetworkErrorToastTime > NETWORK_ERROR_COOLDOWN_MS) {
-        toast.error('Сервер недоступен. Проверьте подключение к сети или обратитесь к администратору.', {
+        const toastMsg = isTimeout 
+          ? 'Превышено время ожидания ответа от сервера. Проверьте подключение к сети или обратитесь к администратору.' 
+          : 'Сервер недоступен. Проверьте подключение к сети или обратитесь к администратору.';
+        
+        toast.error(toastMsg, {
           id: 'global-network-error'
         });
         lastNetworkErrorToastTime = now;
