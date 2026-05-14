@@ -12,13 +12,16 @@
   align-items: flex-start;
   flex-shrink: 0;
   gap: 16px;
+  container-type: inline-size;
+  container-name: logsHeader;
 }
 
 .titleBlock {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  flex: 0 0 auto;
+  flex: 1 1 400px;
+  min-width: 0;
 }
 
 .title {
@@ -35,8 +38,10 @@
 .controlsArea {
   display: flex;
   flex-direction: column;
+  align-items: flex-end;
   gap: 12px;
   flex: 1 1 480px;
+  max-width: 600px;
   min-width: 0;
 }
 
@@ -45,31 +50,32 @@
 .actionRow {
   display: flex;
   flex-wrap: wrap;
-  column-gap: 12px;
-  row-gap: 0;
+  gap: 12px;
   justify-content: flex-end;
   align-items: center;
   width: 100%;
 }
 
-.actionRow::after {
-  content: '';
-  order: 2;
-  flex: 0 0 100%;
-  height: 0;
-}
-
 .fileSelect {
-  order: 1;
-  flex: 1 0 280px;
-  min-width: 0;
-  margin-bottom: 12px;
+  flex: 1 1 290px;
+  min-width: min(290px, 100%);
 }
 
-.actionRow > button {
-  order: 3;
+.actionButtons {
+  display: flex;
+  gap: 12px;
+  flex-wrap: nowrap;
+  flex-shrink: 0;
+}
+
+.actionButtons button {
   height: 40px;
-  flex: 0 0 auto;
+}
+
+@container logsHeader (max-width: 900px) {
+  .controlsArea {
+    max-width: 100%;
+  }
 }
 
 .terminalWrapper {
@@ -126,7 +132,13 @@
 }
 
 @media (max-width: 480px) {
-  .actionRow > button { flex: 1; }
+  .actionButtons {
+    width: 100%;
+  }
+  .actionButtons button {
+    flex: 1;
+  }
+  .fileSelect { flex: 1 1 100%; }
   .terminalWrapper {
     padding: 12px;
     font-size: 12px;
@@ -139,7 +151,6 @@
   .title    { font-size: 18px; }
   .subtitle { font-size: 12px; }
   .terminalWrapper {
-    font-size: 11px;
     padding: 10px;
     min-height: 200px;
   }

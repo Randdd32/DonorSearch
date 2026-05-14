@@ -10,13 +10,16 @@
   justify-content: space-between;
   align-items: flex-start;
   gap: 16px;
+  container-type: inline-size;
+  container-name: tableHeader;
 }
 
 .titleBlock {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  flex: 0 0 auto;
+  flex: 1 1 400px;
+  min-width: 0;
 }
 
 .title {
@@ -42,6 +45,7 @@
   column-gap: 12px;
   row-gap: 0;
   flex: 1 1 500px;
+  max-width: 600px;
   min-width: 0;
 }
 
@@ -56,13 +60,18 @@
   order: 0;
   flex: 0 0 auto;
   width: 100%;
-  max-width: 600px;
   margin-bottom: 12px;
 }
 
 .toolbar > button,
 .controlsArea > button {
   order: 2;
+}
+
+@container tableHeader (max-width: 900px) {
+  .controlsArea {
+    max-width: 100%;
+  }
 }
 
 .muted  { color: var(--text-muted); font-size: 13px; }

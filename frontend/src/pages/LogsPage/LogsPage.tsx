@@ -118,13 +118,14 @@ export const LogsPage = () => {
               />
             </div>
             
-            <Button variant="secondary" onClick={() => refetch()} isLoading={isFetching}>
-              <RefreshCw size={16} /> Обновить
-            </Button>
-            
-            <Button onClick={handleDownload} isLoading={isDownloading}>
-              <Download size={16} /> Скачать
-            </Button>
+            <div className={styles.actionButtons}>
+              <Button variant="secondary" onClick={() => refetch()} isLoading={isFetching}>
+                <RefreshCw size={16} /> Обновить
+              </Button>
+              <Button onClick={handleDownload} isLoading={isDownloading}>
+                <Download size={16} /> Скачать
+              </Button>
+            </div>
           </div>
         </div>
       </div>
