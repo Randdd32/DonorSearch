@@ -7,6 +7,7 @@ import { useMappings, useMappingMutations } from '../../features/admin/hooks/use
 import { parseMappingFilters } from './mappingsParser';
 import { formatDateTime } from '../../utils/formatters';
 import { useDocumentTitle } from '../../hooks/useDocumentTitle';
+import { confidenceConfig } from '../../config/confidenceStatuses';
 import { Input } from '../../components/ui/Input/Input';
 import { Button } from '../../components/ui/Button/Button';
 import { Badge } from '../../components/ui/Badge/Badge';
@@ -14,15 +15,7 @@ import { Pagination } from '../../components/ui/Pagination/Pagination';
 import { TableCard, Table, TableHead, TableRow, TableHeader, TableBody, TableCell } from '../../components/ui/Table/Table';
 import { MappingFilters } from '../../features/admin/components/MappingFilters/MappingFilters';
 import { ConfirmModal } from '../../components/ui/ConfirmModal/ConfirmModal';
-import type { MappingConfidence } from '../../types/integration';
 import styles from '../../styles/layouts/tablePageLayout.module.css';
-
-const confidenceConfig: Record<MappingConfidence, { label: string, variant: 'success' | 'info' | 'warning' | 'danger' }> = {
-  CONFIRMED: { label: 'Подтверждено', variant: 'success' },
-  AUTO: { label: 'Авто (>=90%)', variant: 'info' },
-  NEEDS_REVIEW: { label: 'Требует проверки (60-89%)', variant: 'warning' },
-  BAD_MATCH: { label: 'Низкая уверенность (<60%)', variant: 'danger' },
-};
 
 export const MappingsPage = () => {
   useDocumentTitle('Таблица сопоставления');

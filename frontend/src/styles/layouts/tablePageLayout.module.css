@@ -1,14 +1,14 @@
-.container { 
-  display: flex; 
-  flex-direction: column; 
-  gap: 24px; 
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 
 .header {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: flex-start;
-  flex-wrap: wrap;
   gap: 16px;
 }
 
@@ -16,6 +16,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  flex: 0 0 auto;
 }
 
 .title {
@@ -29,43 +30,45 @@
   color: var(--text-secondary);
 }
 
-.controlsArea {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 12px;
-  flex: 1;
+.toolbar {
+  display: contents;
 }
 
-.toolbar {
+.controlsArea {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  justify-content: flex-end;
   flex-wrap: wrap;
-  width: 100%;
+  align-items: center;
+  justify-content: flex-end;
+  column-gap: 12px;
+  row-gap: 0;
+  flex: 1 1 500px;
+  min-width: 0;
+}
+
+.controlsArea::after {
+  content: '';
+  order: 1;
+  flex: 0 0 100%;
+  height: 0;
 }
 
 .searchBar {
-  flex: 1;
-  max-width: 400px;
+  order: 0;
+  flex: 0 0 auto;
+  width: 100%;
+  max-width: 600px;
+  margin-bottom: 12px;
 }
 
-.muted {
-  color: var(--text-muted);
-  font-size: 13px;
+.toolbar > button,
+.controlsArea > button {
+  order: 2;
 }
 
-.bold {
-  font-weight: 600;
-  color: var(--text-primary);
-}
+.muted  { color: var(--text-muted); font-size: 13px; }
+.bold   { font-weight: 600; color: var(--text-primary); }
 
-.nameWithBadge {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
+.nameWithBadge { display: flex; align-items: center; gap: 8px; }
 
 .targetTypesWrapper {
   display: flex;
@@ -74,38 +77,27 @@
   max-width: 200px;
 }
 
-.codeCell { 
-  font-family: monospace; 
-  font-size: 13px; 
-  color: var(--text-primary); 
-  font-weight: 500; 
+.codeCell {
+  font-family: monospace;
+  font-size: 13px;
+  color: var(--text-primary);
+  font-weight: 500;
 }
 
-.compCell {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
+.compCell { display: flex; flex-direction: column; gap: 2px; }
 
 .compName {
   font-weight: 500;
   color: var(--text-primary);
-  white-space: nowrap; 
-  overflow: hidden; 
-  text-overflow: ellipsis; 
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   max-width: 300px;
 }
 
-.compId {
-  font-size: 11px;
-  color: var(--text-muted);
-}
+.compId { font-size: 11px; color: var(--text-muted); }
 
-.actions {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
+.actions { display: flex; align-items: center; gap: 4px; }
 
 .actionBtn {
   background: transparent;
@@ -116,35 +108,35 @@
   color: var(--text-secondary);
   transition: all 0.2s;
 }
-
-.actionBtn:hover {
-  background-color: var(--bg-hover);
-}
+.actionBtn:hover    { background-color: var(--bg-hover); }
+.iconSuccess:hover  { color: var(--status-info); }
+.iconEdit:hover     { color: var(--primary-color); }
+.iconDanger:hover   { color: var(--status-critical); }
 
 .selfRow {
   background-color: color-mix(in srgb, var(--primary-color) 8%, transparent);
 }
 
-.iconSuccess:hover { color: var(--status-info); }
-.iconEdit:hover { color: var(--primary-color); }
-.iconDanger:hover { color: var(--status-critical); }
-
 .paginationWrapper { padding: 25px 20px 20px 20px; }
 
-@media (max-width: 1000px) {
-  .header { 
-    flex-direction: column; 
-    align-items: stretch; 
+@media (max-width: 600px) {
+  .title    { font-size: 20px; }
+  .subtitle { font-size: 13px; }
+  .paginationWrapper { padding: 20px 16px 16px 16px; }
+}
+
+@media (max-width: 480px) {
+  .toolbar > button,
+  .controlsArea > button {
+    flex: 1;
+    justify-content: center;
   }
-  .controlsArea { 
-    min-width: 100%;
-    align-items: stretch; 
-  }
-  .toolbar { 
-    flex-direction: column; 
-    align-items: stretch; 
-  }
-  .searchBar { 
-    max-width: 100%; 
-  }
+}
+
+@media (max-width: 400px) {
+  .title    { font-size: 18px; }
+  .subtitle { font-size: 12px; }
+  .actionBtn { padding: 8px; }
+  .compName  { max-width: 160px; }
+  .targetTypesWrapper { max-width: 140px; }
 }

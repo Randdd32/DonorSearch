@@ -5,6 +5,10 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import toast from 'react-hot-toast';
 import { mappingsService } from '../../services/mappings.service';
+import { formatDateTime } from '../../utils/formatters';
+import { useDocumentTitle } from '../../hooks/useDocumentTitle';
+import { COMPONENT_TYPE_OPTIONS } from '../../config/componentTypes';
+import { confidenceConfig } from '../../config/confidenceStatuses';
 import { Input } from '../../components/ui/Input/Input';
 import { Button } from '../../components/ui/Button/Button';
 import { Select } from '../../components/ui/Select/Select';
@@ -13,9 +17,6 @@ import { Badge } from '../../components/ui/Badge/Badge';
 import { Spinner } from '../../components/ui/Spinner/Spinner';
 import { ErrorState } from '../../components/ui/ErrorState/ErrorState';
 import { ComponentSelectionModal } from '../../features/admin/components/ComponentSelectionModal/ComponentSelectionModal';
-import { formatDateTime } from '../../utils/formatters';
-import { useDocumentTitle } from '../../hooks/useDocumentTitle';
-import { COMPONENT_TYPE_OPTIONS } from '../../config/componentTypes';
 import type { ExternalComponentCategory, IntegrationMappingDto, MappingConfidence } from '../../types/integration';
 import styles from '../../styles/layouts/editPageLayout.module.css';
 
@@ -55,7 +56,7 @@ const MappingForm = ({ isNew, id, originalData }: MappingFormProps) => {
   const queryClient = useQueryClient();
   const [searchParams] = useSearchParams();
 
-  const[externalName, setExternalName] = useState(
+  const [externalName, setExternalName] = useState(
     originalData?.externalName || (isNew ? searchParams.get('externalName') || '' : '')
   );
   const [componentType, setComponentType] = useState<ExternalComponentCategory | ''>(
@@ -197,8 +198,8 @@ const MappingForm = ({ isNew, id, originalData }: MappingFormProps) => {
               <div className={styles.metaItem}>
                 <span className={styles.metaLabel}>Текущий статус</span>
                 <div>
-                  <Badge variant={confidence === 'CONFIRMED' ? 'success' : confidence === 'AUTO' ? 'info' : 'warning'}>
-                    {confidence}
+                  <Badge variant={confidenceConfig[confidence].variant}>
+                    {confidenceConfig[confidence].label}
                   </Badge>
                 </div>
               </div>
