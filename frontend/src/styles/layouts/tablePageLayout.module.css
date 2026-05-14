@@ -68,7 +68,7 @@
   order: 2;
 }
 
-@container tableHeader (max-width: 900px) {
+@container tableHeader (max-width: 915px) {
   .controlsArea {
     max-width: 100%;
   }

@@ -189,7 +189,7 @@
 .containerWide { max-width: 1600px; }
 
 .leftColumn {
-  flex: 1;
+  flex: 1 1 340px;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -197,7 +197,7 @@
 }
 
 .rightColumnWide {
-  flex: 2.5;
+  flex: 2.5 1 600px;
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -238,15 +238,7 @@
   margin-top: 8px;
 }
 
-@media (max-width: 1000px) {
-  .rightColumnWide,
-  .leftColumn {
-    flex: auto;
-    width: 100%;
-  }
-}
-
-@media (max-width: 1000px) {
+@media (max-width: 600px) {
   .actions {
     flex-direction: column-reverse;
     align-items: stretch;
@@ -262,6 +254,10 @@
   .actionsClean > * {
     width: 100%;
     justify-content: center;
+  }
+  .metaGrid {
+    flex-direction: column;
+    gap: 16px;
   }
 }
 

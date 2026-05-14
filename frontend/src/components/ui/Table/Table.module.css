@@ -53,7 +53,10 @@
   margin-bottom: 2px;
 }
 
-.sortIconIdle { color: var(--border-color); }
+.sortIconIdle { 
+  color: var(--text-muted); 
+  opacity: 0.6; 
+}
 .sortIconActive { color: var(--primary-color); }
 
 .table td {

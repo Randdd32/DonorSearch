@@ -163,6 +163,7 @@ const RuleForm = ({ isNew, id, originalData }: RuleFormProps) => {
 
           {!isNew && originalData && (
             <Card className={styles.metaCard}>
+              <h3 className={styles.cardTitle}>Системная информация</h3> 
               <div className={styles.metaGrid}>
                 <div className={styles.metaItem}><span className={styles.metaLabel}>ID</span><span className={styles.metaValue}>{originalData.id}</span></div>
                 <div className={styles.metaItem}><span className={styles.metaLabel}>Создано</span><span className={styles.metaValue}>{formatDateTime(originalData.createdAt)}</span></div>
