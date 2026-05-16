@@ -41,4 +41,16 @@ public class UserEntity extends BaseEntity {
     @LastModifiedDate
     @Column(name = "updated_at")
     private Instant updatedAt;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof UserEntity that)) return false;
+        return username != null && username.equals(that.getUsername());
+    }
+
+    @Override
+    public int hashCode() {
+        return java.util.Objects.hash(username);
+    }
 }

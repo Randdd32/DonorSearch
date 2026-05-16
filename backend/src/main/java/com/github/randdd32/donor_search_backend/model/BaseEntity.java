@@ -8,6 +8,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.Hibernate;
+
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -21,12 +24,13 @@ public abstract class BaseEntity {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof BaseEntity that)) return false;
-        return id != null && id.equals(that.getId());
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        BaseEntity that = (BaseEntity) o;
+        return id != null && Objects.equals(id, that.getId());
     }
 
     @Override
     public int hashCode() {
-        return getClass().hashCode();
+        return Hibernate.getClass(this).hashCode();
     }
 }

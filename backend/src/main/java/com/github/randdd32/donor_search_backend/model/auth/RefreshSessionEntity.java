@@ -45,4 +45,16 @@ public class RefreshSessionEntity extends BaseEntity {
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof RefreshSessionEntity that)) return false;
+        return refreshToken != null && refreshToken.equals(that.getRefreshToken());
+    }
+
+    @Override
+    public int hashCode() {
+        return java.util.Objects.hash(refreshToken);
+    }
 }
