@@ -2,7 +2,10 @@ package com.github.randdd32.donor_search_backend.service.search;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.randdd32.donor_search_backend.core.error.NotFoundException;
+import com.github.randdd32.donor_search_backend.model.IntegrationMappingEntity;
 import com.github.randdd32.donor_search_backend.model.enums.ComponentType;
+import com.github.randdd32.donor_search_backend.model.enums.MappingConfidence;
+import com.github.randdd32.donor_search_backend.model.hardware.CpuEntity;
 import com.github.randdd32.donor_search_backend.service.IntegrationMappingService;
 import com.github.randdd32.donor_search_backend.service.compatibility.CompatibilityEngineService;
 import com.github.randdd32.donor_search_backend.service.integration.InfraDeviceService;
@@ -18,6 +21,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -28,6 +33,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -44,6 +50,9 @@ class DonorSearchServiceTest {
     private CompatibilityEngineService compatibilityEngine;
     @Mock
     private Cache<@NonNull String, List<DonorResultDto>> searchCache;
+
+    @Captor
+    private ArgumentCaptor<List<DonorResultDto>> donorResultCaptor;
 
     @InjectMocks
     private DonorSearchService donorSearchService;
@@ -75,6 +84,64 @@ class DonorSearchServiceTest {
 
         assertNotNull(sessionId);
         verify(searchCache, times(1)).put(eq(sessionId), any());
+    }
+
+    @Test
+    @DisplayName("Позитивный тест: успешный подбор донора и корректный расчет штрафов")
+    void runSearch_Positive_CalculatesPenaltiesCorrectly() {
+        ExternalComponentDto donorCpu = new ExternalComponentDto(
+                "adapter999", "cat1", "AMD Ryzen 5", ExternalComponentCategory.CPU,
+                2L, "AMD", "sn2", null, null, null, null, 2L);
+
+        // Статус STORAGE: согласно ExternalDeviceState.STORAGE вес штрафа = 1
+        ExternalDeviceDto donorDevice = new ExternalDeviceDto(
+                2L, "Donor PC", "INV-02", "SN-02", null, null, null, null,
+                1L, "Model", "PN", null, 1L, "Manuf", "typeId", "PC", "stateId",
+                ExternalDeviceState.STORAGE,
+                "Owner", "Phone", "Pos", "DeptId", "Dept",
+                1L, 1L, 1L, "Path", Instant.now(), true, BigDecimal.TEN, null, null,
+                null, null, null, null,
+                List.of(donorCpu)
+        );
+
+        when(infraDeviceService.getDeviceDetails(1L)).thenReturn(mockTargetDevice);
+        when(infraDeviceService.getPotentialDonors(1L, ExternalComponentCategory.CPU)).thenReturn(List.of(donorDevice));
+
+        // Настраиваем маппинг для донорской детали
+        // Статус AUTO: вес штрафа = 1
+        IntegrationMappingEntity mockMapping = new IntegrationMappingEntity();
+        mockMapping.setExternalName("AMD Ryzen 5");
+        mockMapping.setConfidence(MappingConfidence.AUTO);
+
+        CpuEntity internalCpu = new CpuEntity();
+        mockMapping.setInternalComponent(internalCpu);
+
+        when(mappingService.resolveAndSaveBatch(any(), eq(ComponentType.CPU)))
+                .thenReturn(Map.of("amd ryzen 5", mockMapping));
+
+        // Движок совместимости не возвращает ошибок: вес штрафа = 0
+        when(compatibilityEngine.evaluateCompatibility(any(), eq(ComponentType.CPU)))
+                .thenReturn(Collections.emptyList());
+
+        String sessionId = donorSearchService.runSearch(1L, "adapter123", null);
+
+        verify(searchCache).put(eq(sessionId), donorResultCaptor.capture());
+
+        List<DonorResultDto> results = donorResultCaptor.getValue();
+        assertEquals(1, results.size());
+
+        DonorResultDto result = results.get(0);
+        assertEquals(2L, result.donorDevice().externalId());
+
+        // Проверка правильности расчетов:
+        // 1. Штраф за статус устройства STORAGE = 1
+        assertEquals(1, result.devicePenalty(), "Неверный штраф за устройство");
+
+        // 2. Штраф компонента = 1 (за маппинг AUTO) + 0 (предупреждения правил) = 1
+        assertEquals(1, result.compatibleComponents().get(0).componentPenalty(), "Неверный штраф за компонент");
+
+        // 3. Итоговый штраф = 1 + 1 = 2
+        assertEquals(2, result.totalPenalty(), "Неверный итоговый штраф");
     }
 
     @Test
