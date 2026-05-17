@@ -1,19 +1,28 @@
 package com.github.randdd32.donor_search_backend.service.auth;
 
+import com.github.randdd32.donor_search_backend.core.error.NotFoundException;
 import com.github.randdd32.donor_search_backend.model.auth.UserEntity;
 import com.github.randdd32.donor_search_backend.model.enums.UserRole;
 import com.github.randdd32.donor_search_backend.repository.auth.UserRepository;
 import com.github.randdd32.donor_search_backend.web.dto.auth.UserCreateDto;
 import com.github.randdd32.donor_search_backend.web.dto.auth.UserUpdateDto;
+import com.github.randdd32.donor_search_backend.web.dto.filter.UserFilter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -41,6 +50,43 @@ class UserServiceTest {
         user.setUsername("testuser");
         user.setPasswordHash("hashedPass");
         user.setRole(UserRole.USER);
+    }
+
+    @Test
+    @DisplayName("Позитивный тест: получение списка пользователей (getAll)")
+    void getAll_Positive() {
+        Pageable pageable = PageRequest.of(0, 10);
+        UserFilter filter = new UserFilter("test", null, null, null, null, null);
+        Page<UserEntity> page = new PageImpl<>(List.of(user));
+
+        when(repository.findAll(Mockito.<Specification<UserEntity>>any(), eq(pageable))).thenReturn(page);
+
+        Page<UserEntity> result = userService.getAll(filter, pageable);
+        assertEquals(1, result.getTotalElements());
+        verify(repository, times(1)).findAll(Mockito.<Specification<UserEntity>>any(), eq(pageable));
+    }
+
+    @Test
+    @DisplayName("Позитивный тест: получение пользователя по ID")
+    void getById_Positive() {
+        when(repository.findById(1L)).thenReturn(Optional.of(user));
+        UserEntity found = userService.getById(1L);
+        assertEquals("testuser", found.getUsername());
+    }
+
+    @Test
+    @DisplayName("Негативный тест: пользователь по ID не найден")
+    void getById_Negative_NotFound() {
+        when(repository.findById(99L)).thenReturn(Optional.empty());
+        assertThrows(NotFoundException.class, () -> userService.getById(99L));
+    }
+
+    @Test
+    @DisplayName("Позитивный тест: получение пользователя по username")
+    void getByUsername_Positive() {
+        when(repository.findByUsernameIgnoreCase("testuser")).thenReturn(Optional.of(user));
+        UserEntity found = userService.getByUsername("testuser");
+        assertEquals(1L, found.getId());
     }
 
     @Test
@@ -99,6 +145,20 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("Позитивный тест: обновление чужого профиля администратором (изменение роли)")
+    void updateUser_Positive_ByAdmin() {
+        UserUpdateDto dto = new UserUpdateDto(UserRole.ADMIN, null);
+
+        when(repository.findById(1L)).thenReturn(Optional.of(user));
+        when(repository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        UserEntity updated = userService.updateUser(1L, dto, UserRole.SUPERADMIN, "superadmin_user");
+
+        assertEquals(UserRole.ADMIN, updated.getRole());
+        verify(refreshSessionService, never()).revokeAllUserSessions(any());
+    }
+
+    @Test
     @DisplayName("Негативный тест: попытка изменения своей роли")
     void updateUser_Negative_SelfRoleChange() {
         UserUpdateDto dto = new UserUpdateDto(UserRole.ADMIN, null);
@@ -111,14 +171,24 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("Негативный тест: попытка удаления самого себя")
-    void deleteUser_Negative_SelfDeletionIsHandledInController() {
+    @DisplayName("Позитивный тест: успешный отзыв сессий другого пользователя")
+    void revokeSessions_Positive() {
+        when(repository.findById(1L)).thenReturn(Optional.of(user));
+
+        userService.revokeSessions(1L, UserRole.ADMIN);
+
+        verify(refreshSessionService, times(1)).revokeAllUserSessions(1L);
+    }
+
+    @Test
+    @DisplayName("Негативный тест: попытка отзыва сессий пользователя выше по рангу (SUPERADMIN)")
+    void revokeSessions_Negative_RoleHierarchy() {
         user.setRole(UserRole.SUPERADMIN);
         when(repository.findById(1L)).thenReturn(Optional.of(user));
 
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
-                userService.deleteUser(1L, UserRole.ADMIN)
+                userService.revokeSessions(1L, UserRole.ADMIN)
         );
-        assertTrue(ex.getMessage().contains("Nobody has permission to delete a user with role SUPERADMIN"));
+        assertTrue(ex.getMessage().contains("Nobody has permission to revoke sessions of a user with role SUPERADMIN"));
     }
 }

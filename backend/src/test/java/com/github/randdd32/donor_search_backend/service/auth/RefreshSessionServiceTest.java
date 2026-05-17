@@ -97,12 +97,37 @@ class RefreshSessionServiceTest {
     @Test
     @DisplayName("Негативный тест: ротация истекшей сессии")
     void rotateSession_Negative_SessionExpired() {
-        validSession.setExpiresIn(Instant.now().minus(1, ChronoUnit.DAYS)); // Истекла вчера
+        validSession.setExpiresIn(Instant.now().minus(1, ChronoUnit.DAYS));
         when(repository.findByRefreshToken("token-123")).thenReturn(Optional.of(validSession));
 
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
                 sessionService.rotateSession("token-123", "fingerprint-A", "ip", "agent")
         );
         assertEquals("Session has expired", ex.getMessage());
+    }
+
+    @Test
+    @DisplayName("Позитивный тест: отзыв конкретной сессии по токену")
+    void revokeSession_Positive_ValidToken() {
+        when(repository.findByRefreshToken("token-123")).thenReturn(Optional.of(validSession));
+        sessionService.revokeSession("token-123");
+        verify(repository, times(1)).delete(validSession);
+    }
+
+    @Test
+    @DisplayName("Позитивный тест: отзыв сессии игнорируется при пустом токене")
+    void revokeSession_Positive_NullOrBlankToken() {
+        sessionService.revokeSession(null);
+        sessionService.revokeSession("");
+        sessionService.revokeSession("   ");
+        verify(repository, never()).findByRefreshToken(anyString());
+        verify(repository, never()).delete(any());
+    }
+
+    @Test
+    @DisplayName("Позитивный тест: отзыв всех сессий пользователя")
+    void revokeAllUserSessions_Positive() {
+        sessionService.revokeAllUserSessions(1L);
+        verify(repository, times(1)).deleteAllByUserId(1L);
     }
 }
