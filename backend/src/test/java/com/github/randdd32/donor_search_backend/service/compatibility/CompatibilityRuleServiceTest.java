@@ -68,7 +68,8 @@ class CompatibilityRuleServiceTest {
     @DisplayName("Позитивный тест: получение списка с фильтрацией и пагинацией (getAll)")
     void getAll_Positive() {
         Pageable pageable = PageRequest.of(0, 10);
-        CompatibilityRuleFilter filter = new CompatibilityRuleFilter(null, true, null, null, null, null, null);
+        CompatibilityRuleFilter filter = new CompatibilityRuleFilter("Test", true, null,
+                null, null, null, null);
         Page<CompatibilityRuleEntity> page = new PageImpl<>(List.of(rule));
 
         when(repository.findAll(Mockito.<Specification<CompatibilityRuleEntity>>any(), eq(pageable))).thenReturn(page);
@@ -110,21 +111,37 @@ class CompatibilityRuleServiceTest {
     @Test
     @DisplayName("Позитивный тест: успешное обновление правила (update)")
     void update_Positive() {
+        String updatedRuleCode = "TEST_CODE";
+        String updatedName = "Updated Name";
+        String updatedExpression = "1 == 1";
+        String updatedErrorMessage = "New Error";
+        Boolean updatedIsActive = false;
+        String updatedDescription = "Updated Description";
+        ComponentType updatedComponentType = ComponentType.CASE;
+
         CompatibilityRuleEntity updatedRule = new CompatibilityRuleEntity();
-        updatedRule.setRuleCode("UNIQUE_CODE");
-        updatedRule.setRuleName("Updated Name");
-        updatedRule.setExpression("1 == 1");
-        updatedRule.setErrorMessage("New Error");
-        updatedRule.getTargetComponentTypes().add(ComponentType.CASE);
+        updatedRule.setRuleCode(updatedRuleCode);
+        updatedRule.setRuleName(updatedName);
+        updatedRule.setExpression(updatedExpression);
+        updatedRule.setErrorMessage(updatedErrorMessage);
+        updatedRule.setIsActive(updatedIsActive);
+        updatedRule.setDescription(updatedDescription);
+        updatedRule.getTargetComponentTypes().add(updatedComponentType);
 
         when(repository.findById(1L)).thenReturn(Optional.of(rule));
-        when(repository.findByRuleCodeIgnoreCase("UNIQUE_CODE")).thenReturn(Optional.of(rule));
+        when(repository.findByRuleCodeIgnoreCase(updatedRuleCode)).thenReturn(Optional.of(rule));
         when(repository.save(any())).thenReturn(rule);
 
         CompatibilityRuleEntity saved = compatibilityRuleService.update(1L, updatedRule);
 
-        assertEquals("Updated Name", saved.getRuleName());
-        assertEquals("1 == 1", saved.getExpression());
+        assertEquals(updatedRuleCode, saved.getRuleCode());
+        assertEquals(updatedName, saved.getRuleName());
+        assertEquals(updatedExpression, saved.getExpression());
+        assertEquals(updatedErrorMessage, saved.getErrorMessage());
+        assertEquals(updatedIsActive, saved.getIsActive());
+        assertEquals(updatedDescription, saved.getDescription());
+        assertTrue(saved.getTargetComponentTypes().contains(updatedComponentType));
+        assertEquals(1, saved.getTargetComponentTypes().size());
         verify(repository, times(1)).save(rule);
     }
 
@@ -168,7 +185,20 @@ class CompatibilityRuleServiceTest {
 
     @Test
     @DisplayName("Негативный тест: попытка создания правила с существующим кодом (дубликат)")
-    void validate_Negative_DuplicateRuleCode() {
+    void create_Negative_DuplicateRuleCode() {
+        CompatibilityRuleEntity existingRule = new CompatibilityRuleEntity();
+        existingRule.setId(2L);
+        existingRule.setRuleCode("UNIQUE_CODE");
+
+        when(repository.findByRuleCodeIgnoreCase("UNIQUE_CODE")).thenReturn(Optional.of(existingRule));
+
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> compatibilityRuleService.create(rule));
+        assertEquals("Compatibility rule with code 'UNIQUE_CODE' already exists", ex.getMessage());
+    }
+
+    @Test
+    @DisplayName("Негативный тест: попытка обновления правила на код, занятый другим правилом")
+    void update_Negative_DuplicateRuleCode() {
         CompatibilityRuleEntity existingRule = new CompatibilityRuleEntity();
         existingRule.setId(2L);
         existingRule.setRuleCode("UNIQUE_CODE");

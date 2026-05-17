@@ -138,7 +138,7 @@ public class IntegrationMappingService extends AbstractCrudService<IntegrationMa
     protected void validate(IntegrationMappingEntity entity, Long id) {
         if (entity == null) throw new IllegalArgumentException("IntegrationMapping entity is null");
 
-        validateStringField(entity.getExternalName(), "External Name");
+        validateStringField(entity.getExternalName(), "External name");
         if (entity.getConfidence() == null) throw new IllegalArgumentException("Confidence level must not be null");
 
         Optional<IntegrationMappingEntity> existing = repository.findByExternalNameIgnoreCase(entity.getExternalName());

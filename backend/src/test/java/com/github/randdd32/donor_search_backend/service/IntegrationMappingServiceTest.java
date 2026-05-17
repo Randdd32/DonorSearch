@@ -96,6 +96,7 @@ class IntegrationMappingServiceTest {
 
         Page<IntegrationMappingEntity> result = mappingService.getAll(filter, pageable);
         assertEquals(1, result.getTotalElements());
+        verify(repository, times(1)).findAll(Mockito.<Specification<IntegrationMappingEntity>>any(), eq(pageable));
     }
 
     @Test
@@ -209,12 +210,26 @@ class IntegrationMappingServiceTest {
     @DisplayName("Негативный тест: создание с пустым названием")
     void create_Negative_MissingExternalName() {
         mapping.setExternalName("");
-        assertThrows(IllegalArgumentException.class, () -> mappingService.createFromDto(mapping, 10L));
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> mappingService.createFromDto(mapping, 10L));
+        assertTrue(ex.getMessage().contains("External name must not be null or empty"));
     }
 
     @Test
-    @DisplayName("Негативный тест: создание с дублирующимся названием (уже существует)")
-    void validate_Negative_DuplicateExternalName() {
+    @DisplayName("Негативный тест: попытка создания с дублирующимся названием (уже существует)")
+    void create_Negative_DuplicateExternalName() {
+        IntegrationMappingEntity existing = new IntegrationMappingEntity();
+        existing.setId(2L);
+        existing.setExternalName("NVIDIA RTX 3060");
+
+        when(repository.findByExternalNameIgnoreCase("NVIDIA RTX 3060")).thenReturn(Optional.of(existing));
+
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> mappingService.createFromDto(mapping, 10L));
+        assertTrue(ex.getMessage().contains("already exists"));
+    }
+
+    @Test
+    @DisplayName("Негативный тест: обновление на внешнее название, занятое другим маппингом")
+    void update_Negative_DuplicateExternalName() {
         IntegrationMappingEntity existing = new IntegrationMappingEntity();
         existing.setId(2L);
         existing.setExternalName("NVIDIA RTX 3060");
