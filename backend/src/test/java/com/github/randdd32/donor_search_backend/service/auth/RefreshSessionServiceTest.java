@@ -14,8 +14,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -51,14 +49,6 @@ class RefreshSessionServiceTest {
     @Test
     @DisplayName("Позитивный тест: создание новой сессии с удалением лишних (лимит 5)")
     void createSession_Positive_EnforcesMaxSessions() {
-        List<RefreshSessionEntity> existingSessions = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
-            RefreshSessionEntity s = new RefreshSessionEntity();
-            s.setId((long) i);
-            existingSessions.add(s);
-        }
-
-        when(repository.findAllByUserIdOrderByCreatedAtAsc(1L)).thenReturn(existingSessions);
         when(repository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         RefreshSessionEntity newSession = sessionService.createSession(user, "finger-new", "127.0.0.1", "Chrome");
@@ -67,7 +57,7 @@ class RefreshSessionServiceTest {
         assertEquals("finger-new", newSession.getFingerprint());
 
         verify(repository, times(1)).deleteByUserIdAndFingerprint(1L, "finger-new");
-        verify(repository, times(1)).delete(existingSessions.get(0));
+        verify(repository, times(1)).deleteExcessSessions(1L, 4);
     }
 
     @Test

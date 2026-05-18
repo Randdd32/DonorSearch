@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -80,12 +79,6 @@ public class RefreshSessionService {
     }
 
     private void checkAndCleanSessions(Long userId) {
-        List<RefreshSessionEntity> sessions = repository.findAllByUserIdOrderByCreatedAtAsc(userId);
-        if (sessions.size() >= MAX_SESSIONS) {
-            int sessionsToDelete = sessions.size() - MAX_SESSIONS + 1;
-            for (int i = 0; i < sessionsToDelete; i++) {
-                repository.delete(sessions.get(i));
-            }
-        }
+        repository.deleteExcessSessions(userId, MAX_SESSIONS - 1);
     }
 }
