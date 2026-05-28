@@ -4,6 +4,9 @@ import { ArrowLeft, Save, Search, CheckCircle } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import toast from 'react-hot-toast';
+import { useForm, Controller, useWatch } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { clsx } from 'clsx';
 import { mappingsService } from '../../services/mappings.service';
 import { formatDateTime } from '../../utils/formatters';
 import { useDocumentTitle } from '../../hooks/useDocumentTitle';
@@ -17,7 +20,8 @@ import { Badge } from '../../components/ui/Badge/Badge';
 import { Spinner } from '../../components/ui/Spinner/Spinner';
 import { ErrorState } from '../../components/ui/ErrorState/ErrorState';
 import { ComponentSelectionModal } from '../../features/admin/components/ComponentSelectionModal/ComponentSelectionModal';
-import type { ExternalComponentCategory, IntegrationMappingDto, MappingConfidence } from '../../types/integration';
+import type { IntegrationMappingDto, MappingConfidence } from '../../types/integration';
+import { mappingSchema, type MappingFormValues } from './mappingSchema';
 import styles from '../../styles/layouts/editPageLayout.module.css';
 
 export const MappingEditPage = () => {
@@ -56,36 +60,49 @@ const MappingForm = ({ isNew, id, originalData }: MappingFormProps) => {
   const queryClient = useQueryClient();
   const [searchParams] = useSearchParams();
 
-  const [externalName, setExternalName] = useState(
-    originalData?.externalName || (isNew ? searchParams.get('externalName') || '' : '')
-  );
-  const [componentType, setComponentType] = useState<ExternalComponentCategory | ''>(
-    originalData?.internalComponentType || (isNew ? (searchParams.get('type') as ExternalComponentCategory) || '' : '')
-  );
-  const [componentId, setComponentId] = useState<number | null>(originalData?.internalComponentId || null);
-  const [componentName, setComponentName] = useState<string>(originalData?.internalComponentName || '');
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    setValue,
+    formState: { errors }
+  } = useForm<MappingFormValues>({
+    resolver: zodResolver(mappingSchema),
+    defaultValues: {
+      externalName: originalData?.externalName || (isNew ? searchParams.get('externalName') || '' : ''),
+      componentType: originalData?.internalComponentType || (isNew ? searchParams.get('type') || '' : ''),
+      componentId: originalData?.internalComponentId || undefined,
+      componentName: originalData?.internalComponentName || '',
+    },
+    mode: 'onTouched'
+  });
+
+  const externalName = useWatch({ control, name: 'externalName' });
+  const componentType = useWatch({ control, name: 'componentType' });
+  const componentId = useWatch({ control, name: 'componentId' });
+  const componentName = useWatch({ control, name: 'componentName' });
 
   const confidence = originalData?.confidence || 'CONFIRMED' as MappingConfidence;
   const searchName = originalData?.internalComponentSearchName;
 
   const saveMutation = useMutation({
-    mutationFn: async () => {
-      const trimmedName = externalName.trim();
-      if (!trimmedName) throw new Error('Внешнее название обязательно');
-      if (!componentId) throw new Error('Необходимо выбрать деталь из базы');
+    mutationFn: async (data: MappingFormValues) => {
+      const trimmedName = data.externalName.trim();
+      const safeComponentId = data.componentId!;
 
       if (isNew) {
         return mappingsService.create({
           externalName: trimmedName,
-          internalComponentId: componentId,
+          internalComponentId: safeComponentId,
           confidence: 'CONFIRMED',
         });
       } else {
         return mappingsService.update(Number(id), {
           ...originalData!,
           externalName: trimmedName,
-          internalComponentId: componentId,
+          internalComponentId: safeComponentId,
           confidence: 'CONFIRMED',
         });
       }
@@ -103,17 +120,8 @@ const MappingForm = ({ isNew, id, originalData }: MappingFormProps) => {
     }
   });
 
-  const handleTypeChange = (val: string | number | boolean | null) => {
-    const newType = (val ? String(val) : '') as ExternalComponentCategory | '';
-    setComponentType(newType);
-    
-    if (newType !== originalData?.internalComponentType) {
-      setComponentId(null);
-      setComponentName('');
-    } else {
-      setComponentId(originalData.internalComponentId);
-      setComponentName(originalData.internalComponentName);
-    }
+  const onSubmit = (data: MappingFormValues) => {
+    saveMutation.mutate(data);
   };
 
   return (
@@ -132,54 +140,85 @@ const MappingForm = ({ isNew, id, originalData }: MappingFormProps) => {
         <Card className={styles.formCard}>
           <h3 className={styles.cardTitle}>Настройки маппинга</h3>
           
-          <div className={styles.field}>
-            <label className={styles.label}>Внешнее название (Из системы учета) <span className={styles.req}>*</span></label>
-            <Input 
-              value={externalName}
-              onChange={(e) => isNew && setExternalName(e.target.value)}
-              disabled={!isNew}
-              placeholder="Например: Kingston DDR4 16GB"
-            />
-            {!isNew && <p className={styles.hint}>Внешнее название нельзя изменить после создания.</p>}
-          </div>
-
-          <div className={styles.field}>
-            <label className={styles.label}>Категория комплектующего <span className={styles.req}>*</span></label>
-            <Select 
-              value={componentType}
-              onChange={handleTypeChange}
-              options={COMPONENT_TYPE_OPTIONS}
-              placeholder="Выберите тип..."
-              isSearchable={true}
-            />
-          </div>
-
-          <div className={styles.field}>
-            <label className={styles.label}>Компонент из базы данных <span className={styles.req}>*</span></label>
-            <div className={styles.componentSelector}>
-              <div className={styles.selectedComponentBox}>
-                {componentId ? (
-                  <div className={styles.compSelected}>
-                    <CheckCircle size={18} className={styles.successIcon} />
-                    <div className={styles.compText}>
-                      <span className={styles.cName}>{componentName}</span>
-                      <span className={styles.cId}>ID: {componentId}</span>
-                    </div>
-                  </div>
-                ) : (
-                  <span className={styles.compEmpty}>Деталь не выбрана</span>
-                )}
-              </div>
-              <Button onClick={() => setIsModalOpen(true)} disabled={!componentType} className={styles.selectBtn}>
-                <Search size={16} /> Выбрать
-              </Button>
+          <form id="mapping-form" onSubmit={handleSubmit(onSubmit)} className={styles.formContents}>
+            <div className={styles.field}>
+              <label className={styles.label}>Внешнее название (из системы учета) <span className={styles.req}>*</span></label>
+              <Input 
+                {...register('externalName')}
+                disabled={!isNew}
+                placeholder="Например: Kingston DDR4 16GB"
+                error={errors.externalName?.message}
+              />
+              {!isNew && <p className={styles.hint}>Внешнее название нельзя изменить после создания.</p>}
             </div>
-            {!componentType && <p className={styles.hint}>Сначала выберите категорию.</p>}
-          </div>
+
+            <div className={styles.field}>
+              <label className={styles.label}>Категория комплектующего <span className={styles.req}>*</span></label>
+              <Controller
+                name="componentType"
+                control={control}
+                render={({ field }) => (
+                  <Select 
+                    value={field.value}
+                    onChange={(val) => {
+                      const newType = val ? String(val) : '';
+                      field.onChange(newType);
+                      
+                      if (newType !== originalData?.internalComponentType) {
+                        setValue('componentId', undefined, { shouldValidate: true });
+                        setValue('componentName', '');
+                      } else {
+                        setValue('componentId', originalData.internalComponentId, { shouldValidate: true });
+                        setValue('componentName', originalData.internalComponentName);
+                      }
+                    }}
+                    options={COMPONENT_TYPE_OPTIONS}
+                    placeholder="Выберите тип..."
+                    isSearchable={true}
+                  />
+                )}
+              />
+              {errors.componentType && <span className={clsx(styles.hint, styles.req)}>{errors.componentType.message}</span>}
+            </div>
+
+            <div className={styles.field}>
+              <label className={styles.label}>Компонент из базы данных <span className={styles.req}>*</span></label>
+              <div className={styles.componentSelector}>
+                <div className={clsx(styles.selectedComponentBox, { [styles.hasError]: errors.componentId })}>
+                  {componentId ? (
+                    <div className={styles.compSelected}>
+                      <CheckCircle size={18} className={styles.successIcon} />
+                      <div className={styles.compText}>
+                        <span className={styles.cName}>{componentName}</span>
+                        <span className={styles.cId}>ID: {componentId}</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <span className={styles.compEmpty}>Деталь не выбрана</span>
+                  )}
+                </div>
+                <Button 
+                  type="button" 
+                  onClick={() => setIsModalOpen(true)} 
+                  disabled={!componentType} 
+                  className={styles.selectBtn}
+                >
+                  <Search size={16} /> Выбрать
+                </Button>
+              </div>
+              {!componentType && <p className={styles.hint}>Сначала выберите категорию.</p>}
+              {errors.componentId && <span className={clsx(styles.hint, styles.req)}>{errors.componentId.message}</span>}
+            </div>
+          </form>
 
           <div className={styles.actions}>
             <Button variant="secondary" onClick={() => navigate('/mappings')}>Отмена</Button>
-            <Button onClick={() => saveMutation.mutate()} isLoading={saveMutation.isPending} disabled={!externalName || !componentId}>
+            <Button 
+              type="submit" 
+              form="mapping-form" 
+              isLoading={saveMutation.isPending} 
+              disabled={!externalName || !componentId}
+            >
               <Save size={16} /> {isNew ? 'Создать связь' : 'Подтвердить и сохранить'}
             </Button>
           </div>
@@ -206,7 +245,7 @@ const MappingForm = ({ isNew, id, originalData }: MappingFormProps) => {
 
               <div className={styles.metaItem}>
                 <span className={styles.metaLabel}>Поисковое имя БД</span>
-                <span className={styles.metaValue} style={{ fontSize: '13px', fontFamily: 'monospace' }}>
+                <span className={clsx(styles.metaValue, styles.monospaceMeta)}>
                   {searchName || '—'}
                 </span>
               </div>
@@ -230,11 +269,11 @@ const MappingForm = ({ isNew, id, originalData }: MappingFormProps) => {
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           componentType={componentType}
-          selectedId={componentId}
-          selectedName={componentName}
+          selectedId={componentId || null}
+          selectedName={componentName || null}
           onSelect={(selectId, selectName) => {
-            setComponentId(selectId);
-            setComponentName(selectName);
+            setValue('componentId', selectId, { shouldValidate: true, shouldDirty: true });
+            setValue('componentName', selectName);
           }}
         />
       )}

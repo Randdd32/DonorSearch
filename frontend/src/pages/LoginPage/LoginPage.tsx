@@ -3,13 +3,15 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { LogIn } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { isAxiosError } from 'axios';
+import { useForm, useWatch } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { authService } from '../../services/auth.service';
 import { useAuthStore } from '../../store/authStore';
 import { useDocumentTitle } from '../../hooks/useDocumentTitle';
-import { PASSWORD_REGEX } from '../../config/constants';
 import { Card } from '../../components/ui/Card/Card';
 import { Input } from '../../components/ui/Input/Input';
 import { Button } from '../../components/ui/Button/Button';
+import { loginSchema, type LoginFormValues } from './loginSchema';
 import styles from './LoginPage.module.css';
 
 export const LoginPage = () => {
@@ -19,32 +21,32 @@ export const LoginPage = () => {
   const location = useLocation();
   const setAuth = useAuthStore((state) => state.setAuth);
 
-  const [username, setUsername] = useState('');
-  const[password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-
   const from = location.state?.from?.pathname || '/';
 
-  const handleLogin = async (e: React.SyntheticEvent) => {
-    e.preventDefault();
-    
-    if (username.length < 2 || username.length > 100) {
-      toast.error('Логин должен содержать от 2 до 100 символов');
-      return;
-    }
-    
-    if (!PASSWORD_REGEX.test(password)) {
-      toast.error(
-        'Неверный формат пароля. Проверьте правильность ввода.\nПароль должен содержать от 8 до 60 символов, минимум одну заглавную и строчную латинские буквы, одну цифру и один спецсимвол (!@#$%^&*_=+-).'
-      );
-      return;
-    }
+  const { 
+    register, 
+    handleSubmit, 
+    control,
+    setValue,
+    formState: { errors } 
+  } = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      username: '',
+      password: '',
+    },
+    mode: 'onTouched'
+  });
 
+  const usernameValue = useWatch({ control, name: 'username' });
+
+  const onSubmit = async (data: LoginFormValues) => {
     try {
       setIsLoading(true);
-      const data = await authService.login(username, password);
+      const res = await authService.login(data.username, data.password);
       
-      setAuth(data.accessToken, { username: data.username, role: data.role });
+      setAuth(res.accessToken, { username: res.username, role: res.role });
       navigate(from, { replace: true });
     } catch (error: unknown) {
       console.error('Ошибка входа', error);
@@ -72,27 +74,29 @@ export const LoginPage = () => {
           <p className={styles.subtitle}>Войдите в свою учетную запись</p>
         </div>
 
-        <form onSubmit={handleLogin} className={styles.form}>
+        <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
           <div className={styles.field}>
             <label className={styles.label}>Логин</label>
             <Input 
+              {...register('username')}
               type="text" 
               placeholder="Введите логин" 
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
               disabled={isLoading}
               autoFocus
+              error={errors.username?.message}
+              value={usernameValue}
+              onClear={() => setValue('username', '', { shouldValidate: true })}
             />
           </div>
 
           <div className={styles.field}>
             <label className={styles.label}>Пароль</label>
             <Input 
+              {...register('password')}
               type="password" 
               placeholder="•••••••••••••••••••" 
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
               disabled={isLoading}
+              error={errors.password?.message}
             />
           </div>
 

@@ -1,5 +1,6 @@
 import { AlertTriangle, Info, CheckCircle, Hash, User, Building, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { clsx } from 'clsx'; // Импортируем clsx
 import type { DonorResultDto, WarningSeverity } from '../../../../types/search';
 import { getStateConfig, formatPluralPoints } from '../../../../utils/formatters';
 import { Card } from '../../../../components/ui/Card/Card';
@@ -11,12 +12,12 @@ interface DonorCardProps {
   result: DonorResultDto;
 }
 
-const severityConfig: Record<WarningSeverity, { color: string; label: string }> = {
-  CRITICAL: { color: 'var(--status-critical)', label: 'Критично' },
-  HIGH: { color: 'var(--status-high)', label: 'Высокий риск' },
-  MEDIUM: { color: 'var(--status-medium)', label: 'Средний риск' },
-  LOW: { color: 'var(--status-low)', label: 'Низкий риск' },
-  INFO: { color: 'var(--status-info)', label: 'Информация' },
+const severityConfig: Record<WarningSeverity, { boxClass: string; textClass: string; label: string }> = {
+  CRITICAL: { boxClass: styles.warningCritical, textClass: styles.textCritical, label: 'Критично' },
+  HIGH: { boxClass: styles.warningHigh, textClass: styles.textHigh, label: 'Высокий риск' },
+  MEDIUM: { boxClass: styles.warningMedium, textClass: styles.textMedium, label: 'Средний риск' },
+  LOW: { boxClass: styles.warningLow, textClass: styles.textLow, label: 'Низкий риск' },
+  INFO: { boxClass: styles.warningInfo, textClass: styles.textInfo, label: 'Информация' },
 };
 
 export const DonorCard = ({ result }: DonorCardProps) => {
@@ -95,12 +96,11 @@ export const DonorCard = ({ result }: DonorCardProps) => {
                     return (
                       <div 
                         key={wIdx} 
-                        className={styles.warningItem} 
-                        style={{ borderLeftColor: sevConfig.color, backgroundColor: `color-mix(in srgb, ${sevConfig.color} 10%, transparent)` }}
+                        className={clsx(styles.warningItem, sevConfig.boxClass)} 
                       >
-                        <Info size={16} color={sevConfig.color} className={styles.warningIcon} />
+                        <Info size={16} className={clsx(styles.warningIcon, sevConfig.textClass)} />
                         <div>
-                          <div className={styles.warningSeverity} style={{ color: sevConfig.color }}>
+                          <div className={clsx(styles.warningSeverity, sevConfig.textClass)}>
                             {sevConfig.label}
                           </div>
                           <div className={styles.warningMessage}>{warning.message}</div>

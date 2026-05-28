@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { Badge } from '../../../../components/ui/Badge/Badge';
 import type { DictionaryName } from '../../../../services/dictionary.service';
 import type { ExternalComponentCategory } from '../../../../types/integration';
+import styles from './ComponentSelectionModal.module.css';
 
 export interface ColumnDef {
   key: string;
@@ -24,7 +25,7 @@ export interface ComponentConfig {
 }
 
 export const renderArray = (arr: unknown) => {
-  if (!Array.isArray(arr) || arr.length === 0) return <span style={{ color: 'var(--text-muted)' }}>—</span>;
+   if (!Array.isArray(arr) || arr.length === 0) return <span className={styles.muted}>—</span>;
   if (arr.length <= 2) return arr.join(', ');
   return <span title={arr.join(', ')}>{arr[0]}, {arr[1]} <Badge variant="default">+{arr.length - 2}</Badge></span>;
 };

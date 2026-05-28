@@ -1,4 +1,5 @@
 export const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*_=+-]).{8,60}$/;
+export const PASSWORD_REQUIREMENTS_MESSAGE = 'Пароль должен содержать от 8 до 60 символов, минимум одну заглавную и строчную латинские буквы, одну цифру и один спецсимвол (!@#$%^&*_=+-).';
 
 export const API_BASE_URL = '/api/v1';
 

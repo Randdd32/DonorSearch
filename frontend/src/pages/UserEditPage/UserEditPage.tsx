@@ -1,9 +1,11 @@
-import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Save, AlertTriangle } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import toast from 'react-hot-toast';
+import { useForm, Controller, useWatch } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { clsx } from 'clsx';
 import { useAuthStore } from '../../store/authStore';
 import { usersService } from '../../services/users.service';
 import { Input } from '../../components/ui/Input/Input';
@@ -14,8 +16,8 @@ import { Spinner } from '../../components/ui/Spinner/Spinner';
 import { ErrorState } from '../../components/ui/ErrorState/ErrorState';
 import { formatDateTime } from '../../utils/formatters';
 import { useDocumentTitle } from '../../hooks/useDocumentTitle';
-import { PASSWORD_REGEX } from '../../config/constants';
-import type { UserRole, UserDto } from '../../types/auth';
+import type { UserDto } from '../../types/auth';
+import { getUserSchema, type UserFormValues } from './userSchema';
 import styles from '../../styles/layouts/editPageLayout.module.css';
 
 export const UserEditPage = () => {
@@ -46,36 +48,46 @@ const UserForm = ({ isNew, id, originalData }: UserFormProps) => {
   const queryClient = useQueryClient();
   const { user: currentUser, logout } = useAuthStore();
 
-  const [username, setUsername] = useState(originalData?.username || '');
-  const [password, setPassword] = useState('');
-  const[role, setRole] = useState<UserRole>(originalData?.role || 'USER');
-
   const isSelf = currentUser?.username === originalData?.username;
   const isSuperAdmin = currentUser?.role === 'SUPERADMIN';
 
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors }
+  } = useForm<UserFormValues>({
+    resolver: zodResolver(getUserSchema(isNew)),
+    defaultValues: {
+      username: originalData?.username || '',
+      password: '',
+      role: originalData?.role || 'USER',
+    },
+    mode: 'onTouched',
+  });
+
+  const passwordValue = useWatch({ control, name: 'password' });
+
   const saveMutation = useMutation({
-    mutationFn: async () => {
-      const trimmedName = username.trim();
-      if (isNew && (trimmedName.length < 2 || trimmedName.length > 100)) {
-        throw new Error('Логин должен содержать от 2 до 100 символов');
-      }
-
-      if (isNew && !password) throw new Error('Для нового пользователя необходимо задать пароль');
-      if (password && !PASSWORD_REGEX.test(password)) {
-        throw new Error('Неверный формат пароля');
-      }
-
+    mutationFn: async (data: UserFormValues) => {
       if (isNew) {
-        return usersService.create({ username: trimmedName, password, role });
+        return usersService.create({ 
+          username: data.username, 
+          password: data.password!, 
+          role: data.role 
+        });
       } else {
-        return usersService.update(Number(id), { password: password || undefined, role });
+        return usersService.update(Number(id), { 
+          password: data.password || undefined, 
+          role: data.role 
+        });
       }
     },
     onSuccess: () => {
       toast.success(isNew ? 'Пользователь создан' : 'Данные обновлены');
       queryClient.invalidateQueries({ queryKey: ['users'] });
       
-      if (isSelf && password.length > 0) {
+      if (isSelf && passwordValue && passwordValue.length > 0) {
         logout(); 
         navigate('/login', { replace: true });
         toast('Вы были выведены из системы в связи со сменой пароля.', { icon: '🔒' });
@@ -110,6 +122,10 @@ const UserForm = ({ isNew, id, originalData }: UserFormProps) => {
       ]
     :[];
 
+  const onSubmit = (data: UserFormValues) => {
+    saveMutation.mutate(data);
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -126,51 +142,61 @@ const UserForm = ({ isNew, id, originalData }: UserFormProps) => {
         <Card className={styles.formCard}>
           <h3 className={styles.cardTitle}>Учетные данные</h3>
           
-          <div className={styles.field}>
-            <label className={styles.label}>Логин {isNew && <span className={styles.req}>*</span>}</label>
-            <Input 
-              value={username}
-              onChange={(e) => isNew && setUsername(e.target.value)}
-              disabled={!isNew}
-              placeholder="Введите логин (от 2 до 100 символов)"
-            />
-            {!isNew && <p className={styles.hint}>Логин нельзя изменить после создания.</p>}
-          </div>
+          <form id="user-form" onSubmit={handleSubmit(onSubmit)} className={styles.formContents}>
+            <div className={styles.field}>
+              <label className={styles.label}>Логин {isNew && <span className={styles.req}>*</span>}</label>
+              <Input 
+                {...register('username')}
+                disabled={!isNew}
+                placeholder="Введите логин (от 2 до 100 символов)"
+                error={errors.username?.message}
+              />
+              {!isNew && <p className={styles.hint}>Логин нельзя изменить после создания.</p>}
+            </div>
 
-          <div className={styles.field}>
-            <label className={styles.label}>Пароль {isNew && <span className={styles.req}>*</span>}</label>
-            <Input 
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder={isNew ? 'Задайте безопасный пароль' : 'Введите новый пароль, чтобы изменить текущий'}
-            />
-            <p className={styles.hint}>
-              От 8 до 60 символов, как минимум одна заглавная и одна строчная латинская буква, цифра, спецсимвол (!@#$%^&*_=+-).
-            </p>
-            {isSelf && password.length > 0 && (
-              <div className={styles.warningBanner}>
-                <AlertTriangle size={18} />
-                Внимание: смена пароля приведет к завершению всех активных сессий. Вам придется заново войти в систему.
+            <div className={styles.field}>
+              <label className={styles.label}>Пароль {isNew && <span className={styles.req}>*</span>}</label>
+              <Input 
+                {...register('password')}
+                type="password"
+                placeholder={isNew ? 'Задайте безопасный пароль' : 'Введите новый пароль, чтобы изменить текущий'}
+                error={errors.password?.message}
+              />
+              {isSelf && passwordValue && passwordValue.length > 0 && (
+                <div className={styles.warningBanner}>
+                  <AlertTriangle size={18} />
+                  Внимание: смена пароля приведет к завершению всех активных сессий.
+                </div>
+              )}
+            </div>
+
+            {(!isSelf && isSuperAdmin) && (
+              <div className={styles.field}>
+                <label className={styles.label}>Системная роль <span className={styles.req}>*</span></label>
+                <Controller
+                  name="role"
+                  control={control}
+                  render={({ field }) => (
+                    <Select 
+                      value={field.value}
+                      onChange={field.onChange}
+                      options={roleOptions}
+                      isSearchable={false}
+                    />
+                  )}
+                />
+                {errors.role && <span className={clsx(styles.hint, styles.req)}>{errors.role.message}</span>}
               </div>
             )}
-          </div>
-
-          {(!isSelf && isSuperAdmin) && (
-            <div className={styles.field}>
-              <label className={styles.label}>Системная роль <span className={styles.req}>*</span></label>
-              <Select 
-                value={role}
-                onChange={(val) => setRole(val as UserRole)}
-                options={roleOptions}
-                isSearchable={false}
-              />
-            </div>
-          )}
+          </form>
 
           <div className={styles.actions}>
             <Button variant="secondary" onClick={() => navigate('/users')}>Отмена</Button>
-            <Button onClick={() => saveMutation.mutate()} isLoading={saveMutation.isPending}>
+            <Button 
+              type="submit" 
+              form="user-form" 
+              isLoading={saveMutation.isPending}
+            >
               <Save size={16} /> {isNew ? 'Создать аккаунт' : 'Сохранить изменения'}
             </Button>
           </div>

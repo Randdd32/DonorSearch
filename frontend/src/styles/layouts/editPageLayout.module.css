@@ -238,6 +238,21 @@
   margin-top: 8px;
 }
 
+.formContents {
+  display: contents;
+}
+
+.monospaceMeta {
+  font-size: 13px;
+  font-family: monospace;
+}
+
+.formErrorInline {
+  padding: 10px 20px;
+  color: var(--status-critical);
+  font-size: 13px;
+}
+
 @media (max-width: 600px) {
   .actions {
     flex-direction: column-reverse;

@@ -1,10 +1,11 @@
-import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Save } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import toast from 'react-hot-toast';
 import ReactSelect, { type MultiValue } from 'react-select';
+import { useForm, Controller, useWatch } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { clsx } from 'clsx';
 import { rulesService } from '../../services/rules.service';
 import { Input } from '../../components/ui/Input/Input';
@@ -20,6 +21,7 @@ import { getSelectStyles } from '../../utils/selectStyles';
 import { COMPONENT_TYPE_OPTIONS } from '../../config/componentTypes';
 import type { ExternalComponentCategory } from '../../types/integration';
 import type { CompatibilityRuleDto } from '../../types/compatibility';
+import { ruleSchema, type RuleFormValues } from './ruleSchema';
 import styles from '../../styles/layouts/editPageLayout.module.css';
 
 export const RuleEditPage = () => {
@@ -49,30 +51,37 @@ const RuleForm = ({ isNew, id, originalData }: RuleFormProps) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const[ruleCode, setRuleCode] = useState(originalData?.ruleCode || '');
-  const[ruleName, setRuleName] = useState(originalData?.ruleName || '');
-  const [description, setDescription] = useState(originalData?.description || '');
-  const [errorMessage, setErrorMessage] = useState(originalData?.errorMessage || '');
-  const [isActive, setIsActive] = useState<boolean>(originalData?.isActive ?? true);
-  const[targetTypes, setTargetTypes] = useState<ExternalComponentCategory[]>(originalData?.targetComponentTypes || []);
-  const[expression, setExpression] = useState(originalData?.expression || '');
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors }
+  } = useForm<RuleFormValues>({
+    resolver: zodResolver(ruleSchema),
+    defaultValues: {
+      ruleCode: originalData?.ruleCode || '',
+      ruleName: originalData?.ruleName || '',
+      description: originalData?.description || '',
+      errorMessage: originalData?.errorMessage || '',
+      isActive: originalData?.isActive ?? true,
+      targetTypes: originalData?.targetComponentTypes || [],
+      expression: originalData?.expression || '',
+    },
+    mode: 'onTouched'
+  });
+
+  const targetTypesValue = useWatch({ control, name: 'targetTypes' }) as ExternalComponentCategory[];
 
   const saveMutation = useMutation({
-    mutationFn: async () => {
-      if (!ruleCode.trim() || ruleCode.length > 100) throw new Error('Код правила обязателен и не более 100 символов');
-      if (!ruleName.trim() || ruleName.length > 200) throw new Error('Название правила обязательно и не более 200 символов');
-      if (!errorMessage.trim()) throw new Error('Текст ошибки обязателен');
-      if (!expression.trim()) throw new Error('Выражение SpEL не может быть пустым');
-      if (targetTypes.length === 0) throw new Error('Выберите минимум один целевой тип оборудования');
-
+    mutationFn: async (data: RuleFormValues) => {
       const dto = {
-        ruleCode: ruleCode.trim(),
-        ruleName: ruleName.trim(),
-        description: description.trim() || undefined,
-        errorMessage: errorMessage.trim(),
-        isActive,
-        targetComponentTypes: targetTypes,
-        expression: expression.trim(),
+        ruleCode: data.ruleCode.trim(),
+        ruleName: data.ruleName.trim(),
+        description: data.description?.trim() || undefined,
+        errorMessage: data.errorMessage.trim(),
+        isActive: data.isActive,
+        targetComponentTypes: data.targetTypes as ExternalComponentCategory[],
+        expression: data.expression.trim(),
       };
 
       return isNew ? rulesService.create(dto) : rulesService.update(Number(id), dto);
@@ -90,6 +99,10 @@ const RuleForm = ({ isNew, id, originalData }: RuleFormProps) => {
     }
   });
 
+  const onSubmit = (data: RuleFormValues) => {
+    saveMutation.mutate(data);
+  };
+
   return (
     <div className={clsx(styles.container, styles.containerWide)}>
       <div className={styles.header}>
@@ -106,59 +119,103 @@ const RuleForm = ({ isNew, id, originalData }: RuleFormProps) => {
         <Card className={clsx(styles.formCard, styles.leftColumn)}>
           <h3 className={styles.cardTitle}>Базовые настройки</h3>
           
-          <div className={styles.field}>
-            <label className={styles.label}>Код правила <span className={styles.req}>*</span></label>
-            <Input value={ruleCode} onChange={(e) => setRuleCode(e.target.value)} placeholder="Например: GPU_LENGTH_LIMIT" />
-          </div>
+          <form id="rule-form" onSubmit={handleSubmit(onSubmit)} className={styles.formContents}>
+            <div className={styles.field}>
+              <label className={styles.label}>Код правила <span className={styles.req}>*</span></label>
+              <Input 
+                {...register('ruleCode')}
+                placeholder="Например: GPU_LENGTH_LIMIT" 
+                error={errors.ruleCode?.message}
+              />
+            </div>
 
-          <div className={styles.field}>
-            <label className={styles.label}>Читаемое название <span className={styles.req}>*</span></label>
-            <Input value={ruleName} onChange={(e) => setRuleName(e.target.value)} placeholder="Например: Ограничение длины видеокарты" />
-          </div>
+            <div className={styles.field}>
+              <label className={styles.label}>Читаемое название <span className={styles.req}>*</span></label>
+              <Input 
+                {...register('ruleName')}
+                placeholder="Например: Ограничение длины видеокарты" 
+                error={errors.ruleName?.message}
+              />
+            </div>
 
-          <div className={styles.field}>
-            <label className={styles.label}>Целевые типы оборудования <span className={styles.req}>*</span></label>
-            <ReactSelect
-              isMulti
-              options={COMPONENT_TYPE_OPTIONS}
-              value={COMPONENT_TYPE_OPTIONS.filter(opt => targetTypes.includes(opt.value))}
-              onChange={(selected: MultiValue<{ value: ExternalComponentCategory; label: string }>) => {
-                setTargetTypes(selected ? selected.map(s => s.value) :[]);
-              }}
-              styles={getSelectStyles()}
-              placeholder="Выберите типы..."
-              noOptionsMessage={() => 'Не найдено'}
-            />
-          </div>
+            <div className={styles.field}>
+              <label className={styles.label}>Целевые типы оборудования <span className={styles.req}>*</span></label>
+              <Controller
+                name="targetTypes"
+                control={control}
+                render={({ field }) => (
+                  <ReactSelect
+                    isMulti
+                    options={COMPONENT_TYPE_OPTIONS}
+                    value={COMPONENT_TYPE_OPTIONS.filter(opt => field.value.includes(opt.value))}
+                    onChange={(selected: MultiValue<{ value: ExternalComponentCategory; label: string }>) => {
+                      field.onChange(selected ? selected.map(s => s.value) : []);
+                    }}
+                    styles={getSelectStyles()}
+                    placeholder="Выберите типы..."
+                    noOptionsMessage={() => 'Не найдено'}
+                  />
+                )}
+              />
+              {errors.targetTypes && <span className={clsx(styles.hint, styles.req)}>{errors.targetTypes.message}</span>}
+            </div>
 
-          <div className={styles.field}>
-            <label className={styles.label}>Сообщение об ошибке<span className={styles.req}>*</span></label>
-            <Input value={errorMessage} onChange={(e) => setErrorMessage(e.target.value)} placeholder="Видеокарта не поместится в корпус" />
-          </div>
+            <div className={styles.field}>
+              <label className={styles.label}>Сообщение об ошибке <span className={styles.req}>*</span></label>
+              <Input 
+                {...register('errorMessage')}
+                placeholder="Видеокарта не поместится в корпус" 
+                error={errors.errorMessage?.message}
+              />
+            </div>
 
-          <div className={styles.field}>
-            <label className={styles.label}>Описание правила (опционально)</label>
-            <textarea 
-              value={description} onChange={(e) => setDescription(e.target.value)}
-              className={clsx(styles.nativeInput, styles.textareaInput)} 
-              placeholder="Краткое пояснение логики правила..."
-            />
-          </div>
+            <div className={styles.field}>
+              <label className={styles.label}>Описание правила (опционально)</label>
+              <textarea 
+                {...register('description')}
+                className={clsx(styles.nativeInput, styles.textareaInput)} 
+                placeholder="Краткое пояснение логики правила..."
+              />
+            </div>
 
-          <div className={styles.field}>
-            <label className={styles.label}>Статус активности</label>
-            <Select 
-              value={isActive ? 'true' : 'false'}
-              onChange={(val) => setIsActive(val === 'true')}
-              options={[{ value: 'true', label: 'Включено (проверяется)' }, { value: 'false', label: 'Отключено (игнорируется)' }]}
-              isSearchable={false}
-            />
-          </div>
+            <div className={styles.field}>
+              <label className={styles.label}>Статус активности</label>
+              <Controller
+                name="isActive"
+                control={control}
+                render={({ field }) => (
+                  <Select 
+                    value={field.value ? 'true' : 'false'}
+                    onChange={(val) => field.onChange(val === 'true')}
+                    options={[{ value: 'true', label: 'Включено (проверяется)' }, { value: 'false', label: 'Отключено (игнорируется)' }]}
+                    isSearchable={false}
+                  />
+                )}
+              />
+            </div>
+          </form>
         </Card>
 
         <div className={styles.rightColumnWide}>
           <Card className={styles.flushCard}>
-            <SpelBuilder expression={expression} onChange={setExpression} targetTypes={targetTypes} />
+            <Controller
+              name="expression"
+              control={control}
+              render={({ field }) => (
+                <>
+                  <SpelBuilder 
+                    expression={field.value} 
+                    onChange={field.onChange} 
+                    targetTypes={targetTypesValue || []} 
+                  />
+                  {errors.expression && (
+                    <div className={styles.formErrorInline}>
+                      {errors.expression.message}
+                    </div>
+                  )}
+                </>
+              )}
+            />
           </Card>
 
           {!isNew && originalData && (
@@ -174,12 +231,15 @@ const RuleForm = ({ isNew, id, originalData }: RuleFormProps) => {
 
           <div className={styles.actionsClean}>
             <Button variant="secondary" onClick={() => navigate('/compatibility')}>Отмена</Button>
-            <Button onClick={() => saveMutation.mutate()} isLoading={saveMutation.isPending}>
+            <Button 
+              type="submit" 
+              form="rule-form" 
+              isLoading={saveMutation.isPending}
+            >
               <Save size={16} /> {isNew ? 'Создать правило' : 'Сохранить изменения'}
             </Button>
           </div>
         </div>
-
       </div>
     </div>
   );
