@@ -5,7 +5,6 @@ import { AxiosError } from 'axios';
 import toast from 'react-hot-toast';
 import { useForm, Controller, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { clsx } from 'clsx';
 import { useAuthStore } from '../../store/authStore';
 import { usersService } from '../../services/users.service';
 import { Input } from '../../components/ui/Input/Input';
@@ -182,10 +181,11 @@ const UserForm = ({ isNew, id, originalData }: UserFormProps) => {
                       onChange={field.onChange}
                       options={roleOptions}
                       isSearchable={false}
+                      hasError={!!errors.role}
                     />
                   )}
                 />
-                {errors.role && <span className={clsx(styles.hint, styles.req)}>{errors.role.message}</span>}
+                {errors.role && <span className={styles.errorMessage}>{errors.role.message}</span>}
               </div>
             )}
           </form>

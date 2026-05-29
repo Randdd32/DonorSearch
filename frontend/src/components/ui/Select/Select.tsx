@@ -14,10 +14,11 @@ interface SelectProps {
   className?: string;
   isDisabled?: boolean;
   isSearchable?: boolean;
+  hasError?: boolean;
 }
 
 export const Select = ({ 
-  value, onChange, options, placeholder, className, isDisabled, isSearchable = false 
+  value, onChange, options, placeholder, className, isDisabled, isSearchable = false, hasError = false 
 }: SelectProps) => {
   const selectedOption = options.find(opt => String(opt.value) === String(value)) || null;
 
@@ -29,7 +30,7 @@ export const Select = ({
         onChange(opt ? opt.value : null);
       }}
       options={options}
-      styles={getSelectStyles()}
+      styles={getSelectStyles(hasError)}
       placeholder={placeholder}
       className={className}
       isDisabled={isDisabled}

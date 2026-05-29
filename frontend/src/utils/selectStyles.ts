@@ -1,12 +1,14 @@
 import type { StylesConfig } from 'react-select';
 
-export const getSelectStyles = <OptionType, IsMulti extends boolean>(): StylesConfig<OptionType, IsMulti> => ({
+export const getSelectStyles = <OptionType, IsMulti extends boolean>(hasError: boolean = false): StylesConfig<OptionType, IsMulti> => ({
   control: (base, state) => ({
     ...base,
     backgroundColor: 'var(--bg-surface)',
-    borderColor: state.isFocused ? 'var(--primary-color)' : 'var(--border-color)',
-    boxShadow: state.isFocused ? '0 0 0 1px color-mix(in srgb, var(--primary-color) 20%, transparent)' : 'none',
-    '&:hover': { borderColor: 'var(--primary-color)' },
+    borderColor: hasError ? 'var(--status-critical)' : (state.isFocused ? 'var(--primary-color)' : 'var(--border-color)'),
+    boxShadow: state.isFocused 
+      ? `0 0 0 3px color-mix(in srgb, ${hasError ? 'var(--status-critical)' : 'var(--primary-color)'} 20%, transparent)` 
+      : 'none',
+    '&:hover': { borderColor: hasError ? 'var(--status-critical)' : 'var(--primary-color)' },
     minHeight: '40px',
     borderRadius: 'var(--radius-md)',
     cursor: 'pointer',

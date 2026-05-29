@@ -151,13 +151,13 @@ const RuleForm = ({ isNew, id, originalData }: RuleFormProps) => {
                     onChange={(selected: MultiValue<{ value: ExternalComponentCategory; label: string }>) => {
                       field.onChange(selected ? selected.map(s => s.value) : []);
                     }}
-                    styles={getSelectStyles()}
+                    styles={getSelectStyles(!!errors.targetTypes)}
                     placeholder="Выберите типы..."
                     noOptionsMessage={() => 'Не найдено'}
                   />
                 )}
               />
-              {errors.targetTypes && <span className={clsx(styles.hint, styles.req)}>{errors.targetTypes.message}</span>}
+              {errors.targetTypes && <span className={styles.errorMessage}>{errors.targetTypes.message}</span>}
             </div>
 
             <div className={styles.field}>

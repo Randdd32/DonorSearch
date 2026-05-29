@@ -175,16 +175,17 @@ const MappingForm = ({ isNew, id, originalData }: MappingFormProps) => {
                     options={COMPONENT_TYPE_OPTIONS}
                     placeholder="Выберите тип..."
                     isSearchable={true}
+                    hasError={!!errors.componentType}
                   />
                 )}
               />
-              {errors.componentType && <span className={clsx(styles.hint, styles.req)}>{errors.componentType.message}</span>}
+              {errors.componentType && <span className={styles.errorMessage}>{errors.componentType.message}</span>}
             </div>
 
             <div className={styles.field}>
               <label className={styles.label}>Компонент из базы данных <span className={styles.req}>*</span></label>
               <div className={styles.componentSelector}>
-                <div className={clsx(styles.selectedComponentBox, { [styles.hasError]: errors.componentId })}>
+                <div className={clsx(styles.selectedComponentBox, { [styles.hasError]: !!errors.componentId })}>
                   {componentId ? (
                     <div className={styles.compSelected}>
                       <CheckCircle size={18} className={styles.successIcon} />
@@ -207,7 +208,7 @@ const MappingForm = ({ isNew, id, originalData }: MappingFormProps) => {
                 </Button>
               </div>
               {!componentType && <p className={styles.hint}>Сначала выберите категорию.</p>}
-              {errors.componentId && <span className={clsx(styles.hint, styles.req)}>{errors.componentId.message}</span>}
+              {errors.componentId && <span className={styles.errorMessage}>{errors.componentId.message}</span>}
             </div>
           </form>
 
