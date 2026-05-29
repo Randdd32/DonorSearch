@@ -36,6 +36,8 @@ export const Select = ({
       isDisabled={isDisabled}
       isSearchable={isSearchable}
       noOptionsMessage={() => 'Элементы не найдены'}
+      menuPortalTarget={document.body}
+      menuPosition="fixed"
     />
   );
 };

@@ -20,6 +20,10 @@ export const getSelectStyles = <OptionType, IsMulti extends boolean>(hasError: b
     boxShadow: 'var(--shadow-md)',
     zIndex: 50,
   }),
+  menuPortal: (base) => ({
+    ...base,
+    zIndex: 9999,
+  }),
   option: (base, state) => ({
     ...base,
     backgroundColor: state.isSelected 

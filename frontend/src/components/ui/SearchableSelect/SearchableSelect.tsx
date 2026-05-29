@@ -86,6 +86,8 @@ export const SearchableSelect = ({
       styles={getSelectStyles()}
       noOptionsMessage={() => 'Элементы не найдены'}
       isClearable={true}
+      menuPortalTarget={document.body}
+      menuPosition="fixed"
     />
   );
 };
