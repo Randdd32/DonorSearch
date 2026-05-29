@@ -2,6 +2,7 @@ import AsyncSelect from 'react-select/async';
 import { useState, useEffect } from 'react';
 import debounce from 'lodash.debounce';
 import { getSelectStyles } from '../../../utils/selectStyles';
+import { closeSelectMenuOnScroll } from '../../../utils/selectUtils';
 import type { MultiValue, SingleValue } from 'react-select';
 import type { SelectOption } from '../../../services/dictionary.service';
 
@@ -30,17 +31,17 @@ export const SearchableSelect = ({
         : (!value && value !== 0 && value !== '');
         
       if (isValueEmpty) {
-        setSelectedOptions(isMulti ?[] : null);
+        setSelectedOptions(isMulti ? [] : null);
         return;
       }
       
       setIsLoadingInitial(true);
       try {
-        const idsToFetch = isMulti ? (value as (number | string)[]) :[value as number | string];
+        const idsToFetch = isMulti ? (value as (number | string)[]) : [value as number | string];
         const fetched = await fetchByIds(idsToFetch);
         setSelectedOptions(isMulti ? fetched : (fetched.length > 0 ? fetched[0] : null));
       } catch {
-        setSelectedOptions(isMulti ?[] : null);
+        setSelectedOptions(isMulti ? [] : null);
       } finally {
         setIsLoadingInitial(false);
       }
@@ -88,6 +89,7 @@ export const SearchableSelect = ({
       isClearable={true}
       menuPortalTarget={document.body}
       menuPosition="fixed"
+      closeMenuOnScroll={closeSelectMenuOnScroll}
     />
   );
 };

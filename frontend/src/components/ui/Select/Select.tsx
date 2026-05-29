@@ -1,5 +1,6 @@
 import ReactSelect, { type SingleValue } from 'react-select';
 import { getSelectStyles } from '../../../utils/selectStyles';
+import { closeSelectMenuOnScroll } from '../../../utils/selectUtils';
 
 interface Option {
   value: string | number | boolean;
@@ -38,6 +39,7 @@ export const Select = ({
       noOptionsMessage={() => 'Элементы не найдены'}
       menuPortalTarget={document.body}
       menuPosition="fixed"
+      closeMenuOnScroll={closeSelectMenuOnScroll}
     />
   );
 };
