@@ -132,16 +132,16 @@ public class DatabaseInitializer implements CommandLineRunner {
 
         createRule("CASE_35_BAYS_LIMIT",
                 "Наличие отсеков 3.5\"",
-                "#ctx.getStorageCountByFormFactor('3,5') <= (#ctx.pcCase.int35Bays + #ctx.pcCase.ext35Bays)",
-                "Количество жестких дисков 3.5 превышает количество доступных корзин в корпусе",
-                "Проверка того, хватит ли в корпусе места для накопителей с форм-фактором 3.5\".",
+                "#ctx.getStorageCountByFormFactor('3.5') <= (#ctx.pcCase.int35Bays + #ctx.pcCase.ext35Bays)",
+                "Количество жестких дисков 3.5\" превышает количество доступных корзин в корпусе",
+                "Проверка того, что количество устанавливаемых накопителей 3.5\" не превышает суммарное количество внутренних и внешних отсеков 3.5\" в корпусе.",
                 Set.of(ComponentType.STORAGE, ComponentType.CASE));
 
-        createRule("CASE_25_BAYS_LIMIT",
-                "Наличие отсеков 2.5\"",
-                "#ctx.getStorageCountByFormFactor('2,5') <= #ctx.pcCase.int25Bays",
-                "Количество накопителей 2.5 превышает количество отсеков в корпусе",
-                "Проверка того, хватит ли в корпусе места для накопителей с форм-фактором 2.5\".",
+        createRule("CASE_TOTAL_STORAGE_LIMIT",
+                "Суммарная вместимость накопителей",
+                "(#ctx.getStorageCountByFormFactor('3.5') + #ctx.getStorageCountByFormFactor('2.5')) <= (#ctx.pcCase.int35Bays + #ctx.pcCase.ext35Bays + #ctx.pcCase.int25Bays)",
+                "Суммарное количество накопителей (2.5\" и 3.5\") превышает общую вместимость отсеков корпуса",
+                "Проверка того, что суммарное количество всех накопителей 2.5\" и 3.5\" не превышает общее число посадочных мест в корпусе, с учетом возможности установки 2.5\" дисков в 3.5\" слоты.",
                 Set.of(ComponentType.STORAGE, ComponentType.CASE));
 
         createRule("CASE_525_BAYS_LIMIT",
@@ -178,6 +178,13 @@ public class DatabaseInitializer implements CommandLineRunner {
                 "Количество видеокарт превышает количество слотов PCIe x16 на материнской плате",
                 "Проверка того, что у материнской платы хватает полноразмерных слотов расширения для подключения видеокарт.",
                 Set.of(ComponentType.VIDEO_CARD, ComponentType.MOTHERBOARD));
+
+        createRule("CASE_PSU_COMPATIBILITY",
+                "Совместимость габаритов блока питания",
+                "!(#ctx.pcCase.caseType != null and #ctx.pcCase.caseType.name.contains('Mini ITX') and #ctx.psus.?[powerSupplyType != null and powerSupplyType.name.contains('ATX')].size() > 0)",
+                "Стандартный блок питания ATX не поместится в компактный Mini-ITX корпус",
+                "Проверка того, что в компактный корпус форм-фактора Mini-ITX не устанавливается крупногабаритный блок питания стандарта ATX.",
+                Set.of(ComponentType.POWER_SUPPLY, ComponentType.CASE));
     }
 
     private void createRule(String code, String name, String expr, String error, String desc, Set<ComponentType> targets) {
