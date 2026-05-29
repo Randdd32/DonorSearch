@@ -8,6 +8,7 @@ import { parseMappingFilters } from './mappingsParser';
 import { formatDateTime } from '../../utils/formatters';
 import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 import { confidenceConfig } from '../../config/confidenceStatuses';
+import { COMPONENT_CATEGORY_CONFIG } from '../../config/componentTypes';
 import { Input } from '../../components/ui/Input/Input';
 import { Button } from '../../components/ui/Button/Button';
 import { Badge } from '../../components/ui/Badge/Badge';
@@ -85,7 +86,11 @@ export const MappingsPage = () => {
               <TableRow key={row.id}>
                 <TableCell className={styles.muted}>{row.id}</TableCell>
                 <TableCell className={styles.bold}>{row.externalName}</TableCell>
-                <TableCell><Badge variant="default">{row.internalComponentType}</Badge></TableCell>
+                <TableCell>
+                  <Badge variant="default">
+                    {COMPONENT_CATEGORY_CONFIG[row.internalComponentType]?.label || row.internalComponentType}
+                  </Badge>
+                </TableCell>
                 <TableCell>
                   <div className={styles.compCell}>
                     <span className={styles.compName}>{row.internalComponentName}</span>
