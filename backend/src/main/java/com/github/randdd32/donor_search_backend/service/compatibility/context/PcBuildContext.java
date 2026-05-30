@@ -101,6 +101,10 @@ public class PcBuildContext {
         return require(coolers, "Нет данных о кулерах");
     }
 
+    public List<PowerSupplyEntity> requirePsus() {
+        return require(psus, "Нет данных о блоках питания");
+    }
+
     public Integer getTotalTdpW() {
         if (cpus.isEmpty()) {
             throw new MissingContextDataException("Нет данных о процессорах");

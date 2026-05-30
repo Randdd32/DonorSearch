@@ -41,9 +41,9 @@ public class DatabaseInitializer implements CommandLineRunner {
 
         createRule("COOLER_SOCKET_MATCH",
                 "Совместимость крепления кулера",
-                "#ctx.requireCoolers().size() > 0 and #ctx.coolers.?[!sockets.contains(#ctx.motherboard.socket)].isEmpty()",
+                "#ctx.requireCoolers().size() > 0 and #ctx.motherboard.socket.toString() != null and #ctx.coolers.?[!sockets.contains(#ctx.motherboard.socket)].isEmpty()",
                 "Крепление кулера не подходит к сокету материнской платы",
-                "Проверка того, крепление всех кулеров поддерживает сокет материнской платы.",
+                "Проверка того, что крепление всех кулеров поддерживает сокет материнской платы.",
                 Set.of(ComponentType.CPU_COOLER, ComponentType.MOTHERBOARD));
 
         createRule("RAM_TYPE_MATCH",
@@ -55,49 +55,49 @@ public class DatabaseInitializer implements CommandLineRunner {
 
         createRule("RAM_CAPACITY_LIMIT",
                 "Ограничение объема оперативной памяти",
-                "#ctx.getTotalRamCapacityGb() <= #ctx.motherboard.maxMemoryGb",
+                "#ctx.getTotalRamCapacityGb() <= #ctx.motherboard.maxMemoryGb.intValue()",
                 "Суммарный объем оперативной памяти превышает лимит материнской платы",
                 "Проверка того, что общий объем всех модулей ОЗУ не больше заявленного для материнской платы.",
                 Set.of(ComponentType.MEMORY, ComponentType.MOTHERBOARD));
 
         createRule("RAM_SLOT_LIMIT",
                 "Ограничение количества слотов оперативной памяти",
-                "#ctx.getTotalRamModules() <= #ctx.motherboard.memorySlots",
+                "#ctx.getTotalRamModules() <= #ctx.motherboard.memorySlots.intValue()",
                 "Количество модулей оперативной памяти превышает количество слотов на материнской плате",
                 "Проверка того, что общее количество модулей ОЗУ не больше количества слотов, доступных на материнской плате.",
                 Set.of(ComponentType.MEMORY, ComponentType.MOTHERBOARD));
 
         createRule("RAM_ECC_SUPPORT_MATCH",
                 "Поддержка ECC памяти",
-                "#ctx.requireMemories().size() > 0 and #ctx.memories.?[isEcc && !#ctx.isEccSupported()].isEmpty()",
+                "#ctx.requireMemories().size() > 0 and #ctx.memories.?[isEcc.booleanValue() && !#ctx.isEccSupported()].isEmpty()",
                 "Материнская плата или один из процессоров не поддерживают ECC-память",
                 "Проверка того, что материнская плата и все установленные процессоры поддерживают серверную память с коррекцией ошибок (ECC).",
                 Set.of(ComponentType.MEMORY, ComponentType.MOTHERBOARD, ComponentType.CPU));
 
         createRule("GPU_LENGTH_LIMIT",
                 "Ограничение длины видеокарты",
-                "#ctx.requireGpus().size() > 0 and #ctx.gpus.?[lengthMm > #ctx.pcCase.maxGpuLenMm].isEmpty()",
+                "#ctx.requireGpus().size() > 0 and #ctx.gpus.?[lengthMm.intValue() > #ctx.pcCase.maxGpuLenMm.intValue()].isEmpty()",
                 "Видеокарта слишком длинная и не поместится в корпус",
                 "Проверка того, что каждая из видеокарт поместится в корпус.",
                 Set.of(ComponentType.VIDEO_CARD, ComponentType.CASE));
 
         createRule("COOLER_HEIGHT_LIMIT",
                 "Ограничение высоты кулера",
-                "#ctx.requireCoolers().size() > 0 and #ctx.coolers.?[!isWaterCooled && heightMm > #ctx.pcCase.maxCpuCoolerHeightMm].isEmpty()",
+                "#ctx.requireCoolers().size() > 0 and #ctx.coolers.?[!isWaterCooled.booleanValue() && heightMm.intValue() > #ctx.pcCase.maxCpuCoolerHeightMm.intValue()].isEmpty()",
                 "Воздушный кулер слишком высокий: боковая крышка корпуса не закроется",
                 "Проверка того, что высота радиаторов воздушных кулеров не слишком велика относительно ширины корпуса.",
                 Set.of(ComponentType.CPU_COOLER, ComponentType.CASE));
 
         createRule("WATER_COOLER_SIZE_MATCH",
                 "Поддержка размера радиатора СЖО",
-                "#ctx.requireCoolers().size() > 0 and #ctx.coolers.?[isWaterCooled && !#ctx.pcCase.radiatorSizes.contains(waterCooledSizeMm)].isEmpty()",
+                "#ctx.requireCoolers().size() > 0 and #ctx.coolers.?[isWaterCooled.booleanValue() && !#ctx.pcCase.radiatorSizes.contains(waterCooledSizeMm.intValue())].isEmpty()",
                 "Радиатор жидкостного охлаждения данного размера не поддерживается корпусом",
                 "Проверка того, что размер радиатора СЖО (например, 240мм, 360мм) входит в список поддерживаемых корпусом.",
                 Set.of(ComponentType.CPU_COOLER, ComponentType.CASE));
 
         createRule("MOBO_FORM_FACTOR_MATCH",
                 "Совместимость форм-фактора материнской платы",
-                "#ctx.pcCase.moboFormFactors.contains(#ctx.motherboard.formFactor)",
+                "#ctx.motherboard.formFactor.toString() != null and #ctx.pcCase.moboFormFactors.contains(#ctx.motherboard.formFactor)",
                 "Форм-фактор материнской платы не поддерживается корпусом",
                 "Проверка того, что материнская плата поместится в корпус.",
                 Set.of(ComponentType.MOTHERBOARD, ComponentType.CASE));
@@ -132,56 +132,56 @@ public class DatabaseInitializer implements CommandLineRunner {
 
         createRule("CASE_35_BAYS_LIMIT",
                 "Наличие отсеков 3.5\"",
-                "#ctx.getStorageCountByFormFactor('3.5') <= (#ctx.pcCase.int35Bays + #ctx.pcCase.ext35Bays)",
+                "#ctx.getStorageCountByFormFactor('3.5') <= (#ctx.pcCase.int35Bays.intValue() + #ctx.pcCase.ext35Bays.intValue())",
                 "Количество жестких дисков 3.5\" превышает количество доступных корзин в корпусе",
                 "Проверка того, что количество устанавливаемых накопителей 3.5\" не превышает суммарное количество внутренних и внешних отсеков 3.5\" в корпусе.",
                 Set.of(ComponentType.STORAGE, ComponentType.CASE));
 
         createRule("CASE_TOTAL_STORAGE_LIMIT",
                 "Суммарная вместимость накопителей",
-                "(#ctx.getStorageCountByFormFactor('3.5') + #ctx.getStorageCountByFormFactor('2.5')) <= (#ctx.pcCase.int35Bays + #ctx.pcCase.ext35Bays + #ctx.pcCase.int25Bays)",
+                "(#ctx.getStorageCountByFormFactor('3.5') + #ctx.getStorageCountByFormFactor('2.5')) <= (#ctx.pcCase.int35Bays.intValue() + #ctx.pcCase.ext35Bays.intValue() + #ctx.pcCase.int25Bays.intValue())",
                 "Суммарное количество накопителей (2.5\" и 3.5\") превышает общую вместимость отсеков корпуса",
                 "Проверка того, что суммарное количество всех накопителей 2.5\" и 3.5\" не превышает общее число посадочных мест в корпусе, с учетом возможности установки 2.5\" дисков в 3.5\" слоты.",
                 Set.of(ComponentType.STORAGE, ComponentType.CASE));
 
         createRule("CASE_525_BAYS_LIMIT",
                 "Наличие отсеков 5.25\"",
-                "#ctx.opticalDrives.size() <= #ctx.pcCase.ext525Bays",
+                "#ctx.opticalDrives.size() <= #ctx.pcCase.ext525Bays.intValue()",
                 "В корпусе нет отсеков 5.25 для установки оптического привода",
                 "Проверка того, хватит ли в корпусе слотов под оптические приводы.",
                 Set.of(ComponentType.OPTICAL_DRIVE, ComponentType.CASE));
 
         createRule("CASE_FAN_SIZE_MATCH",
                 "Совместимость размера корпусного вентилятора",
-                "#ctx.caseFans.?[!#ctx.pcCase.fanSizes.contains(sizeMm)].isEmpty()",
+                "#ctx.caseFans.?[!#ctx.pcCase.fanSizes.contains(sizeMm.intValue())].isEmpty()",
                 "Размер корпусного вентилятора не поддерживается корпусом",
                 "Проверка того, что диаметр всех устанавливаемых вентиляторов входит в список размеров, которые поддерживает корпус.",
                 Set.of(ComponentType.CASE_FAN, ComponentType.CASE));
 
         createRule("CASE_EXPANSION_SLOTS_LIMIT",
                 "Ограничение слотов расширения корпуса",
-                "#ctx.getTotalGpuSlotWidth() <= #ctx.pcCase.expansionSlotsFullHeight",
+                "#ctx.getTotalGpuSlotWidth() <= #ctx.pcCase.expansionSlotsFullHeight.intValue()",
                 "Толщина видеокарт превышает количество слотов расширения в корпусе",
                 "Проверка того, что суммарная ширина всех видеокарт не выходит за рамки PCIe заглушек корпуса.",
                 Set.of(ComponentType.VIDEO_CARD, ComponentType.CASE));
 
         createRule("MOBO_SATA_LIMIT",
                 "Наличие портов SATA",
-                "#ctx.getSataDevicesCount() <= (#ctx.motherboard.sata3Ports + #ctx.motherboard.sata6Ports)",
+                "#ctx.getSataDevicesCount() <= (#ctx.motherboard.sata3Ports.intValue() + #ctx.motherboard.sata6Ports.intValue())",
                 "Не хватает SATA портов на материнской плате для всех накопителей и приводов",
                 "Проверка того, что общее количество всех SATA устройств не превышает сумму портов 3Gb/s и 6Gb/s.",
                 Set.of(ComponentType.STORAGE, ComponentType.OPTICAL_DRIVE, ComponentType.MOTHERBOARD));
 
         createRule("MOBO_PCIE_X16_LIMIT",
                 "Наличие слотов PCIe x16",
-                "#ctx.requireGpus().size() <= #ctx.motherboard.pciX16Slots",
+                "#ctx.requireGpus().size() <= #ctx.motherboard.pciX16Slots.intValue()",
                 "Количество видеокарт превышает количество слотов PCIe x16 на материнской плате",
                 "Проверка того, что у материнской платы хватает полноразмерных слотов расширения для подключения видеокарт.",
                 Set.of(ComponentType.VIDEO_CARD, ComponentType.MOTHERBOARD));
 
         createRule("CASE_PSU_COMPATIBILITY",
                 "Совместимость габаритов блока питания",
-                "!(#ctx.pcCase.caseType != null and #ctx.pcCase.caseType.name.contains('Mini ITX') and #ctx.psus.?[powerSupplyType != null and powerSupplyType.name.contains('ATX')].size() > 0)",
+                "!(#ctx.pcCase.caseType.toString() != null and #ctx.pcCase.caseType.name.contains('Mini ITX') and #ctx.requirePsus().?[powerSupplyType.toString() != null and powerSupplyType.name.contains('ATX')].size() > 0)",
                 "Стандартный блок питания ATX не поместится в компактный Mini-ITX корпус",
                 "Проверка того, что в компактный корпус форм-фактора Mini-ITX не устанавливается крупногабаритный блок питания стандарта ATX.",
                 Set.of(ComponentType.POWER_SUPPLY, ComponentType.CASE));

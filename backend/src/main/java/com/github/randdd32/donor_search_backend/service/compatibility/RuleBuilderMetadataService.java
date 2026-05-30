@@ -44,6 +44,7 @@ public class RuleBuilderMetadataService {
                 new MethodMetadataDto("requireCoolers()", "List<CpuCoolerEntity>", "Список кулеров (вызовет ошибку, если пусто)", true),
                 new MethodMetadataDto("requireMemories()", "List<MemoryEntity>", "Список ОЗУ (вызовет ошибку, если пусто)", true),
                 new MethodMetadataDto("requireGpus()", "List<VideoCardEntity>", "Список видеокарт (вызовет ошибку, если пусто)", true),
+                new MethodMetadataDto("requirePsus()", "List<PowerSupplyEntity>", "Список блоков питания (вызовет ошибку, если пусто)", true),
                 new MethodMetadataDto("getTotalTdpW()", "Integer", "Общее тепловыделение / TDP (Вт)", true),
                 new MethodMetadataDto("getTotalPsuWattage()", "Integer", "Общая мощность блоков питания (Вт)", true),
                 new MethodMetadataDto("getTotalRamCapacityGb()", "Integer", "Общий объем ОЗУ (ГБ)", true),
