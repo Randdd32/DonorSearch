@@ -83,21 +83,21 @@ public class DatabaseInitializer implements CommandLineRunner {
 
         createRule("COOLER_HEIGHT_LIMIT",
                 "Ограничение высоты кулера",
-                "#ctx.requireCoolers().size() > 0 and #ctx.coolers.?[!isWaterCooled.booleanValue() && heightMm.intValue() > #ctx.pcCase.maxCpuCoolerHeightMm.intValue()].isEmpty()",
+                "#ctx.requireCoolers().?[!isWaterCooled.booleanValue() && heightMm.intValue() > #ctx.pcCase.maxCpuCoolerHeightMm.intValue()].isEmpty()",
                 "Воздушный кулер слишком высокий: боковая крышка корпуса не закроется",
                 "Проверка того, что высота радиаторов воздушных кулеров не слишком велика относительно ширины корпуса.",
                 Set.of(ComponentType.CPU_COOLER, ComponentType.CASE));
 
         createRule("WATER_COOLER_SIZE_MATCH",
                 "Поддержка размера радиатора СЖО",
-                "#ctx.requireCoolers().size() > 0 and #ctx.coolers.?[isWaterCooled.booleanValue() && !#ctx.pcCase.radiatorSizes.contains(waterCooledSizeMm.intValue())].isEmpty()",
+                "#ctx.requireCoolers().?[isWaterCooled.booleanValue() && !#ctx.requireCaseRadiatorSizes().contains(waterCooledSizeMm.intValue())].isEmpty()",
                 "Радиатор жидкостного охлаждения данного размера не поддерживается корпусом",
                 "Проверка того, что размер радиатора СЖО (например, 240мм, 360мм) входит в список поддерживаемых корпусом.",
                 Set.of(ComponentType.CPU_COOLER, ComponentType.CASE));
 
         createRule("MOBO_FORM_FACTOR_MATCH",
                 "Совместимость форм-фактора материнской платы",
-                "#ctx.motherboard.formFactor.toString() != null and #ctx.pcCase.moboFormFactors.contains(#ctx.motherboard.formFactor)",
+                "#ctx.requireCaseMoboFormFactors().![id].contains(#ctx.motherboard.formFactor.id)",
                 "Форм-фактор материнской платы не поддерживается корпусом",
                 "Проверка того, что материнская плата поместится в корпус.",
                 Set.of(ComponentType.MOTHERBOARD, ComponentType.CASE));
@@ -153,7 +153,7 @@ public class DatabaseInitializer implements CommandLineRunner {
 
         createRule("CASE_FAN_SIZE_MATCH",
                 "Совместимость размера корпусного вентилятора",
-                "#ctx.caseFans.?[!#ctx.pcCase.fanSizes.contains(sizeMm.intValue())].isEmpty()",
+                "#ctx.caseFans.?[!#ctx.requireCaseFanSizes().contains(sizeMm.intValue())].isEmpty()",
                 "Размер корпусного вентилятора не поддерживается корпусом",
                 "Проверка того, что диаметр всех устанавливаемых вентиляторов входит в список размеров, которые поддерживает корпус.",
                 Set.of(ComponentType.CASE_FAN, ComponentType.CASE));
@@ -185,6 +185,8 @@ public class DatabaseInitializer implements CommandLineRunner {
                 "Стандартный блок питания ATX не поместится в компактный Mini-ITX корпус",
                 "Проверка того, что в компактный корпус форм-фактора Mini-ITX не устанавливается крупногабаритный блок питания стандарта ATX.",
                 Set.of(ComponentType.POWER_SUPPLY, ComponentType.CASE));
+
+
     }
 
     private void createRule(String code, String name, String expr, String error, String desc, Set<ComponentType> targets) {

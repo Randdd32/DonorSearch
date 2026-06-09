@@ -1,6 +1,7 @@
 package com.github.randdd32.donor_search_backend.service.compatibility.context;
 
 import com.github.randdd32.donor_search_backend.core.error.MissingContextDataException;
+import com.github.randdd32.donor_search_backend.model.dictionary.MotherboardFormFactorEntity;
 import com.github.randdd32.donor_search_backend.model.hardware.CaseEntity;
 import com.github.randdd32.donor_search_backend.model.hardware.CaseFanEntity;
 import com.github.randdd32.donor_search_backend.model.hardware.ComponentEntity;
@@ -17,9 +18,11 @@ import com.github.randdd32.donor_search_backend.model.hardware.VideoCardEntity;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.function.ToIntFunction;
 
 @Slf4j
@@ -112,6 +115,36 @@ public class PcBuildContext {
         int cpuTdp = cpus.stream().mapToInt(CpuEntity::getTdpW).sum();
         int gpuTdp = gpus.stream().mapToInt(VideoCardEntity::getTdpW).sum();
         return cpuTdp + gpuTdp;
+    }
+
+    public Set<MotherboardFormFactorEntity> requireCaseMoboFormFactors() {
+        if (pcCase == null) {
+            throw new MissingContextDataException("Нет данных о корпусе");
+        }
+        if (CollectionUtils.isEmpty(pcCase.getMoboFormFactors())) {
+            throw new MissingContextDataException("Нет данных о поддерживаемых форм-факторах материнских плат корпусом");
+        }
+        return pcCase.getMoboFormFactors();
+    }
+
+    public List<Integer> requireCaseFanSizes() {
+        if (pcCase == null) {
+            throw new MissingContextDataException("Нет данных о корпусе");
+        }
+        if (CollectionUtils.isEmpty(pcCase.getFanSizes())) {
+            throw new MissingContextDataException("Нет данных о поддерживаемых размерах корпусных вентиляторов");
+        }
+        return pcCase.getFanSizes();
+    }
+
+    public List<Integer> requireCaseRadiatorSizes() {
+        if (pcCase == null) {
+            throw new MissingContextDataException("Нет данных о корпусе");
+        }
+        if (CollectionUtils.isEmpty(pcCase.getRadiatorSizes())) {
+            throw new MissingContextDataException("Нет данных о поддерживаемых размерах радиаторов корпусом");
+        }
+        return pcCase.getRadiatorSizes();
     }
 
     public Integer getTotalPsuWattage() {
