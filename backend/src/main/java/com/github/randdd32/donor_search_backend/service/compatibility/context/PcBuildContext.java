@@ -17,6 +17,7 @@ import com.github.randdd32.donor_search_backend.model.hardware.OpticalDriveEntit
 import com.github.randdd32.donor_search_backend.model.hardware.PowerSupplyEntity;
 import com.github.randdd32.donor_search_backend.model.hardware.StorageEntity;
 import com.github.randdd32.donor_search_backend.model.hardware.VideoCardEntity;
+import com.github.randdd32.donor_search_backend.model.hardware.nested.M2Slot;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -188,14 +189,16 @@ public class PcBuildContext {
 
     public Boolean canPlaceM2Storages() {
         List<Integer> requiredSizes = getRequiredM2StorageSizes();
-
         if (requiredSizes.isEmpty()) {
             return true;
         }
 
-        List<Map<String, Object>> storageSlots = requireMotherboardM2StorageSlots();
-        boolean[] used = new boolean[storageSlots.size()];
+        List<M2Slot> storageSlots = getMotherboardM2StorageSlots();
+        if (storageSlots.isEmpty()) {
+            return false;
+        }
 
+        boolean[] used = new boolean[storageSlots.size()];
         return canAssignM2Storage(requiredSizes, storageSlots, used, 0);
     }
 
@@ -399,35 +402,27 @@ public class PcBuildContext {
         return result;
     }
 
-    private List<Map<String, Object>> requireMotherboardM2StorageSlots() {
+    private List<M2Slot> getMotherboardM2StorageSlots() {
         if (motherboard == null) {
             throw new MissingContextDataException("Нет данных о материнской плате");
         }
-        if (CollectionUtils.isEmpty(motherboard.getM2Slots())) {
+        if (motherboard.getM2Slots() == null) {
             throw new MissingContextDataException("Нет данных о слотах M.2 материнской платы");
         }
 
-        List<Map<String, Object>> result = new ArrayList<>();
-
-        for (Map<String, Object> slot : motherboard.getM2Slots()) {
-            Object keysObj = slot.get("keys");
-
-            if (keysObj == null) {
-                throw new MissingContextDataException("Нет данных о ключе слота M.2 материнской платы");
-            }
-
-            String keys = keysObj.toString().toLowerCase();
-
-            if (keys.contains("m-key") || keys.contains("b-key")) {
-                result.add(slot);
-            }
-        }
-
-        return result;
+        return motherboard.getM2Slots().stream()
+                .filter(slot -> {
+                    if (slot.keys() == null) {
+                        throw new MissingContextDataException("Нет данных о ключе слота M.2 материнской платы");
+                    }
+                    String keys = slot.keys().toLowerCase();
+                    return keys.contains("m-key") || keys.contains("b-key");
+                })
+                .toList();
     }
 
     private boolean canAssignM2Storage(List<Integer> requiredSizes,
-                                       List<Map<String, Object>> slots,
+                                       List<M2Slot> slots,
                                        boolean[] used,
                                        int storageIndex) {
         if (storageIndex >= requiredSizes.size()) {
@@ -455,24 +450,12 @@ public class PcBuildContext {
         return false;
     }
 
-    private List<Integer> getM2SlotSizes(Map<String, Object> slot) {
-        Object sizesObj = slot.get("sizes");
-
-        if (!(sizesObj instanceof Collection<?> sizes) || sizes.isEmpty()) {
+    private List<Integer> getM2SlotSizes(M2Slot slot) {
+        if (slot == null || CollectionUtils.isEmpty(slot.sizes())) {
             throw new MissingContextDataException("Нет данных о поддерживаемых типоразмерах слота M.2");
         }
 
-        List<Integer> result = new ArrayList<>();
-
-        for (Object size : sizes) {
-            if (size instanceof Number number) {
-                result.add(number.intValue());
-            } else {
-                result.add(Integer.parseInt(size.toString()));
-            }
-        }
-
-        return result;
+        return slot.sizes();
     }
 
     private String requireStorageFormFactorName(StorageEntity storage) {
