@@ -169,8 +169,22 @@ public class DatabaseInitializer implements CommandLineRunner {
                 "Наличие портов SATA",
                 "#ctx.getSataDevicesCount() <= (#ctx.motherboard.sata3Ports.intValue() + #ctx.motherboard.sata6Ports.intValue())",
                 "Не хватает SATA портов на материнской плате для всех накопителей и приводов",
-                "Проверка того, что общее количество всех SATA устройств не превышает сумму портов 3Gb/s и 6Gb/s.",
+                "Проверка того, что количество внутренних SATA-устройств не превышает сумму портов SATA 3Gb/s и SATA 6Gb/s на материнской плате.",
                 Set.of(ComponentType.STORAGE, ComponentType.OPTICAL_DRIVE, ComponentType.MOTHERBOARD));
+
+        createRule("MOBO_MSATA_SLOT_LIMIT",
+                "Наличие слотов mSATA",
+                "#ctx.getMsataStorageCount() <= #ctx.motherboard.miniPcieMsataSlots.intValue()",
+                "Количество mSATA-накопителей превышает количество слотов mSATA на материнской плате",
+                "Проверка того, что количество mSATA-накопителей не превышает количество доступных слотов Mini-PCIe/mSATA на материнской плате.",
+                Set.of(ComponentType.STORAGE, ComponentType.MOTHERBOARD));
+
+        createRule("MOBO_M2_STORAGE_SLOT_MATCH",
+                "Совместимость M.2-накопителей со слотами материнской платы",
+                "#ctx.canPlaceM2Storages()",
+                "На материнской плате нет подходящих слотов M.2 для всех накопителей",
+                "Проверка того, что количество и типоразмеры M.2-накопителей соответствуют доступным слотам M.2 на материнской плате.",
+                Set.of(ComponentType.STORAGE, ComponentType.MOTHERBOARD));
 
         createRule("MOBO_PCIE_X16_LIMIT",
                 "Наличие слотов PCIe x16",

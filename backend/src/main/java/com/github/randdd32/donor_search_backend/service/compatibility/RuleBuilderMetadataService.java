@@ -53,8 +53,8 @@ public class RuleBuilderMetadataService {
                 new MethodMetadataDto("getTotalPsuWattage()", "Integer", "Общая мощность блоков питания (Вт)", true),
                 new MethodMetadataDto("getTotalRamCapacityGb()", "Integer", "Общий объем ОЗУ (ГБ)", true),
                 new MethodMetadataDto("getTotalRamModules()", "Integer", "Общее количество плашек ОЗУ (шт)", true),
-                new MethodMetadataDto("getStorageCountByFormFactor('String ffName')", "Integer", "Количество накопителей по форм-фактору (шт)", true),
-                new MethodMetadataDto("getSataDevicesCount()", "Integer", "Общее количество SATA-устройств (шт)", true),
+                new MethodMetadataDto("getStorageCountByFormFactor('String ffName')", "Integer", "Количество внутренних накопителей по форм-фактору (шт)", true),
+                new MethodMetadataDto("getSataDevicesCount()", "Integer", "Количество внутренних SATA-устройств, требующих обычный SATA-порт материнской платы (шт)", true),
                 new MethodMetadataDto("getTotalGpuSlotWidth()", "Integer", "Общая толщина видеокарт (в слотах)", true),
                 new MethodMetadataDto("isEccSupported()", "Boolean", "Поддерживается ли ECC-память (материнская плата + процессор)", true),
                 new MethodMetadataDto("getReqPcie8Pin()", "Integer", "Требуется 8-pin PCIe коннекторов (шт)", true),
@@ -66,7 +66,9 @@ public class RuleBuilderMetadataService {
                 new MethodMetadataDto("getRequiredFrontUsb20Headers()", "Integer", "Требуемое количество внутренних USB 2.0 колодок для передней панели корпуса", true),
                 new MethodMetadataDto("getRequiredFrontUsb32Gen1Headers()", "Integer", "Требуемое количество внутренних USB 3.2 Gen 1 колодок для передней панели корпуса", true),
                 new MethodMetadataDto("getRequiredFrontUsb32Gen2Headers()", "Integer", "Требуемое количество внутренних USB 3.2 Gen 2 колодок для передней панели корпуса", true),
-                new MethodMetadataDto("getRequiredFrontUsb32Gen2x2Headers()", "Integer", "Требуемое количество внутренних USB 3.2 Gen 2x2 колодок для передней панели корпуса", true)
+                new MethodMetadataDto("getRequiredFrontUsb32Gen2x2Headers()", "Integer", "Требуемое количество внутренних USB 3.2 Gen 2x2 колодок для передней панели корпуса", true),
+                new MethodMetadataDto("canPlaceM2Storages()", "Boolean", "Можно ли разместить все M.2-накопители в слотах M.2 материнской платы с учетом типоразмеров", true),
+                new MethodMetadataDto("getMsataStorageCount()", "Integer", "Количество внутренних mSATA-накопителей (шт)", true)
         );
     }
 

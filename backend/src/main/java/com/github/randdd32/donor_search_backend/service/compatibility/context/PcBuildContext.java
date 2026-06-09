@@ -3,6 +3,7 @@ package com.github.randdd32.donor_search_backend.service.compatibility.context;
 import com.github.randdd32.donor_search_backend.core.error.MissingContextDataException;
 import com.github.randdd32.donor_search_backend.model.dictionary.CpuSocketEntity;
 import com.github.randdd32.donor_search_backend.model.dictionary.MotherboardFormFactorEntity;
+import com.github.randdd32.donor_search_backend.model.dictionary.StorageInterfaceEntity;
 import com.github.randdd32.donor_search_backend.model.hardware.CaseEntity;
 import com.github.randdd32.donor_search_backend.model.hardware.CaseFanEntity;
 import com.github.randdd32.donor_search_backend.model.hardware.ComponentEntity;
@@ -22,9 +23,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.ToIntFunction;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Slf4j
 @Getter
@@ -42,6 +47,8 @@ public class PcBuildContext {
     private List<CaseFanEntity> caseFans = new ArrayList<>();
     private List<OpticalDriveEntity> opticalDrives = new ArrayList<>();
     private List<MonitorEntity> monitors = new ArrayList<>();
+
+    private static final Pattern M2_FORM_FACTOR_PATTERN = Pattern.compile("(?i)M\\.2-(\\d+)");
 
     public PcBuildContext copy() {
         PcBuildContext copy = new PcBuildContext();
@@ -179,23 +186,51 @@ public class PcBuildContext {
         return memories.stream().mapToInt(MemoryEntity::getModulesCount).sum();
     }
 
+    public Boolean canPlaceM2Storages() {
+        List<Integer> requiredSizes = getRequiredM2StorageSizes();
+
+        if (requiredSizes.isEmpty()) {
+            return true;
+        }
+
+        List<Map<String, Object>> storageSlots = requireMotherboardM2StorageSlots();
+        boolean[] used = new boolean[storageSlots.size()];
+
+        return canAssignM2Storage(requiredSizes, storageSlots, used, 0);
+    }
+
     public Integer getStorageCountByFormFactor(String ffName) {
-        return (int) storages.stream()
-                .filter(s -> s.getFormFactor() != null && s.getFormFactor().getName().contains(ffName))
-                .count();
+        int count = 0;
+        for (StorageEntity storage : storages) {
+            if (Boolean.TRUE.equals(storage.getIsExternal())) {
+                continue;
+            }
+
+            String formFactorName = requireStorageFormFactorName(storage);
+
+            if (formFactorName.contains(ffName)) {
+                count++;
+            }
+        }
+        return count;
     }
 
     public Integer getSataDevicesCount() {
         int count = 0;
 
         for (StorageEntity storage : storages) {
+            if (Boolean.TRUE.equals(storage.getIsExternal())) {
+                continue;
+            }
             if (CollectionUtils.isEmpty(storage.getInterfaces())) {
                 throw new MissingContextDataException("Нет данных об интерфейсах накопителя");
             }
 
-            boolean isSata = storage.getInterfaces().stream()
-                    .anyMatch(i -> i.getName() != null && i.getName().toLowerCase().contains("sata"));
-            if (isSata) {
+            boolean usesInternalSataPort = storage.getInterfaces().stream()
+                    .map(StorageInterfaceEntity::getName)
+                    .anyMatch(this::isInternalSataPortInterface);
+
+            if (usesInternalSataPort) {
                 count++;
             }
         }
@@ -204,7 +239,26 @@ public class PcBuildContext {
             if (drive.getStorageInterface() == null || drive.getStorageInterface().getName() == null) {
                 throw new MissingContextDataException("Нет данных об интерфейсе оптического привода");
             }
-            if (drive.getStorageInterface().getName().toLowerCase().contains("sata")) {
+
+            if (isInternalSataPortInterface(drive.getStorageInterface().getName())) {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    public Integer getMsataStorageCount() {
+        int count = 0;
+
+        for (StorageEntity storage : storages) {
+            if (Boolean.TRUE.equals(storage.getIsExternal())) {
+                continue;
+            }
+
+            String formFactorName = requireStorageFormFactorName(storage);
+
+            if (formFactorName.equalsIgnoreCase("mSATA")) {
                 count++;
             }
         }
@@ -304,6 +358,16 @@ public class PcBuildContext {
         return psus.stream().mapToInt(mapper).sum();
     }
 
+    private boolean isInternalSataPortInterface(String interfaceName) {
+        if (interfaceName == null) {
+            throw new MissingContextDataException("Нет данных об интерфейсе накопителя");
+        }
+
+        String normalized = interfaceName.toLowerCase();
+
+        return normalized.startsWith("sata ");
+    }
+
     private Integer getRequiredFrontUsbHeadersByName(String usbNamePart) {
         if (pcCase == null) {
             throw new MissingContextDataException("Нет данных о корпусе");
@@ -314,6 +378,109 @@ public class PcBuildContext {
         return (int) pcCase.getFrontPanelUsbTypes().stream()
                 .filter(usb -> usb.getName() != null && usb.getName().contains(usbNamePart))
                 .count();
+    }
+
+    private List<Integer> getRequiredM2StorageSizes() {
+        List<Integer> result = new ArrayList<>();
+
+        for (StorageEntity storage : storages) {
+            if (Boolean.TRUE.equals(storage.getIsExternal())) {
+                continue;
+            }
+
+            String formFactorName = requireStorageFormFactorName(storage);
+
+            Matcher matcher = M2_FORM_FACTOR_PATTERN.matcher(formFactorName);
+            if (matcher.find()) {
+                result.add(Integer.parseInt(matcher.group(1)));
+            }
+        }
+
+        return result;
+    }
+
+    private List<Map<String, Object>> requireMotherboardM2StorageSlots() {
+        if (motherboard == null) {
+            throw new MissingContextDataException("Нет данных о материнской плате");
+        }
+        if (CollectionUtils.isEmpty(motherboard.getM2Slots())) {
+            throw new MissingContextDataException("Нет данных о слотах M.2 материнской платы");
+        }
+
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        for (Map<String, Object> slot : motherboard.getM2Slots()) {
+            Object keysObj = slot.get("keys");
+
+            if (keysObj == null) {
+                throw new MissingContextDataException("Нет данных о ключе слота M.2 материнской платы");
+            }
+
+            String keys = keysObj.toString().toLowerCase();
+
+            if (keys.contains("m-key") || keys.contains("b-key")) {
+                result.add(slot);
+            }
+        }
+
+        return result;
+    }
+
+    private boolean canAssignM2Storage(List<Integer> requiredSizes,
+                                       List<Map<String, Object>> slots,
+                                       boolean[] used,
+                                       int storageIndex) {
+        if (storageIndex >= requiredSizes.size()) {
+            return true;
+        }
+
+        Integer requiredSize = requiredSizes.get(storageIndex);
+
+        for (int i = 0; i < slots.size(); i++) {
+            if (used[i]) {
+                continue;
+            }
+
+            if (getM2SlotSizes(slots.get(i)).contains(requiredSize)) {
+                used[i] = true;
+
+                if (canAssignM2Storage(requiredSizes, slots, used, storageIndex + 1)) {
+                    return true;
+                }
+
+                used[i] = false;
+            }
+        }
+
+        return false;
+    }
+
+    private List<Integer> getM2SlotSizes(Map<String, Object> slot) {
+        Object sizesObj = slot.get("sizes");
+
+        if (!(sizesObj instanceof Collection<?> sizes) || sizes.isEmpty()) {
+            throw new MissingContextDataException("Нет данных о поддерживаемых типоразмерах слота M.2");
+        }
+
+        List<Integer> result = new ArrayList<>();
+
+        for (Object size : sizes) {
+            if (size instanceof Number number) {
+                result.add(number.intValue());
+            } else {
+                result.add(Integer.parseInt(size.toString()));
+            }
+        }
+
+        return result;
+    }
+
+    private String requireStorageFormFactorName(StorageEntity storage) {
+        if (storage == null || storage.getFormFactor() == null || storage.getFormFactor().getName() == null) {
+            throw new MissingContextDataException("Нет данных о форм-факторе накопителя");
+        }
+
+        return storage.getFormFactor().getName();
     }
 
     private <T> List<T> require(List<T> list, String message) {
