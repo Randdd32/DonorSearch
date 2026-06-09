@@ -48,6 +48,7 @@ public class RuleBuilderMetadataService {
                 new MethodMetadataDto("requireCaseMoboFormFactors()", "Set<MotherboardFormFactorEntity>", "Поддерживаемые корпусом форм-факторы материнских плат (вызовет ошибку, если данных нет)", true),
                 new MethodMetadataDto("requireCaseFanSizes()", "List<Integer>", "Поддерживаемые корпусом размеры вентиляторов (вызовет ошибку, если данных нет)", true),
                 new MethodMetadataDto("requireCaseRadiatorSizes()", "List<Integer>", "Поддерживаемые корпусом размеры радиаторов СЖО (вызовет ошибку, если данных нет)", true),
+                new MethodMetadataDto("requireCoolerSockets(CpuCoolerEntity cooler)", "Set<CpuSocketEntity>", "Поддерживаемые кулером сокеты (вызовет ошибку, если данных нет)", true),
                 new MethodMetadataDto("getTotalTdpW()", "Integer", "Общее тепловыделение / TDP (Вт)", true),
                 new MethodMetadataDto("getTotalPsuWattage()", "Integer", "Общая мощность блоков питания (Вт)", true),
                 new MethodMetadataDto("getTotalRamCapacityGb()", "Integer", "Общий объем ОЗУ (ГБ)", true),
@@ -61,7 +62,11 @@ public class RuleBuilderMetadataService {
                 new MethodMetadataDto("getReqPcie6Pin()", "Integer", "Требуется 6-pin PCIe коннекторов (шт)", true),
                 new MethodMetadataDto("getAvailPcie6Pin()", "Integer", "Доступно 6-pin PCIe коннекторов от БП (шт)", true),
                 new MethodMetadataDto("getReqPcie12vhpwr()", "Integer", "Требуется 12VHPWR коннекторов (шт)", true),
-                new MethodMetadataDto("getAvailPcie12vhpwr()", "Integer", "Доступно 12VHPWR коннекторов от БП (шт)", true)
+                new MethodMetadataDto("getAvailPcie12vhpwr()", "Integer", "Доступно 12VHPWR коннекторов от БП (шт)", true),
+                new MethodMetadataDto("getRequiredFrontUsb20Headers()", "Integer", "Требуемое количество внутренних USB 2.0 колодок для передней панели корпуса", true),
+                new MethodMetadataDto("getRequiredFrontUsb32Gen1Headers()", "Integer", "Требуемое количество внутренних USB 3.2 Gen 1 колодок для передней панели корпуса", true),
+                new MethodMetadataDto("getRequiredFrontUsb32Gen2Headers()", "Integer", "Требуемое количество внутренних USB 3.2 Gen 2 колодок для передней панели корпуса", true),
+                new MethodMetadataDto("getRequiredFrontUsb32Gen2x2Headers()", "Integer", "Требуемое количество внутренних USB 3.2 Gen 2x2 колодок для передней панели корпуса", true)
         );
     }
 

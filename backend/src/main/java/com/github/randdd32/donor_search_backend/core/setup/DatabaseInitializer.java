@@ -34,21 +34,21 @@ public class DatabaseInitializer implements CommandLineRunner {
     private void initializeRules() {
         createRule("CPU_SOCKET_MATCH",
                 "Совместимость сокета процессора",
-                "#ctx.requireCpus().size() > 0 and #ctx.cpus.?[socket.id != #ctx.motherboard.socket.id].isEmpty()",
+                "#ctx.requireCpus().?[socket.id != #ctx.motherboard.socket.id].isEmpty()",
                 "Сокет процессора не поддерживается материнской платой",
                 "Проверка того, что сокеты всех установленных процессоров совпадают с сокетом материнской платы.",
                 Set.of(ComponentType.CPU, ComponentType.MOTHERBOARD));
 
         createRule("COOLER_SOCKET_MATCH",
                 "Совместимость крепления кулера",
-                "#ctx.requireCoolers().size() > 0 and #ctx.motherboard.socket.toString() != null and #ctx.coolers.?[!sockets.contains(#ctx.motherboard.socket)].isEmpty()",
+                "#ctx.requireCoolers().?[!#ctx.requireCoolerSockets(#this).![id].contains(#ctx.motherboard.socket.id)].isEmpty()",
                 "Крепление кулера не подходит к сокету материнской платы",
                 "Проверка того, что крепление всех кулеров поддерживает сокет материнской платы.",
                 Set.of(ComponentType.CPU_COOLER, ComponentType.MOTHERBOARD));
 
         createRule("RAM_TYPE_MATCH",
                 "Совместимость типа оперативной памяти",
-                "#ctx.requireMemories().size() > 0 and #ctx.memories.?[memoryType.id != #ctx.motherboard.memoryType.id].isEmpty()",
+                "#ctx.requireMemories().?[memoryType.id != #ctx.motherboard.memoryType.id].isEmpty()",
                 "Поколение оперативной памяти (DDR) не поддерживается материнской платой",
                 "Проверка того, что поколение всех модулей ОЗУ совпадает со слотами на плате.",
                 Set.of(ComponentType.MEMORY, ComponentType.MOTHERBOARD));
@@ -69,7 +69,7 @@ public class DatabaseInitializer implements CommandLineRunner {
 
         createRule("RAM_ECC_SUPPORT_MATCH",
                 "Поддержка ECC памяти",
-                "#ctx.requireMemories().size() > 0 and #ctx.memories.?[isEcc.booleanValue() && !#ctx.isEccSupported()].isEmpty()",
+                "#ctx.requireMemories().?[isEcc.booleanValue() && !#ctx.isEccSupported()].isEmpty()",
                 "Материнская плата или один из процессоров не поддерживают ECC-память",
                 "Проверка того, что материнская плата и все установленные процессоры поддерживают серверную память с коррекцией ошибок (ECC).",
                 Set.of(ComponentType.MEMORY, ComponentType.MOTHERBOARD, ComponentType.CPU));
@@ -186,7 +186,33 @@ public class DatabaseInitializer implements CommandLineRunner {
                 "Проверка того, что в компактный корпус форм-фактора Mini-ITX не устанавливается крупногабаритный блок питания стандарта ATX.",
                 Set.of(ComponentType.POWER_SUPPLY, ComponentType.CASE));
 
+        createRule("FRONT_USB_2_0_HEADER_MATCH",
+                "Поддержка USB 2.0 передней панели",
+                "#ctx.getRequiredFrontUsb20Headers() <= (#ctx.motherboard.headerUsb20.intValue() + #ctx.motherboard.headerUsb20SinglePort.intValue())",
+                "На материнской плате не хватает внутренних колодок USB 2.0 для передней панели корпуса",
+                "Проверка того, что материнская плата имеет достаточное количество внутренних USB 2.0 колодок для разъемов передней панели корпуса.",
+                Set.of(ComponentType.MOTHERBOARD, ComponentType.CASE));
 
+        createRule("FRONT_USB_3_2_GEN_1_HEADER_MATCH",
+                "Поддержка USB 3.2 Gen 1 передней панели",
+                "#ctx.getRequiredFrontUsb32Gen1Headers() <= #ctx.motherboard.headerUsb32Gen1.intValue()",
+                "На материнской плате не хватает внутренних колодок USB 3.2 Gen 1 для передней панели корпуса",
+                "Проверка того, что материнская плата имеет достаточное количество внутренних USB 3.2 Gen 1 колодок для разъемов передней панели корпуса.",
+                Set.of(ComponentType.MOTHERBOARD, ComponentType.CASE));
+
+        createRule("FRONT_USB_3_2_GEN_2_HEADER_MATCH",
+                "Поддержка USB 3.2 Gen 2 передней панели",
+                "#ctx.getRequiredFrontUsb32Gen2Headers() <= #ctx.motherboard.headerUsb32Gen2.intValue()",
+                "На материнской плате не хватает внутренних колодок USB 3.2 Gen 2 для передней панели корпуса",
+                "Проверка того, что материнская плата имеет достаточное количество внутренних USB 3.2 Gen 2 колодок для разъемов передней панели корпуса.",
+                Set.of(ComponentType.MOTHERBOARD, ComponentType.CASE));
+
+        createRule("FRONT_USB_3_2_GEN_2X2_HEADER_MATCH",
+                "Поддержка USB 3.2 Gen 2x2 передней панели",
+                "#ctx.getRequiredFrontUsb32Gen2x2Headers() <= #ctx.motherboard.headerUsb32Gen2x2.intValue()",
+                "На материнской плате не хватает внутренних колодок USB 3.2 Gen 2x2 для передней панели корпуса",
+                "Проверка того, что материнская плата имеет достаточное количество внутренних USB 3.2 Gen 2x2 колодок для разъемов передней панели корпуса.",
+                Set.of(ComponentType.MOTHERBOARD, ComponentType.CASE));
     }
 
     private void createRule(String code, String name, String expr, String error, String desc, Set<ComponentType> targets) {

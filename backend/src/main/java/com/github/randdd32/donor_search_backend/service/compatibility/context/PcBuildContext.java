@@ -1,6 +1,7 @@
 package com.github.randdd32.donor_search_backend.service.compatibility.context;
 
 import com.github.randdd32.donor_search_backend.core.error.MissingContextDataException;
+import com.github.randdd32.donor_search_backend.model.dictionary.CpuSocketEntity;
 import com.github.randdd32.donor_search_backend.model.dictionary.MotherboardFormFactorEntity;
 import com.github.randdd32.donor_search_backend.model.hardware.CaseEntity;
 import com.github.randdd32.donor_search_backend.model.hardware.CaseFanEntity;
@@ -147,6 +148,16 @@ public class PcBuildContext {
         return pcCase.getRadiatorSizes();
     }
 
+    public Set<CpuSocketEntity> requireCoolerSockets(CpuCoolerEntity cooler) {
+        if (cooler == null) {
+            throw new MissingContextDataException("Нет данных о кулере");
+        }
+        if (CollectionUtils.isEmpty(cooler.getSockets())) {
+            throw new MissingContextDataException("Нет данных о поддерживаемых сокетах кулера");
+        }
+        return cooler.getSockets();
+    }
+
     public Integer getTotalPsuWattage() {
         if (psus.isEmpty()) {
             throw new MissingContextDataException("Нет данных о блоках питания");
@@ -169,28 +180,36 @@ public class PcBuildContext {
     }
 
     public Integer getStorageCountByFormFactor(String ffName) {
-        if (storages.isEmpty()) {
-            throw new MissingContextDataException("Нет данных об накопителях");
-        }
         return (int) storages.stream()
                 .filter(s -> s.getFormFactor() != null && s.getFormFactor().getName().contains(ffName))
                 .count();
     }
 
     public Integer getSataDevicesCount() {
-        if (storages.isEmpty()) {
-            throw new MissingContextDataException("Нет данных об накопителях");
+        int count = 0;
+
+        for (StorageEntity storage : storages) {
+            if (CollectionUtils.isEmpty(storage.getInterfaces())) {
+                throw new MissingContextDataException("Нет данных об интерфейсах накопителя");
+            }
+
+            boolean isSata = storage.getInterfaces().stream()
+                    .anyMatch(i -> i.getName() != null && i.getName().toLowerCase().contains("sata"));
+            if (isSata) {
+                count++;
+            }
         }
 
-        long sataDisks = storages.stream()
-                .filter(s -> s.getInterfaces() != null && s.getInterfaces().stream().anyMatch(i -> i.getName().toLowerCase().contains("sata")))
-                .count();
+        for (OpticalDriveEntity drive : opticalDrives) {
+            if (drive.getStorageInterface() == null || drive.getStorageInterface().getName() == null) {
+                throw new MissingContextDataException("Нет данных об интерфейсе оптического привода");
+            }
+            if (drive.getStorageInterface().getName().toLowerCase().contains("sata")) {
+                count++;
+            }
+        }
 
-        long sataOpticalDrives = opticalDrives.stream()
-                .filter(o -> o.getStorageInterface() != null && o.getStorageInterface().getName().toLowerCase().contains("sata"))
-                .count();
-
-        return (int) (sataDisks + sataOpticalDrives);
+        return count;
     }
 
     public Integer getTotalGpuSlotWidth() {
@@ -243,6 +262,22 @@ public class PcBuildContext {
         return sumPsuPowerPins(PowerSupplyEntity::getPcie12vhpwrConnectors);
     }
 
+    public Integer getRequiredFrontUsb20Headers() {
+        return getRequiredFrontUsbHeadersByName("USB 2.0");
+    }
+
+    public Integer getRequiredFrontUsb32Gen1Headers() {
+        return getRequiredFrontUsbHeadersByName("USB 3.2 Gen 1");
+    }
+
+    public Integer getRequiredFrontUsb32Gen2Headers() {
+        return getRequiredFrontUsbHeadersByName("USB 3.2 Gen 2 Type-C");
+    }
+
+    public Integer getRequiredFrontUsb32Gen2x2Headers() {
+        return getRequiredFrontUsbHeadersByName("USB 3.2 Gen 2x2");
+    }
+
     private void requireVideoCapability() {
         if (gpus.isEmpty()) {
             if (cpus.isEmpty()) {
@@ -267,6 +302,18 @@ public class PcBuildContext {
             throw new MissingContextDataException("Нет данных о блоках питания");
         }
         return psus.stream().mapToInt(mapper).sum();
+    }
+
+    private Integer getRequiredFrontUsbHeadersByName(String usbNamePart) {
+        if (pcCase == null) {
+            throw new MissingContextDataException("Нет данных о корпусе");
+        }
+        if (CollectionUtils.isEmpty(pcCase.getFrontPanelUsbTypes())) {
+            throw new MissingContextDataException("Нет данных о разъемах USB на передней панели корпуса");
+        }
+        return (int) pcCase.getFrontPanelUsbTypes().stream()
+                .filter(usb -> usb.getName() != null && usb.getName().contains(usbNamePart))
+                .count();
     }
 
     private <T> List<T> require(List<T> list, String message) {
