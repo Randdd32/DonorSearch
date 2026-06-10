@@ -436,6 +436,24 @@ public class PcBuildContext {
                 .allMatch(cpu -> Boolean.TRUE.equals(cpu.getEccSupport()));
     }
 
+    public Integer getTotalSataPowerConnectors() {
+        return sumPsuPowerPins(PowerSupplyEntity::getSataConnectors);
+    }
+
+    public Boolean canPowerGpuPcie6And8PinConnectors() {
+        int req8 = getReqPcie8Pin();
+        int req6 = getReqPcie6Pin();
+
+        int avail8 = sumPsuPowerPins(PowerSupplyEntity::getPcie8PinConnectors);
+        int avail6 = sumPsuPowerPins(PowerSupplyEntity::getPcie6PinConnectors);
+        int avail6Plus2 = sumPsuPowerPins(PowerSupplyEntity::getPcie6Plus2PinConnectors);
+
+        int flexUsedFor8 = Math.max(0, req8 - avail8);
+        int flexUsedFor6 = Math.max(0, req6 - avail6);
+
+        return flexUsedFor8 + flexUsedFor6 <= avail6Plus2;
+    }
+
     public Integer getReqPcie8Pin() {
         return sumGpuPowerPins(VideoCardEntity::getPower8pinCount);
     }

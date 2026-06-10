@@ -116,32 +116,25 @@ public class DatabaseInitializer implements CommandLineRunner {
                 "Проверка того, что номинала блоков питания достаточно для работы устройства. Для этого рассчитывается TDP сборки (зависит от процессоров и видеокарт) с запасом 30%.",
                 Set.of(ComponentType.POWER_SUPPLY, ComponentType.CPU, ComponentType.VIDEO_CARD));
 
-        createRule("PSU_GPU_8PIN_CHECK",
-                "Наличие 8-pin коннекторов PCIe",
-                "#ctx.getAvailPcie8Pin() >= #ctx.getReqPcie8Pin()",
-                "У блока питания не хватает кабелей 8-pin PCIe для видеокарты",
-                "Проверка физического наличия необходимых коннекторов у блока питания для подключения питания к видеокарте.",
-                Set.of(ComponentType.POWER_SUPPLY, ComponentType.VIDEO_CARD));
-
-        createRule("PSU_GPU_6PIN_CHECK",
-                "Наличие 6-pin коннекторов PCIe",
-                "#ctx.getAvailPcie6Pin() >= #ctx.getReqPcie6Pin()",
-                "У блока питания не хватает кабелей 6-pin PCIe для видеокарты",
-                "Проверка физического наличия необходимых коннекторов у блока питания для подключения питания к видеокарте.",
+        createRule("PSU_GPU_PCIE_6_8PIN_CHECK",
+                "Наличие 6-pin и 8-pin коннекторов PCIe",
+                "#ctx.canPowerGpuPcie6And8PinConnectors()",
+                "У блока питания не хватает 6-pin/8-pin кабелей PCIe для видеокарты",
+                "Проверка физического наличия необходимых 6-pin и 8-pin коннекторов PCIe у блока питания для подключения питания к видеокарте.",
                 Set.of(ComponentType.POWER_SUPPLY, ComponentType.VIDEO_CARD));
 
         createRule("PSU_GPU_12VHPWR_CHECK",
                 "Наличие коннекторов 12VHPWR",
                 "#ctx.getAvailPcie12vhpwr() >= #ctx.getReqPcie12vhpwr()",
                 "У блока питания нет разъема 12VHPWR для современных видеокарт",
-                "Проверка физического наличия необходимых коннекторов у блока питания для подключения питания к видеокарте.",
+                "Проверка физического наличия необходимых 12VHPWR коннекторов у блока питания для подключения питания к видеокарте.",
                 Set.of(ComponentType.POWER_SUPPLY, ComponentType.VIDEO_CARD));
 
-        createRule("PSU_GPU_12PIN_CHECK",
+        createRule("PSU_GPU_PCIE_12PIN_CHECK",
                 "Наличие 12-pin коннекторов PCIe",
                 "#ctx.getAvailPcie12Pin() >= #ctx.getReqPcie12Pin()",
                 "У блока питания не хватает кабелей 12-pin PCIe для видеокарты",
-                "Проверка физического наличия необходимых коннекторов у блока питания для подключения питания к видеокарте.",
+                "Проверка физического наличия необходимых 12-pin коннекторов PCIe у блока питания для подключения питания к видеокарте.",
                 Set.of(ComponentType.POWER_SUPPLY, ComponentType.VIDEO_CARD));
 
         createRule("PSU_GPU_EPS_CHECK",
@@ -150,6 +143,13 @@ public class DatabaseInitializer implements CommandLineRunner {
                 "У блока питания не хватает EPS 8-pin кабелей",
                 "Проверка физического наличия необходимых EPS 8-pin коннекторов у блока питания.",
                 Set.of(ComponentType.POWER_SUPPLY, ComponentType.VIDEO_CARD));
+
+        createRule("PSU_SATA_POWER_CONNECTORS_CHECK",
+                "Наличие SATA-коннекторов питания",
+                "#ctx.getSataDevicesCount() <= #ctx.getTotalSataPowerConnectors()",
+                "У блока питания не хватает SATA-коннекторов питания для накопителей и оптических приводов",
+                "Проверка физического наличия SATA-коннекторов питания у блока питания для подключения внутренних SATA-накопителей и оптических приводов.",
+                Set.of(ComponentType.POWER_SUPPLY, ComponentType.STORAGE, ComponentType.OPTICAL_DRIVE));
 
         createRule("CASE_35_BAYS_LIMIT",
                 "Наличие отсеков 3.5\"",
