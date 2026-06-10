@@ -39,6 +39,13 @@ public class DatabaseInitializer implements CommandLineRunner {
                 "Проверка того, что сокеты всех установленных процессоров совпадают с сокетом материнской платы.",
                 Set.of(ComponentType.CPU, ComponentType.MOTHERBOARD));
 
+        createRule("CPU_MAX_MEMORY_LIMIT",
+                "Ограничение объема оперативной памяти процессором",
+                "#ctx.requireCpus().?[maxMemoryGb.intValue() < #ctx.getTotalRamCapacityGb()].isEmpty()",
+                "Суммарный объем оперативной памяти превышает лимит, поддерживаемый процессором",
+                "Проверка того, что общий объем оперативной памяти не превышает максимальный объем памяти, поддерживаемый процессором.",
+                Set.of(ComponentType.CPU, ComponentType.MEMORY));
+
         createRule("COOLER_SOCKET_MATCH",
                 "Совместимость крепления кулера",
                 "#ctx.requireCoolers().?[!#ctx.requireCoolerSockets(#this).![id].contains(#ctx.motherboard.socket.id)].isEmpty()",

@@ -122,6 +122,7 @@ public class PcBuildContext {
         if (cpus.isEmpty()) {
             throw new MissingContextDataException("Нет данных о процессорах");
         }
+        requireVideoCapability();
         int cpuTdp = cpus.stream().mapToInt(CpuEntity::getTdpW).sum();
         int gpuTdp = gpus.stream().mapToInt(VideoCardEntity::getTdpW).sum();
         return cpuTdp + gpuTdp;
@@ -403,11 +404,12 @@ public class PcBuildContext {
         if (motherboard == null) {
             throw new MissingContextDataException("Нет данных о материнской плате");
         }
-        if (Boolean.FALSE.equals(motherboard.getEccSupport())) {
-            return false;
-        }
         if (cpus.isEmpty()) {
             throw new MissingContextDataException("Нет данных о процессорах");
+        }
+
+        if (Boolean.FALSE.equals(motherboard.getEccSupport())) {
+            return false;
         }
         return cpus.stream()
                 .allMatch(cpu -> Boolean.TRUE.equals(cpu.getEccSupport()));
