@@ -440,6 +440,37 @@ public class PcBuildContext {
         return sumPsuPowerPins(PowerSupplyEntity::getSataConnectors);
     }
 
+    public Integer getFullSizeOpticalDriveCount() {
+        int count = 0;
+        for (OpticalDriveEntity drive : opticalDrives) {
+            String formFactorName = requireOpticalDriveFormFactorName(drive);
+            if (formFactorName.equals("5.25")) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public Boolean canVerifySlimOpticalDrivePlacement() {
+        for (OpticalDriveEntity drive : opticalDrives) {
+            String formFactorName = requireOpticalDriveFormFactorName(drive).toLowerCase();
+            if (formFactorName.contains("slim")) {
+                throw new MissingContextDataException("Нет данных о поддержке slim-отсеков для оптических приводов корпусом");
+            }
+        }
+        return true;
+    }
+
+    public Boolean canVerifyOpticalDriveInterfaces() {
+        for (OpticalDriveEntity drive : opticalDrives) {
+            String interfaceName = requireOpticalDriveInterfaceName(drive).toLowerCase();
+            if (interfaceName.contains("pata")) {
+                throw new MissingContextDataException("В модели материнской платы отсутствуют данные о PATA/IDE-портах для оптических приводов");
+            }
+        }
+        return true;
+    }
+
     public Boolean canPowerGpuPcie6And8PinConnectors() {
         int req8 = getReqPcie8Pin();
         int req6 = getReqPcie6Pin();
@@ -930,6 +961,22 @@ public class PcBuildContext {
         }
 
         return storage.getFormFactor().getName();
+    }
+
+    private String requireOpticalDriveFormFactorName(OpticalDriveEntity drive) {
+        if (drive == null || drive.getFormFactor() == null || drive.getFormFactor().getName() == null) {
+            throw new MissingContextDataException("Нет данных о форм-факторе оптического привода");
+        }
+
+        return drive.getFormFactor().getName();
+    }
+
+    private String requireOpticalDriveInterfaceName(OpticalDriveEntity drive) {
+        if (drive == null || drive.getStorageInterface() == null || drive.getStorageInterface().getName() == null) {
+            throw new MissingContextDataException("Нет данных об интерфейсе оптического привода");
+        }
+
+        return drive.getStorageInterface().getName();
     }
 
     private <T> List<T> require(List<T> list, String message) {

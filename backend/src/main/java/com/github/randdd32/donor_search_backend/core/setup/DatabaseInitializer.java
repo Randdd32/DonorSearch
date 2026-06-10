@@ -167,10 +167,24 @@ public class DatabaseInitializer implements CommandLineRunner {
 
         createRule("CASE_525_BAYS_LIMIT",
                 "Наличие отсеков 5.25\"",
-                "#ctx.opticalDrives.size() <= #ctx.pcCase.ext525Bays.intValue()",
-                "В корпусе нет отсеков 5.25 для установки оптического привода",
-                "Проверка того, хватит ли в корпусе слотов под оптические приводы.",
+                "#ctx.getFullSizeOpticalDriveCount() <= #ctx.pcCase.ext525Bays.intValue()",
+                "Количество полноразмерных оптических приводов превышает количество внешних отсеков 5.25 в корпусе",
+                "Проверка того, что количество полноразмерных оптических приводов не превышает количество внешних отсеков 5.25 в корпусе.",
                 Set.of(ComponentType.OPTICAL_DRIVE, ComponentType.CASE));
+
+        createRule("SLIM_OPTICAL_DRIVE_BAY_VERIFIABLE",
+                "Проверка slim-отсеков для оптических приводов",
+                "#ctx.canVerifySlimOpticalDrivePlacement()",
+                "Невозможно проверить установку slim-оптического привода в корпус",
+                "Проверка того, что размещение slim-оптического привода может быть определено по доступным данным корпуса.",
+                Set.of(ComponentType.OPTICAL_DRIVE, ComponentType.CASE));
+
+        createRule("OPTICAL_DRIVE_INTERFACE_VERIFIABLE",
+                "Проверка интерфейса оптического привода",
+                "#ctx.canVerifyOpticalDriveInterfaces()",
+                "Невозможно проверить совместимость интерфейса оптического привода",
+                "Проверка того, что интерфейс оптического привода может быть идентифицирован по доступным данным материнской платы.",
+                Set.of(ComponentType.OPTICAL_DRIVE, ComponentType.MOTHERBOARD));
 
         createRule("CASE_FAN_SIZE_MATCH",
                 "Совместимость размера корпусного вентилятора",

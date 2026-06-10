@@ -83,7 +83,10 @@ public class RuleBuilderMetadataService {
                 new MethodMetadataDto("getM2ExpansionCardCount()", "Integer", "Количество M.2-карт расширения (шт)", true),
                 new MethodMetadataDto("canVerifyLegacyGpuInterfaces()", "Boolean", "Можно ли проверить устаревшие интерфейсы видеокарт по данным материнской платы", true),
                 new MethodMetadataDto("isGcHpwrGpuCompatibleWithMotherboard()", "Boolean", "Совместима ли GC-HPWR видеокарта с материнской платой по back-connect признаку", true),
-                new MethodMetadataDto("canConnectAllMonitorsToGpus()", "Boolean", "Можно ли подключить все мониторы к доступным видеовыходам видеокарт", true)
+                new MethodMetadataDto("canConnectAllMonitorsToGpus()", "Boolean", "Можно ли подключить все мониторы к доступным видеовыходам видеокарт", true),
+                new MethodMetadataDto("getFullSizeOpticalDriveCount()", "Integer", "Количество полноразмерных оптических приводов 5.25", true),
+                new MethodMetadataDto("canVerifySlimOpticalDrivePlacement()", "Boolean", "Можно ли проверить размещение slim-оптических приводов по данным корпуса", true),
+                new MethodMetadataDto("canVerifyOpticalDriveInterfaces()", "Boolean", "Можно ли проверить интерфейсы оптических приводов по данным материнской платы", true)
         );
     }
 
