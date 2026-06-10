@@ -276,6 +276,13 @@ public class DatabaseInitializer implements CommandLineRunner {
                 "На материнской плате не хватает внутренних колодок USB 3.2 Gen 2x2 для передней панели корпуса",
                 "Проверка того, что материнская плата имеет достаточное количество внутренних USB 3.2 Gen 2x2 колодок для разъемов передней панели корпуса.",
                 Set.of(ComponentType.MOTHERBOARD, ComponentType.CASE));
+
+        createRule("MONITOR_VIDEO_OUTPUT_MATCH",
+                "Совместимость мониторов с видеовыходами",
+                "#ctx.canConnectAllMonitorsToGpus()",
+                "Не хватает совместимых видеовыходов для подключения всех мониторов",
+                "Проверка того, что каждый монитор может быть подключен к одному из доступных видеовыходов видеокарт.",
+                Set.of(ComponentType.MONITOR, ComponentType.VIDEO_CARD));
     }
 
     private void createRule(String code, String name, String expr, String error, String desc, Set<ComponentType> targets) {

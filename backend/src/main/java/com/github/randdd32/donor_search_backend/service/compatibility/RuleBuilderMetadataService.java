@@ -80,7 +80,8 @@ public class RuleBuilderMetadataService {
                 new MethodMetadataDto("canPlaceM2ExpansionCards()", "Boolean", "Можно ли разместить M.2-карты расширения в M.2 E-key слотах материнской платы", true),
                 new MethodMetadataDto("getM2ExpansionCardCount()", "Integer", "Количество M.2-карт расширения (шт)", true),
                 new MethodMetadataDto("canVerifyLegacyGpuInterfaces()", "Boolean", "Можно ли проверить устаревшие интерфейсы видеокарт по данным материнской платы", true),
-                new MethodMetadataDto("isGcHpwrGpuCompatibleWithMotherboard()", "Boolean", "Совместима ли GC-HPWR видеокарта с материнской платой по back-connect признаку", true)
+                new MethodMetadataDto("isGcHpwrGpuCompatibleWithMotherboard()", "Boolean", "Совместима ли GC-HPWR видеокарта с материнской платой по back-connect признаку", true),
+                new MethodMetadataDto("canConnectAllMonitorsToGpus()", "Boolean", "Можно ли подключить все мониторы к доступным видеовыходам видеокарт", true)
         );
     }
 

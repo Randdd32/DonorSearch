@@ -25,7 +25,9 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.ToIntFunction;
@@ -256,6 +258,25 @@ public class PcBuildContext {
             }
         }
         return count;
+    }
+
+    public Boolean canConnectAllMonitorsToGpus() {
+        if (monitors.isEmpty()) {
+            return true;
+        }
+        if (gpus.isEmpty()) {
+            throw new MissingContextDataException("Нет данных о видеовыходах: в сборке отсутствует дискретная видеокарта, а видеовыходы материнской платы не описаны");
+        }
+
+        Map<String, Integer> availableOutputs = getAvailableVideoOutputFamilies();
+        if (availableOutputs.values().stream().mapToInt(Integer::intValue).sum() == 0) {
+            throw new MissingContextDataException("Нет данных о видеовыходах видеокарт");
+        }
+
+        List<List<String>> requiredMonitorInputFamilies = getRequiredMonitorInputFamilies();
+        boolean[] connected = new boolean[requiredMonitorInputFamilies.size()];
+
+        return canAssignMonitorToOutput(requiredMonitorInputFamilies, availableOutputs, connected, 0);
     }
 
     public Integer getSataDevicesCount() {
@@ -715,6 +736,158 @@ public class PcBuildContext {
         }
 
         return Integer.parseInt(matcher.group(1));
+    }
+
+    private Map<String, Integer> getAvailableVideoOutputFamilies() {
+        Map<String, Integer> result = new HashMap<>();
+
+        for (VideoCardEntity gpu : gpus) {
+            if (gpu.getVideoOutputs() == null || gpu.getVideoOutputs().isEmpty()) {
+                throw new MissingContextDataException("Нет данных о видеовыходах видеокарты");
+            }
+
+            for (Map.Entry<String, Integer> entry : gpu.getVideoOutputs().entrySet()) {
+                String family = normalizeVideoOutputFamily(entry.getKey());
+
+                if (family == null) {
+                    continue;
+                }
+
+                Integer count = entry.getValue();
+
+                if (count == null) {
+                    throw new MissingContextDataException("Нет данных о количестве видеовыходов видеокарты");
+                }
+
+                result.merge(family, count, Integer::sum);
+            }
+        }
+
+        return result;
+    }
+
+    private List<List<String>> getRequiredMonitorInputFamilies() {
+        List<List<String>> result = new ArrayList<>();
+
+        for (MonitorEntity monitor : monitors) {
+            List<String> families = getMonitorInputFamilies(monitor);
+            if (families.isEmpty()) {
+                throw new MissingContextDataException("Нет данных о видеовходах монитора");
+            }
+            result.add(families);
+        }
+
+        return result;
+    }
+
+    private List<String> getMonitorInputFamilies(MonitorEntity monitor) {
+        if (monitor == null) {
+            throw new MissingContextDataException("Нет данных о мониторе");
+        }
+
+        List<String> result = new ArrayList<>();
+
+        addMonitorInputFamily(result, "HDMI", monitor.getInputHdmi());
+        addMonitorInputFamily(result, "HDMI", monitor.getInputMiniHdmi());
+        addMonitorInputFamily(result, "HDMI", monitor.getInputMicroHdmi());
+
+        addMonitorInputFamily(result, "DISPLAYPORT", monitor.getInputDp());
+        addMonitorInputFamily(result, "DISPLAYPORT", monitor.getInputMiniDp());
+
+        addMonitorInputFamily(result, "DVI", monitor.getInputDvi());
+        addMonitorInputFamily(result, "VGA", monitor.getInputVga());
+        addMonitorInputFamily(result, "USB_C", monitor.getInputUsbC());
+        addMonitorInputFamily(result, "BNC", monitor.getInputBnc());
+        addMonitorInputFamily(result, "COMPONENT", monitor.getInputComponent());
+        addMonitorInputFamily(result, "S_VIDEO", monitor.getInputSVideo());
+        addMonitorInputFamily(result, "VIRTUAL_LINK", monitor.getInputVirtualLink());
+
+        return result.stream().distinct().toList();
+    }
+
+    private void addMonitorInputFamily(List<String> result, String family, Integer count) {
+        if (count == null) {
+            throw new MissingContextDataException("Нет данных о количестве видеовходов монитора");
+        }
+        if (count > 0) {
+            result.add(family);
+        }
+    }
+
+    private boolean canAssignMonitorToOutput(List<List<String>> monitorInputFamilies,
+                                             Map<String, Integer> availableOutputs,
+                                             boolean[] connected,
+                                             int monitorIndex) {
+        if (monitorIndex >= monitorInputFamilies.size()) {
+            return true;
+        }
+
+        List<String> possibleFamilies = monitorInputFamilies.get(monitorIndex);
+
+        for (String family : possibleFamilies) {
+            int availableCount = availableOutputs.getOrDefault(family, 0);
+            if (availableCount <= 0) {
+                continue;
+            }
+
+            availableOutputs.put(family, availableCount - 1);
+            connected[monitorIndex] = true;
+
+            if (canAssignMonitorToOutput(monitorInputFamilies, availableOutputs, connected, monitorIndex + 1)) {
+                return true;
+            }
+
+            connected[monitorIndex] = false;
+            availableOutputs.put(family, availableCount);
+        }
+
+        return false;
+    }
+
+    private String normalizeVideoOutputFamily(String outputName) {
+        if (outputName == null) {
+            throw new MissingContextDataException("Нет данных о типе видеовыхода видеокарты");
+        }
+
+        String normalized = outputName.toLowerCase();
+
+        if (normalized.contains("hdmi")) {
+            return "HDMI";
+        }
+
+        if (normalized.contains("displayport") || normalized.contains("minidisplayport")) {
+            return "DISPLAYPORT";
+        }
+
+        if (normalized.contains("dvi")) {
+            return "DVI";
+        }
+
+        if (normalized.contains("vga")) {
+            return "VGA";
+        }
+
+        if (normalized.contains("usb_type_c")) {
+            return "USB_C";
+        }
+
+        if (normalized.contains("bnc")) {
+            return "BNC";
+        }
+
+        if (normalized.contains("component")) {
+            return "COMPONENT";
+        }
+
+        if (normalized.contains("s_video")) {
+            return "S_VIDEO";
+        }
+
+        if (normalized.contains("virtuallink")) {
+            return "VIRTUAL_LINK";
+        }
+
+        return null;
     }
 
     private String requireGpuInterfaceName(VideoCardEntity gpu) {
