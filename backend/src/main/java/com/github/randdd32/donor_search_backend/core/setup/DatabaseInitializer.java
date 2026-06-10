@@ -172,12 +172,19 @@ public class DatabaseInitializer implements CommandLineRunner {
                 "Проверка того, что количество внутренних SATA-устройств не превышает сумму портов SATA 3Gb/s и SATA 6Gb/s на материнской плате.",
                 Set.of(ComponentType.STORAGE, ComponentType.OPTICAL_DRIVE, ComponentType.MOTHERBOARD));
 
-        createRule("MOBO_MSATA_SLOT_LIMIT",
-                "Наличие слотов mSATA",
-                "#ctx.getMsataStorageCount() <= #ctx.motherboard.miniPcieMsataSlots.intValue()",
-                "Количество mSATA-накопителей превышает количество слотов mSATA на материнской плате",
-                "Проверка того, что количество mSATA-накопителей не превышает количество доступных слотов Mini-PCIe/mSATA на материнской плате.",
-                Set.of(ComponentType.STORAGE, ComponentType.MOTHERBOARD));
+        createRule("MOBO_MINI_PCIE_MSATA_SLOT_LIMIT",
+                "Наличие слотов Mini-PCIe/mSATA",
+                "#ctx.getMiniPcieMsataDeviceCount() <= #ctx.motherboard.miniPcieMsataSlots.intValue()",
+                "Количество Mini-PCIe/mSATA устройств превышает количество соответствующих слотов на материнской плате",
+                "Проверка того, что количество mSATA-накопителей и Mini-PCIe карт расширения не превышает количество доступных слотов Mini-PCIe/mSATA на материнской плате.",
+                Set.of(ComponentType.STORAGE, ComponentType.EXPANSION_CARD, ComponentType.MOTHERBOARD));
+
+        createRule("MOBO_M2_EXPANSION_CARD_SLOT_MATCH",
+                "Совместимость M.2-карт расширения со слотами материнской платы",
+                "#ctx.canPlaceM2ExpansionCards()",
+                "На материнской плате нет подходящих M.2 E-key слотов для карт расширения",
+                "Проверка того, что M.2-карты расширения могут быть размещены в доступных M.2 E-key слотах материнской платы.",
+                Set.of(ComponentType.EXPANSION_CARD, ComponentType.MOTHERBOARD));
 
         createRule("MOBO_M2_STORAGE_SLOT_MATCH",
                 "Совместимость M.2-накопителей со слотами материнской платы",
@@ -186,12 +193,19 @@ public class DatabaseInitializer implements CommandLineRunner {
                 "Проверка того, что количество и типоразмеры M.2-накопителей соответствуют доступным слотам M.2 на материнской плате.",
                 Set.of(ComponentType.STORAGE, ComponentType.MOTHERBOARD));
 
-        createRule("MOBO_PCIE_X16_LIMIT",
-                "Наличие слотов PCIe x16",
-                "#ctx.requireGpus().size() <= #ctx.motherboard.pciX16Slots.intValue()",
-                "Количество видеокарт превышает количество слотов PCIe x16 на материнской плате",
-                "Проверка того, что у материнской платы хватает полноразмерных слотов расширения для подключения видеокарт.",
-                Set.of(ComponentType.VIDEO_CARD, ComponentType.MOTHERBOARD));
+        createRule("MOBO_PCIE_SLOT_ALLOCATION_MATCH",
+                "Совместимость PCIe-устройств со слотами материнской платы",
+                "#ctx.canPlacePcieDevices()",
+                "На материнской плате нет подходящих PCIe-слотов для всех устройств",
+                "Проверка того, что видеокарты, PCIe-карты расширения и PCIe-накопители могут быть размещены в доступных слотах PCIe материнской платы.",
+                Set.of(ComponentType.VIDEO_CARD, ComponentType.EXPANSION_CARD, ComponentType.STORAGE, ComponentType.MOTHERBOARD));
+
+        createRule("MOBO_PCI_SLOT_LIMIT",
+                "Наличие слотов PCI",
+                "#ctx.getRegularPciExpansionCardCount() <= #ctx.motherboard.pciSlots.intValue()",
+                "Количество PCI-карт превышает количество PCI-слотов на материнской плате",
+                "Проверка того, что количество карт расширения с интерфейсом PCI не превышает количество доступных PCI-слотов на материнской плате.",
+                Set.of(ComponentType.EXPANSION_CARD, ComponentType.MOTHERBOARD));
 
         createRule("CASE_PSU_COMPATIBILITY",
                 "Совместимость габаритов блока питания",

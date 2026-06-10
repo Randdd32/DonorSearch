@@ -24,9 +24,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.ToIntFunction;
 import java.util.regex.Matcher;
@@ -50,6 +50,7 @@ public class PcBuildContext {
     private List<MonitorEntity> monitors = new ArrayList<>();
 
     private static final Pattern M2_FORM_FACTOR_PATTERN = Pattern.compile("(?i)M\\.2-(\\d+)");
+    private static final Pattern PCIE_INTERFACE_PATTERN = Pattern.compile("(?i)^PCIe\\s*x(\\d+)$");
 
     public PcBuildContext copy() {
         PcBuildContext copy = new PcBuildContext();
@@ -202,6 +203,44 @@ public class PcBuildContext {
         return canAssignM2Storage(requiredSizes, storageSlots, used, 0);
     }
 
+    public Boolean canPlaceM2ExpansionCards() {
+        int requiredCount = getM2ExpansionCardCount();
+        if (requiredCount == 0) {
+            return true;
+        }
+
+        if (motherboard == null) {
+            throw new MissingContextDataException("Нет данных о материнской плате");
+        }
+        if (motherboard.getM2Slots() == null) {
+            throw new MissingContextDataException("Нет данных о слотах M.2 материнской платы");
+        }
+
+        long availableEKeySlots = motherboard.getM2Slots().stream()
+                .filter(slot -> {
+                    if (slot.keys() == null) {
+                        throw new MissingContextDataException("Нет данных о ключе слота M.2 материнской платы");
+                    }
+
+                    return slot.keys().toLowerCase().contains("e-key");
+                })
+                .count();
+
+        return requiredCount <= availableEKeySlots;
+    }
+
+    public Integer getM2ExpansionCardCount() {
+        int count = 0;
+        for (ExpansionCardEntity card : expansionCards) {
+            String interfaceName = requireExpansionCardInterfaceName(card).toLowerCase();
+
+            if (interfaceName.equals("m.2") || interfaceName.equals("m.2 pcie")) {
+                count++;
+            }
+        }
+        return count;
+    }
+
     public Integer getStorageCountByFormFactor(String ffName) {
         int count = 0;
         for (StorageEntity storage : storages) {
@@ -251,9 +290,24 @@ public class PcBuildContext {
         return count;
     }
 
+    public Integer getMiniPcieMsataDeviceCount() {
+        return getMsataStorageCount() + getMiniPcieExpansionCardCount();
+    }
+
+    public Integer getMiniPcieExpansionCardCount() {
+        int count = 0;
+        for (ExpansionCardEntity card : expansionCards) {
+            String interfaceName = requireExpansionCardInterfaceName(card).toLowerCase();
+
+            if (interfaceName.contains("mini-pcie")) {
+                count++;
+            }
+        }
+        return count;
+    }
+
     public Integer getMsataStorageCount() {
         int count = 0;
-
         for (StorageEntity storage : storages) {
             if (Boolean.TRUE.equals(storage.getIsExternal())) {
                 continue;
@@ -265,7 +319,36 @@ public class PcBuildContext {
                 count++;
             }
         }
+        return count;
+    }
 
+    public Boolean canPlacePcieDevices() {
+        List<Integer> requiredWidths = getRequiredPcieSlotWidths();
+        if (requiredWidths.isEmpty()) {
+            return true;
+        }
+
+        List<Integer> availableWidths = getAvailablePcieSlotWidths();
+        if (availableWidths.isEmpty()) {
+            return false;
+        }
+
+        requiredWidths.sort(Comparator.reverseOrder());
+        availableWidths.sort(Comparator.reverseOrder());
+
+        boolean[] used = new boolean[availableWidths.size()];
+        return canAssignPcieDevice(requiredWidths, availableWidths, used, 0);
+    }
+
+    public Integer getRegularPciExpansionCardCount() {
+        int count = 0;
+        for (ExpansionCardEntity card : expansionCards) {
+            String interfaceName = requireExpansionCardInterfaceName(card);
+
+            if (interfaceName.equalsIgnoreCase("PCI")) {
+                count++;
+            }
+        }
         return count;
     }
 
@@ -456,6 +539,128 @@ public class PcBuildContext {
         }
 
         return slot.sizes();
+    }
+
+    private List<Integer> getRequiredPcieSlotWidths() {
+        List<Integer> result = new ArrayList<>();
+
+        for (VideoCardEntity gpu : gpus) {
+            result.add(16);
+        }
+
+        for (ExpansionCardEntity card : expansionCards) {
+            String interfaceName = requireExpansionCardInterfaceName(card);
+            Integer width = parsePcieWidth(interfaceName);
+
+            if (width != null) {
+                result.add(width);
+            }
+        }
+
+        for (StorageEntity storage : storages) {
+            if (Boolean.TRUE.equals(storage.getIsExternal())) {
+                continue;
+            }
+
+            String formFactorName = requireStorageFormFactorName(storage);
+            if (!formFactorName.equalsIgnoreCase("PCIe")) {
+                continue;
+            }
+
+            Integer width = getPcieStorageWidth(storage);
+            result.add(width);
+        }
+
+        return result;
+    }
+
+    private List<Integer> getAvailablePcieSlotWidths() {
+        if (motherboard == null) {
+            throw new MissingContextDataException("Нет данных о материнской плате");
+        }
+
+        List<Integer> result = new ArrayList<>();
+
+        addRepeated(result, 16, motherboard.getPciX16Slots());
+        addRepeated(result, 8, motherboard.getPciX8Slots());
+        addRepeated(result, 4, motherboard.getPciX4Slots());
+        addRepeated(result, 1, motherboard.getPciX1Slots());
+
+        return result;
+    }
+
+    private void addRepeated(List<Integer> target, int width, Integer count) {
+        if (count == null) {
+            throw new MissingContextDataException("Нет данных о количестве PCIe x" + width + " слотов");
+        }
+
+        for (int i = 0; i < count; i++) {
+            target.add(width);
+        }
+    }
+
+    private boolean canAssignPcieDevice(List<Integer> requiredWidths,
+                                        List<Integer> availableWidths,
+                                        boolean[] used,
+                                        int deviceIndex) {
+        if (deviceIndex >= requiredWidths.size()) {
+            return true;
+        }
+
+        Integer requiredWidth = requiredWidths.get(deviceIndex);
+
+        for (int i = 0; i < availableWidths.size(); i++) {
+            if (used[i]) {
+                continue;
+            }
+
+            if (availableWidths.get(i) >= requiredWidth) {
+                used[i] = true;
+
+                if (canAssignPcieDevice(requiredWidths, availableWidths, used, deviceIndex + 1)) {
+                    return true;
+                }
+
+                used[i] = false;
+            }
+        }
+
+        return false;
+    }
+
+    private Integer getPcieStorageWidth(StorageEntity storage) {
+        if (CollectionUtils.isEmpty(storage.getInterfaces())) {
+            throw new MissingContextDataException("Нет данных об интерфейсах PCIe-накопителя");
+        }
+
+        return storage.getInterfaces().stream()
+                .map(StorageInterfaceEntity::getName)
+                .map(this::parsePcieWidth)
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElseThrow(() -> new MissingContextDataException("Нет данных о ширине PCIe-интерфейса накопителя"));
+    }
+
+    private Integer parsePcieWidth(String interfaceName) {
+        if (interfaceName == null) {
+            throw new MissingContextDataException("Нет данных об интерфейсе PCIe-устройства");
+        }
+
+        Matcher matcher = PCIE_INTERFACE_PATTERN.matcher(interfaceName.trim());
+
+        if (!matcher.matches()) {
+            return null;
+        }
+
+        return Integer.parseInt(matcher.group(1));
+    }
+
+    private String requireExpansionCardInterfaceName(ExpansionCardEntity card) {
+        if (card == null || card.getInterfaceType() == null || card.getInterfaceType().getName() == null) {
+            throw new MissingContextDataException("Нет данных об интерфейсе карты расширения");
+        }
+
+        return card.getInterfaceType().getName();
     }
 
     private String requireStorageFormFactorName(StorageEntity storage) {

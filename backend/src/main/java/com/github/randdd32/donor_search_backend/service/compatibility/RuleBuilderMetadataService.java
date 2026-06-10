@@ -68,7 +68,13 @@ public class RuleBuilderMetadataService {
                 new MethodMetadataDto("getRequiredFrontUsb32Gen2Headers()", "Integer", "Требуемое количество внутренних USB 3.2 Gen 2 колодок для передней панели корпуса", true),
                 new MethodMetadataDto("getRequiredFrontUsb32Gen2x2Headers()", "Integer", "Требуемое количество внутренних USB 3.2 Gen 2x2 колодок для передней панели корпуса", true),
                 new MethodMetadataDto("canPlaceM2Storages()", "Boolean", "Можно ли разместить все M.2-накопители в слотах M.2 материнской платы с учетом типоразмеров", true),
-                new MethodMetadataDto("getMsataStorageCount()", "Integer", "Количество внутренних mSATA-накопителей (шт)", true)
+                new MethodMetadataDto("getMsataStorageCount()", "Integer", "Количество внутренних mSATA-накопителей (шт)", true),
+                new MethodMetadataDto("canPlacePcieDevices()", "Boolean", "Можно ли разместить видеокарты, PCIe-карты расширения и PCIe-накопители в слотах PCIe материнской платы", true),
+                new MethodMetadataDto("getRegularPciExpansionCardCount()", "Integer", "Количество карт расширения с интерфейсом PCI (шт)", true),
+                new MethodMetadataDto("getMiniPcieMsataDeviceCount()", "Integer", "Количество устройств, занимающих слоты Mini-PCIe/mSATA (шт)", true),
+                new MethodMetadataDto("getMiniPcieExpansionCardCount()", "Integer", "Количество карт расширения с интерфейсом Mini-PCIe или Half Mini-PCIe (шт)", true),
+                new MethodMetadataDto("canPlaceM2ExpansionCards()", "Boolean", "Можно ли разместить M.2-карты расширения в M.2 E-key слотах материнской платы", true),
+                new MethodMetadataDto("getM2ExpansionCardCount()", "Integer", "Количество M.2-карт расширения (шт)", true)
         );
     }
 
