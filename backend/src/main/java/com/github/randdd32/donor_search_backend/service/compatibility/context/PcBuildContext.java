@@ -191,6 +191,18 @@ public class PcBuildContext {
         return memories.stream().mapToInt(MemoryEntity::getModulesCount).sum();
     }
 
+    public Boolean canVerifyRegisteredMemorySupport() {
+        for (MemoryEntity memory : memories) {
+            if (memory.getIsRegistered() == null) {
+                throw new MissingContextDataException("Нет данных о registered-признаке оперативной памяти");
+            }
+            if (memory.getIsRegistered()) {
+                throw new MissingContextDataException("В модели материнской платы отсутствуют данные о поддержке Registered/RDIMM памяти");
+            }
+        }
+        return true;
+    }
+
     public Boolean canPlaceM2Storages() {
         List<Integer> requiredSizes = getRequiredM2StorageSizes();
         if (requiredSizes.isEmpty()) {

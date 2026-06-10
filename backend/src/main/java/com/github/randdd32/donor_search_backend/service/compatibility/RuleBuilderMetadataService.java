@@ -53,6 +53,7 @@ public class RuleBuilderMetadataService {
                 new MethodMetadataDto("getTotalPsuWattage()", "Integer", "Общая мощность блоков питания (Вт)", true),
                 new MethodMetadataDto("getTotalRamCapacityGb()", "Integer", "Общий объем ОЗУ (ГБ)", true),
                 new MethodMetadataDto("getTotalRamModules()", "Integer", "Общее количество плашек ОЗУ (шт)", true),
+                new MethodMetadataDto("canVerifyRegisteredMemorySupport()", "Boolean", "Можно ли проверить поддержку Registered/RDIMM памяти по данным материнской платы", true),
                 new MethodMetadataDto("getStorageCountByFormFactor('String ffName')", "Integer", "Количество внутренних накопителей по форм-фактору (шт)", true),
                 new MethodMetadataDto("getSataDevicesCount()", "Integer", "Количество внутренних SATA-устройств, требующих обычный SATA-порт материнской платы (шт)", true),
                 new MethodMetadataDto("getTotalGpuCaseExpansionWidth()", "Integer", "Количество слотов корпуса, занимаемых видеокартами (шт)", true),

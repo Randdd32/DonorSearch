@@ -57,7 +57,7 @@ public class DatabaseInitializer implements CommandLineRunner {
                 "Совместимость типа оперативной памяти",
                 "#ctx.requireMemories().?[memoryType.id != #ctx.motherboard.memoryType.id].isEmpty()",
                 "Поколение оперативной памяти (DDR) не поддерживается материнской платой",
-                "Проверка того, что поколение всех модулей ОЗУ совпадает со слотами на плате.",
+                "Проверка того, что поколение всех модулей оперативной памяти совпадает с типом памяти, поддерживаемым материнской платой.",
                 Set.of(ComponentType.MEMORY, ComponentType.MOTHERBOARD));
 
         createRule("RAM_CAPACITY_LIMIT",
@@ -80,6 +80,13 @@ public class DatabaseInitializer implements CommandLineRunner {
                 "Материнская плата или один из процессоров не поддерживают ECC-память",
                 "Проверка того, что материнская плата и все установленные процессоры поддерживают серверную память с коррекцией ошибок (ECC).",
                 Set.of(ComponentType.MEMORY, ComponentType.MOTHERBOARD, ComponentType.CPU));
+
+        createRule("REGISTERED_MEMORY_SUPPORT_VERIFIABLE",
+                "Проверка поддержки Registered памяти",
+                "#ctx.canVerifyRegisteredMemorySupport()",
+                "Невозможно проверить поддержку Registered/RDIMM памяти",
+                "Проверка того, что поддержка Registered/RDIMM памяти может быть определена по доступным данным материнской платы.",
+                Set.of(ComponentType.MEMORY, ComponentType.MOTHERBOARD));
 
         createRule("GPU_LENGTH_LIMIT",
                 "Ограничение длины видеокарты",
