@@ -55,7 +55,7 @@ public class RuleBuilderMetadataService {
                 new MethodMetadataDto("getTotalRamModules()", "Integer", "Общее количество плашек ОЗУ (шт)", true),
                 new MethodMetadataDto("getStorageCountByFormFactor('String ffName')", "Integer", "Количество внутренних накопителей по форм-фактору (шт)", true),
                 new MethodMetadataDto("getSataDevicesCount()", "Integer", "Количество внутренних SATA-устройств, требующих обычный SATA-порт материнской платы (шт)", true),
-                new MethodMetadataDto("getTotalGpuSlotWidth()", "Integer", "Общая толщина видеокарт (в слотах)", true),
+                new MethodMetadataDto("getTotalGpuCaseExpansionWidth()", "Integer", "Количество слотов корпуса, занимаемых видеокартами (шт)", true),
                 new MethodMetadataDto("isEccSupported()", "Boolean", "Поддерживается ли ECC-память (материнская плата + процессор)", true),
                 new MethodMetadataDto("getReqPcie8Pin()", "Integer", "Требуется 8-pin PCIe коннекторов (шт)", true),
                 new MethodMetadataDto("getAvailPcie8Pin()", "Integer", "Доступно 8-pin PCIe коннекторов от БП (шт)", true),
@@ -63,6 +63,10 @@ public class RuleBuilderMetadataService {
                 new MethodMetadataDto("getAvailPcie6Pin()", "Integer", "Доступно 6-pin PCIe коннекторов от БП (шт)", true),
                 new MethodMetadataDto("getReqPcie12vhpwr()", "Integer", "Требуется 12VHPWR коннекторов (шт)", true),
                 new MethodMetadataDto("getAvailPcie12vhpwr()", "Integer", "Доступно 12VHPWR коннекторов от БП (шт)", true),
+                new MethodMetadataDto("getReqPcie12Pin()", "Integer", "Требуется 12-pin PCIe коннекторов (шт)", true),
+                new MethodMetadataDto("getAvailPcie12Pin()", "Integer", "Доступно 12-pin PCIe коннекторов от БП (шт)", true),
+                new MethodMetadataDto("getReqEps8Pin()", "Integer", "Требуется 8-pin EPS коннекторов (шт)", true),
+                new MethodMetadataDto("getAvailEps8Pin()", "Integer", "Доступно 8-pin EPS коннекторов от БП (шт)", true),
                 new MethodMetadataDto("getRequiredFrontUsb20Headers()", "Integer", "Требуемое количество внутренних USB 2.0 колодок для передней панели корпуса", true),
                 new MethodMetadataDto("getRequiredFrontUsb32Gen1Headers()", "Integer", "Требуемое количество внутренних USB 3.2 Gen 1 колодок для передней панели корпуса", true),
                 new MethodMetadataDto("getRequiredFrontUsb32Gen2Headers()", "Integer", "Требуемое количество внутренних USB 3.2 Gen 2 колодок для передней панели корпуса", true),
@@ -70,11 +74,13 @@ public class RuleBuilderMetadataService {
                 new MethodMetadataDto("canPlaceM2Storages()", "Boolean", "Можно ли разместить все M.2-накопители в слотах M.2 материнской платы с учетом типоразмеров", true),
                 new MethodMetadataDto("getMsataStorageCount()", "Integer", "Количество внутренних mSATA-накопителей (шт)", true),
                 new MethodMetadataDto("canPlacePcieDevices()", "Boolean", "Можно ли разместить видеокарты, PCIe-карты расширения и PCIe-накопители в слотах PCIe материнской платы", true),
-                new MethodMetadataDto("getRegularPciExpansionCardCount()", "Integer", "Количество карт расширения с интерфейсом PCI (шт)", true),
+                new MethodMetadataDto("getRegularPciDeviceCount()", "Integer", "Количество PCI-устройств, включая видеокарты и карты расширения (шт)", true),
                 new MethodMetadataDto("getMiniPcieMsataDeviceCount()", "Integer", "Количество устройств, занимающих слоты Mini-PCIe/mSATA (шт)", true),
                 new MethodMetadataDto("getMiniPcieExpansionCardCount()", "Integer", "Количество карт расширения с интерфейсом Mini-PCIe или Half Mini-PCIe (шт)", true),
                 new MethodMetadataDto("canPlaceM2ExpansionCards()", "Boolean", "Можно ли разместить M.2-карты расширения в M.2 E-key слотах материнской платы", true),
-                new MethodMetadataDto("getM2ExpansionCardCount()", "Integer", "Количество M.2-карт расширения (шт)", true)
+                new MethodMetadataDto("getM2ExpansionCardCount()", "Integer", "Количество M.2-карт расширения (шт)", true),
+                new MethodMetadataDto("canVerifyLegacyGpuInterfaces()", "Boolean", "Можно ли проверить устаревшие интерфейсы видеокарт по данным материнской платы", true),
+                new MethodMetadataDto("isGcHpwrGpuCompatibleWithMotherboard()", "Boolean", "Совместима ли GC-HPWR видеокарта с материнской платой по back-connect признаку", true)
         );
     }
 

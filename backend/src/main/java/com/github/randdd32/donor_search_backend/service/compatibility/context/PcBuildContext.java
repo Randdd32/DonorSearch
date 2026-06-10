@@ -50,7 +50,7 @@ public class PcBuildContext {
     private List<MonitorEntity> monitors = new ArrayList<>();
 
     private static final Pattern M2_FORM_FACTOR_PATTERN = Pattern.compile("(?i)M\\.2-(\\d+)");
-    private static final Pattern PCIE_INTERFACE_PATTERN = Pattern.compile("(?i)^PCIe\\s*x(\\d+)$");
+    private static final Pattern PCIE_INTERFACE_PATTERN = Pattern.compile("(?i)^PCIe\\s*x(\\d+).*");
 
     public PcBuildContext copy() {
         PcBuildContext copy = new PcBuildContext();
@@ -340,11 +340,17 @@ public class PcBuildContext {
         return canAssignPcieDevice(requiredWidths, availableWidths, used, 0);
     }
 
-    public Integer getRegularPciExpansionCardCount() {
+    public Integer getRegularPciDeviceCount() {
         int count = 0;
         for (ExpansionCardEntity card : expansionCards) {
             String interfaceName = requireExpansionCardInterfaceName(card);
+            if (interfaceName.equalsIgnoreCase("PCI")) {
+                count++;
+            }
+        }
 
+        for (VideoCardEntity gpu : gpus) {
+            String interfaceName = requireGpuInterfaceName(gpu);
             if (interfaceName.equalsIgnoreCase("PCI")) {
                 count++;
             }
@@ -352,12 +358,45 @@ public class PcBuildContext {
         return count;
     }
 
-    public Integer getTotalGpuSlotWidth() {
+    public Integer getTotalGpuCaseExpansionWidth() {
+        int total = 0;
         if (gpus.isEmpty()) {
             requireVideoCapability();
-            return 0;
+            return total;
         }
-        return gpus.stream().mapToInt(VideoCardEntity::getSlotWidth).sum();
+        for (VideoCardEntity gpu : gpus) {
+            if (gpu.getCaseExpansionWidth() == null) {
+                throw new MissingContextDataException("Нет данных о ширине видеокарты по слотам корпуса");
+            }
+            total += gpu.getCaseExpansionWidth();
+        }
+        return total;
+    }
+
+    public Boolean canVerifyLegacyGpuInterfaces() {
+        for (VideoCardEntity gpu : gpus) {
+            String interfaceName = requireGpuInterfaceName(gpu);
+
+            if (interfaceName.equalsIgnoreCase("AGP")) {
+                throw new MissingContextDataException("В модели материнской платы отсутствуют данные об AGP-слотах");
+            }
+        }
+        return true;
+    }
+
+    public Boolean isGcHpwrGpuCompatibleWithMotherboard() {
+        boolean hasGcHpwrGpu = gpus.stream()
+                .map(this::requireGpuInterfaceName)
+                .anyMatch(interfaceName -> interfaceName.toLowerCase().contains("gc-hpwr"));
+
+        if (!hasGcHpwrGpu) {
+            return true;
+        }
+
+        if (motherboard == null) {
+            throw new MissingContextDataException("Нет данных о материнской плате");
+        }
+        return motherboard.getUsesBackConnect();
     }
 
     public Boolean isEccSupported() {
@@ -386,6 +425,14 @@ public class PcBuildContext {
         return sumGpuPowerPins(VideoCardEntity::getPower12vhpwrCount);
     }
 
+    public Integer getReqPcie12Pin() {
+        return sumGpuPowerPins(VideoCardEntity::getPower12pinCount);
+    }
+
+    public Integer getReqEps8Pin() {
+        return sumGpuPowerPins(VideoCardEntity::getPowerEpsCount);
+    }
+
     public Integer getAvailPcie8Pin() {
         return sumPsuPowerPins(psu ->
                 psu.getPcie8PinConnectors() + psu.getPcie6Plus2PinConnectors()
@@ -400,6 +447,14 @@ public class PcBuildContext {
 
     public Integer getAvailPcie12vhpwr() {
         return sumPsuPowerPins(PowerSupplyEntity::getPcie12vhpwrConnectors);
+    }
+
+    public Integer getAvailPcie12Pin() {
+        return sumPsuPowerPins(PowerSupplyEntity::getPcie12PinConnectors);
+    }
+
+    public Integer getAvailEps8Pin() {
+        return sumPsuPowerPins(PowerSupplyEntity::getEps8PinConnectors);
     }
 
     public Integer getRequiredFrontUsb20Headers() {
@@ -545,7 +600,12 @@ public class PcBuildContext {
         List<Integer> result = new ArrayList<>();
 
         for (VideoCardEntity gpu : gpus) {
-            result.add(16);
+            String interfaceName = requireGpuInterfaceName(gpu);
+            Integer width = parsePcieWidth(interfaceName);
+
+            if (width != null) {
+                result.add(width);
+            }
         }
 
         for (ExpansionCardEntity card : expansionCards) {
@@ -653,6 +713,14 @@ public class PcBuildContext {
         }
 
         return Integer.parseInt(matcher.group(1));
+    }
+
+    private String requireGpuInterfaceName(VideoCardEntity gpu) {
+        if (gpu == null || gpu.getInterfaceType() == null || gpu.getInterfaceType().getName() == null) {
+            throw new MissingContextDataException("Нет данных об интерфейсе видеокарты");
+        }
+
+        return gpu.getInterfaceType().getName();
     }
 
     private String requireExpansionCardInterfaceName(ExpansionCardEntity card) {

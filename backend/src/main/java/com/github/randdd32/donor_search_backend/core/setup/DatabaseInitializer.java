@@ -76,7 +76,7 @@ public class DatabaseInitializer implements CommandLineRunner {
 
         createRule("GPU_LENGTH_LIMIT",
                 "Ограничение длины видеокарты",
-                "#ctx.requireGpus().size() > 0 and #ctx.gpus.?[lengthMm.intValue() > #ctx.pcCase.maxGpuLenMm.intValue()].isEmpty()",
+                "#ctx.requireGpus().?[lengthMm.intValue() > #ctx.pcCase.maxGpuLenMm.intValue()].isEmpty()",
                 "Видеокарта слишком длинная и не поместится в корпус",
                 "Проверка того, что каждая из видеокарт поместится в корпус.",
                 Set.of(ComponentType.VIDEO_CARD, ComponentType.CASE));
@@ -130,6 +130,20 @@ public class DatabaseInitializer implements CommandLineRunner {
                 "Проверка физического наличия необходимых коннекторов у блока питания для подключения питания к видеокарте.",
                 Set.of(ComponentType.POWER_SUPPLY, ComponentType.VIDEO_CARD));
 
+        createRule("PSU_GPU_12PIN_CHECK",
+                "Наличие 12-pin коннекторов PCIe",
+                "#ctx.getAvailPcie12Pin() >= #ctx.getReqPcie12Pin()",
+                "У блока питания не хватает кабелей 12-pin PCIe для видеокарты",
+                "Проверка физического наличия необходимых коннекторов у блока питания для подключения питания к видеокарте.",
+                Set.of(ComponentType.POWER_SUPPLY, ComponentType.VIDEO_CARD));
+
+        createRule("PSU_GPU_EPS_CHECK",
+                "Наличие 8-pin коннекторов EPS",
+                "#ctx.getAvailEps8Pin() >= #ctx.getReqEps8Pin()",
+                "У блока питания не хватает EPS 8-pin кабелей",
+                "Проверка физического наличия необходимых EPS 8-pin коннекторов у блока питания.",
+                Set.of(ComponentType.POWER_SUPPLY, ComponentType.VIDEO_CARD));
+
         createRule("CASE_35_BAYS_LIMIT",
                 "Наличие отсеков 3.5\"",
                 "#ctx.getStorageCountByFormFactor('3.5') <= (#ctx.pcCase.int35Bays.intValue() + #ctx.pcCase.ext35Bays.intValue())",
@@ -160,9 +174,9 @@ public class DatabaseInitializer implements CommandLineRunner {
 
         createRule("CASE_EXPANSION_SLOTS_LIMIT",
                 "Ограничение слотов расширения корпуса",
-                "#ctx.getTotalGpuSlotWidth() <= #ctx.pcCase.expansionSlotsFullHeight.intValue()",
-                "Толщина видеокарт превышает количество слотов расширения в корпусе",
-                "Проверка того, что суммарная ширина всех видеокарт не выходит за рамки PCIe заглушек корпуса.",
+                "#ctx.getTotalGpuCaseExpansionWidth() <= #ctx.pcCase.expansionSlotsFullHeight.intValue()",
+                "Количество занимаемых видеокартами слотов превышает количество полноразмерных слотов расширения корпуса",
+                "Проверка того, что видеокарты не занимают больше полноразмерных слотов расширения, чем доступно в корпусе.",
                 Set.of(ComponentType.VIDEO_CARD, ComponentType.CASE));
 
         createRule("MOBO_SATA_LIMIT",
@@ -202,10 +216,24 @@ public class DatabaseInitializer implements CommandLineRunner {
 
         createRule("MOBO_PCI_SLOT_LIMIT",
                 "Наличие слотов PCI",
-                "#ctx.getRegularPciExpansionCardCount() <= #ctx.motherboard.pciSlots.intValue()",
-                "Количество PCI-карт превышает количество PCI-слотов на материнской плате",
-                "Проверка того, что количество карт расширения с интерфейсом PCI не превышает количество доступных PCI-слотов на материнской плате.",
-                Set.of(ComponentType.EXPANSION_CARD, ComponentType.MOTHERBOARD));
+                "#ctx.getRegularPciDeviceCount() <= #ctx.motherboard.pciSlots.intValue()",
+                "Количество PCI-устройств превышает количество PCI-слотов на материнской плате",
+                "Проверка того, что количество видеокарт и карт расширения с интерфейсом PCI не превышает количество доступных PCI-слотов на материнской плате.",
+                Set.of(ComponentType.VIDEO_CARD, ComponentType.EXPANSION_CARD, ComponentType.MOTHERBOARD));
+
+        createRule("LEGACY_GPU_INTERFACE_VERIFIABLE",
+                "Проверка устаревших интерфейсов видеокарт",
+                "#ctx.canVerifyLegacyGpuInterfaces()",
+                "Невозможно проверить совместимость устаревшего интерфейса видеокарты",
+                "Проверка того, что интерфейс видеокарты может быть проверен по данным, доступным в модели материнской платы.",
+                Set.of(ComponentType.VIDEO_CARD, ComponentType.MOTHERBOARD));
+
+        createRule("GPU_GC_HPWR_BACK_CONNECT_MATCH",
+                "Поддержка GC-HPWR видеокарты",
+                "#ctx.isGcHpwrGpuCompatibleWithMotherboard()",
+                "Видеокарта с интерфейсом GC-HPWR требует совместимую материнскую плату с разъемами на обратной стороне",
+                "Проверка того, что видеокарта с интерфейсом GC-HPWR устанавливается только с материнской платой, поддерживающей back-connect компоновку.",
+                Set.of(ComponentType.VIDEO_CARD, ComponentType.MOTHERBOARD));
 
         createRule("CASE_PSU_COMPATIBILITY",
                 "Совместимость габаритов блока питания",
