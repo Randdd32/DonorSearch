@@ -1,0 +1,8 @@
+pandas
+pypartpicker2
+asyncio
+aiohttp
+beautifulsoup4
+playwright
+camoufox[geoip]
+python-dotenv  

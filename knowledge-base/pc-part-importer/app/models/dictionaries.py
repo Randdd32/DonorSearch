@@ -1,0 +1,133 @@
+from sqlalchemy import String, Identity
+from sqlalchemy.orm import Mapped, mapped_column
+from .base import Base
+
+class Manufacturer(Base):
+    __tablename__ = "dic_manufacturer"
+    id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
+    name: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
+
+class StorageInterface(Base):
+    __tablename__ = "dic_storage_interface"
+    id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
+    name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+
+class OpticalDriveFormFactor(Base):
+    __tablename__ = "dic_optical_drive_form_factor"
+    id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
+    name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+
+class GpuChipset(Base):
+    __tablename__ = "dic_gpu_chipset"
+    id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
+    name: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
+
+class MemoryType(Base):
+    __tablename__ = "dic_memory_type"
+    id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
+    name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+
+class ExpansionInterface(Base):
+    __tablename__ = "dic_expansion_interface"
+    id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
+    name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+
+class Color(Base):
+    __tablename__ = "dic_color"
+    id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
+    name: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
+
+class CaseType(Base):
+    __tablename__ = "dic_case_type"
+    id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
+    name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+
+class SidePanel(Base):
+    __tablename__ = "dic_side_panel"
+    id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
+    name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+
+class MotherboardFormFactor(Base):
+    __tablename__ = "dic_motherboard_form_factor"
+    id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
+    name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+
+class FrontPanelUsb(Base):
+    __tablename__ = "dic_front_panel_usb"
+    id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
+    name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+
+class CpuSocket(Base):
+    __tablename__ = "dic_cpu_socket"
+    id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
+    name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+
+class PowerSupplyType(Base):
+    __tablename__ = "dic_power_supply_type"
+    id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
+    name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+
+class EfficiencyRating(Base):
+    __tablename__ = "dic_efficiency_rating"
+    id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
+    name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+
+class ModularType(Base):
+    __tablename__ = "dic_modular_type"
+    id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
+    name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+
+class FanConnector(Base):
+    __tablename__ = "dic_fan_connector"
+    id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
+    name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+
+class Microarchitecture(Base):
+    __tablename__ = "dic_microarchitecture"
+    id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
+    name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+
+class IntegratedGraphics(Base):
+    __tablename__ = "dic_integrated_graphics"
+    id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
+    name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+
+class StorageType(Base):
+    __tablename__ = "dic_storage_type"
+    id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
+    name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+
+class StorageFormFactor(Base):
+    __tablename__ = "dic_storage_form_factor"
+    id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
+    name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+
+class RamFormFactor(Base):
+    __tablename__ = "dic_ram_form_factor"
+    id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
+    name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+
+class MonitorResolution(Base):
+    __tablename__ = "dic_monitor_resolution"
+    id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
+    name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+
+class PanelType(Base):
+    __tablename__ = "dic_panel_type"
+    id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
+    name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+
+class AspectRatio(Base):
+    __tablename__ = "dic_aspect_ratio"
+    id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
+    name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+
+class AudioChipset(Base):
+    __tablename__ = "dic_audio_chipset"
+    id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
+    name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+
+class WirelessProtocol(Base):
+    __tablename__ = "dic_wireless_protocol"
+    id: Mapped[int] = mapped_column(Identity(always=True), primary_key=True)
+    name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
