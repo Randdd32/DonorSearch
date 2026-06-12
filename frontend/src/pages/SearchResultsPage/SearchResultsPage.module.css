@@ -1,0 +1,195 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.titleBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  min-width: 0;
+}
+
+.backButton {
+  padding-left: 0;
+  height: auto;
+  margin-bottom: 12px;
+  color: var(--text-secondary);
+}
+
+.backButton:hover {
+  background-color: transparent;
+  color: var(--text-primary);
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.controlsArea {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+  flex: 1;
+  max-width: 700px;
+}
+
+.searchRow {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+}
+
+.searchBar {
+  flex: 1;
+  min-width: 0;
+}
+
+.actionButtons {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.actionButtons button {
+  height: 40px;
+}
+
+.actionRow {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.sortSelect {
+  width: auto;
+}
+
+.filterBtn {
+  height: 40px;
+}
+
+.resultsWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.resultsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 520px), 1fr));
+  gap: 24px;
+}
+
+.paginationSpacing {
+  margin-top: 16px;
+}
+
+@media (max-width: 1580px) {
+  .outputBtnText {
+    display: none;
+  }
+  .actionButtons button {
+    width: 40px;
+    padding: 0;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 1400px) {
+  .controlsArea {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .header {
+    flex-direction: column;
+    gap: 16px;
+  }
+  .title {
+    font-size: 20px;
+  }
+  .controlsArea {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: 14px 8px;
+    width: 100%;
+  }
+  .searchRow {
+    display: contents;
+  }
+  .actionRow {
+    display: contents;
+  }
+  .searchBar {
+    order: 1;
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+  .actionButtons {
+    order: 2;
+    flex: 2;
+    gap: 8px;
+  }
+  .actionButtons button {
+    flex: 1;
+    width: auto;
+    padding: 0;
+    justify-content: center;
+  }
+  .filterBtn {
+    order: 2;
+    flex: 1;
+    justify-content: center;
+  }
+  .filterBtnText {
+    display: none;
+  }
+  .sortSelect {
+    order: 3;
+    flex: 0 0 100%;
+    min-width: 0;
+    width: 100%;
+  }
+}
+
+@media (max-width: 400px) {
+  .title {
+    font-size: 18px;
+  }
+  .subtitle {
+    font-size: 12px;
+  }
+  .resultsGrid {
+    gap: 16px;
+  }
+}

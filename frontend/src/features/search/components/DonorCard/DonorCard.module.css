@@ -1,0 +1,288 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 16px;
+  min-width: 0;
+}
+
+.deviceInfo {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.iconWrapper {
+  min-width: 48px;
+  height: 48px;
+  background-color: var(--bg-hover);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-color);
+}
+
+.deviceIcon {
+  min-width: 24px;
+  flex-shrink: 0;
+}
+
+.deviceMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.deviceHeaderRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.deviceSubGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  row-gap: 6px;
+  min-width: 0;
+}
+
+.subItem {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  min-width: 0;
+  max-width: 100%;
+}
+
+.subItem svg {
+  flex-shrink: 0;
+}
+
+.iconShrink {
+  flex-shrink: 0;
+}
+
+.truncate {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.deviceName {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--primary-color);
+  min-width: 0;
+  word-break: break-word;
+}
+
+.deviceName:hover {
+  text-decoration: underline;
+}
+
+.scoreSection {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.scoreLabel {
+  font-size: 12px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.scoreBadge {
+  font-size: 14px;
+  padding: 6px 12px;
+}
+
+.sectionTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+
+.componentsList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.componentItem {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background-color: var(--bg-primary);
+  padding: 12px;
+  border-radius: var(--radius-md);
+  min-width: 0;
+}
+
+.compHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.compName {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  min-width: 0;
+  word-break: break-word;
+}
+
+.perfectMatch {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--status-info);
+}
+
+.hasWarnings {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--status-high);
+}
+
+.warningsList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.warningItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px;
+  border-radius: 6px;
+  border-left: 4px solid;
+  min-width: 0;
+}
+
+.warningIcon {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.warningSeverity {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+.warningMessage {
+  font-size: 13px;
+  color: var(--text-primary);
+
+  min-width: 0;
+  word-break: break-word;
+}
+
+.warningCritical {
+  border-left-color: var(--status-critical);
+  background-color: color-mix(in srgb, var(--status-critical) 10%, transparent);
+}
+.textCritical { color: var(--status-critical); }
+
+.warningHigh {
+  border-left-color: var(--status-high);
+  background-color: color-mix(in srgb, var(--status-high) 10%, transparent);
+}
+.textHigh { color: var(--status-high); }
+
+.warningMedium {
+  border-left-color: var(--status-medium);
+  background-color: color-mix(in srgb, var(--status-medium) 10%, transparent);
+}
+.textMedium { color: var(--status-medium); }
+
+.warningLow {
+  border-left-color: var(--status-low);
+  background-color: color-mix(in srgb, var(--status-low) 10%, transparent);
+}
+.textLow { color: var(--status-low); }
+
+.warningInfo {
+  border-left-color: var(--status-info);
+  background-color: color-mix(in srgb, var(--status-info) 10%, transparent);
+}
+.textInfo { color: var(--status-info); }
+
+@media (max-width: 700px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .scoreSection {
+    align-items: flex-start;
+    margin-top: 12px;
+    width: 100%;
+    padding-top: 12px;
+    border-top: 1px dashed var(--border-color);
+  }
+  .compHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .warningItem {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 400px) {
+  .deviceHeaderRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .subItem {
+    font-size: 12px;
+  }
+  .deviceSubGrid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .iconShrink {
+    min-width: 14px;
+  }
+}

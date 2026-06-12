@@ -1,0 +1,83 @@
+export type ExternalDeviceState = 
+  | 'WRITTEN_OFF' 
+  | 'STORAGE' 
+  | 'UNACCOUNTED' 
+  | 'REPAIR' 
+  | 'IN_USE' 
+  | 'UNKNOWN';
+
+export type ExternalComponentCategory = 
+  | 'CPU' | 'CPU_COOLER' | 'MOTHERBOARD' | 'VIDEO_CARD' | 'MEMORY' 
+  | 'STORAGE' | 'OPTICAL_DRIVE' | 'POWER_SUPPLY' | 'CASE' 
+  | 'CASE_FAN' | 'EXPANSION_CARD' | 'MONITOR' | 'UNKNOWN';
+
+export interface ExternalComponentDto {
+  adapterId: string;
+  categoryId: string;
+  externalName: string;
+  category: ExternalComponentCategory;
+  manufacturerName: string;
+  serialNumber: string | null;
+  note: string | null;
+  modelParameters: string | null;
+  modelNote: string | null;
+  modelProductNumber: string | null;
+  mappedComponentId: number | null;
+}
+
+export interface ExternalDeviceDto {
+  externalId: number;
+  name: string;
+  inventoryNumber: string | null;
+  serialNumber: string | null;
+  note: string | null;
+  assetTag: string | null;
+  code: string | null;
+  description: string | null;
+  modelName: string;
+  modelProductNumber: string | null;
+  modelNote: string | null;
+  manufacturerName: string;
+  typeName: string;
+  lifeCycleState: ExternalDeviceState;
+  ownerFullName: string;
+  ownerPhone: string | null;
+  ownerPosition: string | null;
+  departmentName: string;
+  locationPath: string;
+  dateReceived: string | null; 
+  isWorking: boolean | null;
+  cost: number | null;
+  pcComposition: string | null;
+  ownershipNote: string | null;
+  dateInquiry: string | null;
+  appointmentDate: string | null;
+  dateAnnuled: string | null;
+  organizationName: string | null;
+  components: ExternalComponentDto[];
+}
+
+export type MappingConfidence = 'AUTO' | 'NEEDS_REVIEW' | 'BAD_MATCH' | 'CONFIRMED';
+
+export interface IntegrationMappingDto {
+  id: number;
+  externalName: string;
+  internalComponentId: number;
+  internalComponentName: string;
+  internalComponentType: ExternalComponentCategory;
+  internalComponentSearchName: string;
+  confidence: MappingConfidence;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateMappingDto {
+  externalName: string;
+  internalComponentId: number;
+  confidence: MappingConfidence;
+}
+
+export interface UpdateMappingDto {
+  internalComponentId: number;
+  confidence: MappingConfidence;
+}

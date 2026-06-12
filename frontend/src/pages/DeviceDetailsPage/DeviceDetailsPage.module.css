@@ -1,0 +1,288 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.backButton {
+  align-self: flex-start;
+  padding-left: 0;
+}
+
+.headerCard {
+  background: linear-gradient(145deg, var(--bg-surface) 40%, color-mix(in srgb, var(--bg-hover) 40%, var(--bg-surface)) 100%);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+}
+
+.headerTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-top: 8px;
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-color);
+}
+
+.infoItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.infoLabel {
+  font-size: 12px;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.infoValue {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.sectionTitle {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-top: 8px;
+}
+
+.notesCard {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  border-color: color-mix(in srgb, var(--primary-color) 20%, var(--border-color));
+  background-color: color-mix(in srgb, var(--primary-color) 2%, var(--bg-surface));
+}
+
+.cardTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.noteBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.noteLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+
+.noteText {
+  font-size: 14px;
+  color: var(--text-primary);
+  white-space: pre-wrap;
+  margin: 0;
+}
+
+.componentsLayout {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.categorySection {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.categoryTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 8px;
+}
+
+.componentList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.componentCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.compInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1 1 65%;
+  min-width: 65%;
+}
+
+.compNameRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.compName {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  word-break: break-word;
+}
+
+.iconSuccess {
+  color: var(--status-info);
+}
+
+.iconWarning {
+  color: var(--status-critical);
+}
+
+.compSub {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.compActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.missingComponentCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background-color: color-mix(in srgb, var(--bg-hover) 25%, var(--bg-surface));
+  border: 1px dashed var(--border-color);
+  box-shadow: none;
+}
+
+.missingText {
+  font-size: 14px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.badgesWrapper { 
+  display: flex; 
+  gap: 8px; 
+}
+
+.orgWarning {
+  margin-bottom: 20px;
+}
+
+.compExtraInfo {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.compExtraText {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.compExtraText strong {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+@media (max-width: 600px) {
+  .componentCard {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+  .compActions {
+    width: 100%;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .compActions button {
+    width: 100%;
+  }
+  .missingComponentCard {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+    gap: 16px;
+  }
+  .missingText {
+    padding-bottom: 16px;
+    border-bottom: 1px dashed var(--border-color);
+    width: 100%;
+    display: block;
+  }
+  .missingComponentCard button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 500px) {
+  .headerTop {
+    flex-direction: column;
+    gap: 12px;
+  }
+  .title {
+    font-size: 20px;
+  }
+  .badgesWrapper {
+    align-self: flex-start;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .infoGrid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 400px) {
+  .title {
+    font-size: 18px;
+  }
+  .sectionTitle {
+    font-size: 18px;
+  }
+  .compName {
+    font-size: 14px;
+  }
+}
