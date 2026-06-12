@@ -1,0 +1,230 @@
+package com.github.randdd32.donor_search_backend.service.compatibility;
+
+import com.github.randdd32.donor_search_backend.core.log.NoLogging;
+import com.github.randdd32.donor_search_backend.web.dto.compatibility.ContextPropertyMetadataDto;
+import com.github.randdd32.donor_search_backend.web.dto.compatibility.FieldMetadataDto;
+import com.github.randdd32.donor_search_backend.web.dto.compatibility.MethodMetadataDto;
+import com.github.randdd32.donor_search_backend.web.dto.compatibility.RuleBuilderMetadataDto;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Map;
+
+@NoLogging
+@Service
+public class RuleBuilderMetadataService {
+    public RuleBuilderMetadataDto getMetadata() {
+        return new RuleBuilderMetadataDto(
+                getContextProperties(),
+                getContextMethods(),
+                getComponentFields()
+        );
+    }
+
+    private Map<String, ContextPropertyMetadataDto> getContextProperties() {
+        return Map.ofEntries(
+                Map.entry("CASE", new ContextPropertyMetadataDto("pcCase", "Корпус (объект)")),
+                Map.entry("MOTHERBOARD", new ContextPropertyMetadataDto("motherboard", "Материнская плата (объект)")),
+                Map.entry("POWER_SUPPLY", new ContextPropertyMetadataDto("psus", "Блоки питания (список)")),
+                Map.entry("CPU", new ContextPropertyMetadataDto("cpus", "Процессоры (список)")),
+                Map.entry("CPU_COOLER", new ContextPropertyMetadataDto("coolers", "Кулеры для процессоров (список)")),
+                Map.entry("VIDEO_CARD", new ContextPropertyMetadataDto("gpus", "Видеокарты (список)")),
+                Map.entry("MEMORY", new ContextPropertyMetadataDto("memories", "Оперативная память (список)")),
+                Map.entry("STORAGE", new ContextPropertyMetadataDto("storages", "Накопители (список)")),
+                Map.entry("EXPANSION_CARD", new ContextPropertyMetadataDto("expansionCards", "Карты расширения (список)")),
+                Map.entry("CASE_FAN", new ContextPropertyMetadataDto("caseFans", "Корпусные вентиляторы (список)")),
+                Map.entry("OPTICAL_DRIVE", new ContextPropertyMetadataDto("opticalDrives", "Оптические приводы (список)")),
+                Map.entry("MONITOR", new ContextPropertyMetadataDto("monitors", "Мониторы (список)"))
+        );
+    }
+
+    private List<MethodMetadataDto> getContextMethods() {
+        return List.of(
+                new MethodMetadataDto("requireCpus()", "List<CpuEntity>", "Список процессоров (вызовет ошибку, если пусто)", true),
+                new MethodMetadataDto("requireCoolers()", "List<CpuCoolerEntity>", "Список кулеров (вызовет ошибку, если пусто)", true),
+                new MethodMetadataDto("requireMemories()", "List<MemoryEntity>", "Список ОЗУ (вызовет ошибку, если пусто)", true),
+                new MethodMetadataDto("requireGpus()", "List<VideoCardEntity>", "Список видеокарт (вызовет ошибку, если пусто)", true),
+                new MethodMetadataDto("requirePsus()", "List<PowerSupplyEntity>", "Список блоков питания (вызовет ошибку, если пусто)", true),
+                new MethodMetadataDto("requireCaseMoboFormFactors()", "Set<MotherboardFormFactorEntity>", "Поддерживаемые корпусом форм-факторы материнских плат (вызовет ошибку, если данных нет)", true),
+                new MethodMetadataDto("requireCaseFanSizes()", "List<Integer>", "Поддерживаемые корпусом размеры вентиляторов (вызовет ошибку, если данных нет)", true),
+                new MethodMetadataDto("requireCaseRadiatorSizes()", "List<Integer>", "Поддерживаемые корпусом размеры радиаторов СЖО (вызовет ошибку, если данных нет)", true),
+                new MethodMetadataDto("requireCoolerSockets(CpuCoolerEntity cooler)", "Set<CpuSocketEntity>", "Поддерживаемые кулером сокеты (вызовет ошибку, если данных нет)", true),
+                new MethodMetadataDto("getTotalTdpW()", "Integer", "Общее тепловыделение / TDP (Вт)", true),
+                new MethodMetadataDto("getTotalPsuWattage()", "Integer", "Общая мощность блоков питания (Вт)", true),
+                new MethodMetadataDto("getTotalRamCapacityGb()", "Integer", "Общий объем ОЗУ (ГБ)", true),
+                new MethodMetadataDto("getTotalRamModules()", "Integer", "Общее количество плашек ОЗУ (шт)", true),
+                new MethodMetadataDto("canVerifyRegisteredMemorySupport()", "Boolean", "Можно ли проверить поддержку Registered/RDIMM памяти по данным материнской платы", true),
+                new MethodMetadataDto("getStorageCountByFormFactor('String ffName')", "Integer", "Количество внутренних накопителей по форм-фактору (шт)", true),
+                new MethodMetadataDto("getSataDevicesCount()", "Integer", "Количество внутренних SATA-устройств, требующих обычный SATA-порт материнской платы (шт)", true),
+                new MethodMetadataDto("getTotalGpuCaseExpansionWidth()", "Integer", "Количество слотов корпуса, занимаемых видеокартами (шт)", true),
+                new MethodMetadataDto("isEccSupported()", "Boolean", "Поддерживается ли ECC-память (материнская плата + процессор)", true),
+                new MethodMetadataDto("canPowerGpuPcie6And8PinConnectors()", "Boolean", "Хватает ли 6-pin, 8-pin и 6+2-pin PCIe коннекторов для питания видеокарт", true),
+                new MethodMetadataDto("getReqPcie8Pin()", "Integer", "Требуется 8-pin PCIe коннекторов (шт)", true),
+                new MethodMetadataDto("getAvailPcie8Pin()", "Integer", "Доступно 8-pin PCIe коннекторов от БП (шт)", true),
+                new MethodMetadataDto("getReqPcie6Pin()", "Integer", "Требуется 6-pin PCIe коннекторов (шт)", true),
+                new MethodMetadataDto("getAvailPcie6Pin()", "Integer", "Доступно 6-pin PCIe коннекторов от БП (шт)", true),
+                new MethodMetadataDto("getReqPcie12vhpwr()", "Integer", "Требуется 12VHPWR коннекторов (шт)", true),
+                new MethodMetadataDto("getAvailPcie12vhpwr()", "Integer", "Доступно 12VHPWR коннекторов от БП (шт)", true),
+                new MethodMetadataDto("getReqPcie12Pin()", "Integer", "Требуется 12-pin PCIe коннекторов (шт)", true),
+                new MethodMetadataDto("getAvailPcie12Pin()", "Integer", "Доступно 12-pin PCIe коннекторов от БП (шт)", true),
+                new MethodMetadataDto("getReqEps8Pin()", "Integer", "Требуется 8-pin EPS коннекторов (шт)", true),
+                new MethodMetadataDto("getAvailEps8Pin()", "Integer", "Доступно 8-pin EPS коннекторов от БП (шт)", true),
+                new MethodMetadataDto("getTotalSataPowerConnectors()", "Integer", "Общее количество SATA-коннекторов питания от БП", true),
+                new MethodMetadataDto("getRequiredFrontUsb20Headers()", "Integer", "Требуемое количество внутренних USB 2.0 колодок для передней панели корпуса", true),
+                new MethodMetadataDto("getRequiredFrontUsb32Gen1Headers()", "Integer", "Требуемое количество внутренних USB 3.2 Gen 1 колодок для передней панели корпуса", true),
+                new MethodMetadataDto("getRequiredFrontUsb32Gen2Headers()", "Integer", "Требуемое количество внутренних USB 3.2 Gen 2 колодок для передней панели корпуса", true),
+                new MethodMetadataDto("getRequiredFrontUsb32Gen2x2Headers()", "Integer", "Требуемое количество внутренних USB 3.2 Gen 2x2 колодок для передней панели корпуса", true),
+                new MethodMetadataDto("canPlaceM2Storages()", "Boolean", "Можно ли разместить все M.2-накопители в слотах M.2 материнской платы с учетом типоразмеров", true),
+                new MethodMetadataDto("getMsataStorageCount()", "Integer", "Количество внутренних mSATA-накопителей (шт)", true),
+                new MethodMetadataDto("canPlacePcieDevices()", "Boolean", "Можно ли разместить видеокарты, PCIe-карты расширения и PCIe-накопители в слотах PCIe материнской платы", true),
+                new MethodMetadataDto("getRegularPciDeviceCount()", "Integer", "Количество PCI-устройств, включая видеокарты и карты расширения (шт)", true),
+                new MethodMetadataDto("getMiniPcieMsataDeviceCount()", "Integer", "Количество устройств, занимающих слоты Mini-PCIe/mSATA (шт)", true),
+                new MethodMetadataDto("getMiniPcieExpansionCardCount()", "Integer", "Количество карт расширения с интерфейсом Mini-PCIe или Half Mini-PCIe (шт)", true),
+                new MethodMetadataDto("canPlaceM2ExpansionCards()", "Boolean", "Можно ли разместить M.2-карты расширения в M.2 E-key слотах материнской платы", true),
+                new MethodMetadataDto("getM2ExpansionCardCount()", "Integer", "Количество M.2-карт расширения (шт)", true),
+                new MethodMetadataDto("canVerifyLegacyGpuInterfaces()", "Boolean", "Можно ли проверить устаревшие интерфейсы видеокарт по данным материнской платы", true),
+                new MethodMetadataDto("isGcHpwrGpuCompatibleWithMotherboard()", "Boolean", "Совместима ли GC-HPWR видеокарта с материнской платой по back-connect признаку", true),
+                new MethodMetadataDto("canConnectAllMonitorsToGpus()", "Boolean", "Можно ли подключить все мониторы к доступным видеовыходам видеокарт", true),
+                new MethodMetadataDto("getFullSizeOpticalDriveCount()", "Integer", "Количество полноразмерных оптических приводов 5.25", true),
+                new MethodMetadataDto("canVerifySlimOpticalDrivePlacement()", "Boolean", "Можно ли проверить размещение slim-оптических приводов по данным корпуса", true),
+                new MethodMetadataDto("canVerifyOpticalDriveInterfaces()", "Boolean", "Можно ли проверить интерфейсы оптических приводов по данным материнской платы", true)
+        );
+    }
+
+    private Map<String, List<FieldMetadataDto>> getComponentFields() {
+        return Map.ofEntries(
+                Map.entry("CPU", List.of(
+                        new FieldMetadataDto("socket.id", "Long", "ID cокета", true),
+                        new FieldMetadataDto("microarchitecture.id", "Long", "ID микроархитектуры", true),
+                        new FieldMetadataDto("graphics.id", "Long", "ID встроенной графики", true),
+                        new FieldMetadataDto("coreCount", "Integer", "Количество ядер", false),
+                        new FieldMetadataDto("coreClockGhz", "Double", "Базовая частота (ГГц)", false),
+                        new FieldMetadataDto("tdpW", "Integer", "Тепловыделение (Вт)", false),
+                        new FieldMetadataDto("maxMemoryGb", "Integer", "Макс. поддерживаемая память (ГБ)", true),
+                        new FieldMetadataDto("eccSupport", "Boolean", "Поддержка ECC", false)
+                )),
+                Map.entry("MOTHERBOARD", List.of(
+                        new FieldMetadataDto("socket.id", "Long", "ID сокета", true),
+                        new FieldMetadataDto("formFactor.id", "Long", "ID форм-фактора", true),
+                        new FieldMetadataDto("memoryType.id", "Long", "ID поколения памяти (DDR)", true),
+                        new FieldMetadataDto("maxMemoryGb", "Integer", "Макс. объем ОЗУ (ГБ)", false),
+                        new FieldMetadataDto("memorySlots", "Integer", "Количество слотов ОЗУ", false),
+                        new FieldMetadataDto("memorySpeedMaxMhz", "Integer", "Макс. частота памяти (МГц)", false),
+                        new FieldMetadataDto("eccSupport", "Boolean", "Поддержка ECC", false),
+                        new FieldMetadataDto("usesBackConnect", "Boolean", "Разъемы на обратной стороне", false),
+                        new FieldMetadataDto("m2Slots", "List<Object>", "Слоты M.2 (Пример: [{'sizes':[2280], 'keys':'M-key'}]. В SpEL: m2Slots.?[sizes.contains(2280) && keys.contains('M-key')].size() > 0)", false),
+                        new FieldMetadataDto("sata3Ports", "Integer", "Порты SATA 3Gb/s", false),
+                        new FieldMetadataDto("sata6Ports", "Integer", "Порты SATA 6Gb/s", false),
+                        new FieldMetadataDto("pciX16Slots", "Integer", "Слоты PCIe x16", false),
+                        new FieldMetadataDto("pciX8Slots", "Integer", "Слоты PCIe x8", false),
+                        new FieldMetadataDto("pciX4Slots", "Integer", "Слоты PCIe x4", false),
+                        new FieldMetadataDto("pciX1Slots", "Integer", "Слоты PCIe x1", false),
+                        new FieldMetadataDto("pciSlots", "Integer", "Слоты PCI", false),
+                        new FieldMetadataDto("miniPcieMsataSlots", "Integer", "Слоты Mini-PCIe / mSATA", false),
+                        new FieldMetadataDto("headerUsb20", "Integer", "Колодки USB 2.0", false),
+                        new FieldMetadataDto("headerUsb32Gen1", "Integer", "Колодки USB 3.2 Gen 1", false),
+                        new FieldMetadataDto("headerUsb32Gen2", "Integer", "Колодки USB 3.2 Gen 2", false),
+                        new FieldMetadataDto("headerUsb32Gen2x2", "Integer", "Колодки USB 3.2 Gen 2x2", false),
+                        new FieldMetadataDto("headerUsb20SinglePort", "Integer", "Колодки USB 2.0 (Single Port)", false)
+                )),
+                Map.entry("VIDEO_CARD", List.of(
+                        new FieldMetadataDto("chipset.id", "Long", "ID графического чипа", true),
+                        new FieldMetadataDto("memoryType.id", "Long", "ID типа памяти", true),
+                        new FieldMetadataDto("interfaceType.id", "Long", "ID интерфейса", true),
+                        new FieldMetadataDto("lengthMm", "Integer", "Длина (мм)", true),
+                        new FieldMetadataDto("tdpW", "Integer", "Энергопотребление / TDP (Вт)", false),
+                        new FieldMetadataDto("slotWidth", "Integer", "Толщина (в слотах)", false),
+                        new FieldMetadataDto("caseExpansionWidth", "Integer", "Ширина планки крепления", false),
+                        new FieldMetadataDto("memoryGb", "Integer", "Объем памяти (ГБ)", false),
+                        new FieldMetadataDto("coreClockMhz", "Integer", "Базовая частота (МГц)", true),
+                        new FieldMetadataDto("power6pinCount", "Integer", "Требуется 6-pin PCIe", false),
+                        new FieldMetadataDto("power8pinCount", "Integer", "Требуется 8-pin PCIe", false),
+                        new FieldMetadataDto("power12pinCount", "Integer", "Требуется 12-pin PCIe", false),
+                        new FieldMetadataDto("power12vhpwrCount", "Integer", "Требуется 12VHPWR", false),
+                        new FieldMetadataDto("powerEpsCount", "Integer", "Требуется EPS 8-pin", false),
+                        new FieldMetadataDto("videoOutputs", "Map<String, Integer>", "Видеовыходы (Пример: {'hdmi': 1, 'dp': 2}. В SpEL: videoOutputs['hdmi'] >= 1)", false)
+                )),
+                Map.entry("CASE", List.of(
+                        new FieldMetadataDto("caseType.id", "Long", "ID форм-фактора корпуса", true),
+                        new FieldMetadataDto("maxGpuLenMm", "Integer", "Макс. длина видеокарты (мм)", true),
+                        new FieldMetadataDto("maxCpuCoolerHeightMm", "Integer", "Макс. высота кулера (мм)", true),
+                        new FieldMetadataDto("lengthMm", "Integer", "Длина корпуса (мм)", true),
+                        new FieldMetadataDto("widthMm", "Integer", "Ширина корпуса (мм)", true),
+                        new FieldMetadataDto("heightMm", "Integer", "Высота корпуса (мм)", true),
+                        new FieldMetadataDto("int35Bays", "Integer", "Внутренние отсеки 3.5\"", false),
+                        new FieldMetadataDto("ext35Bays", "Integer", "Внешние отсеки 3.5\"", false),
+                        new FieldMetadataDto("int25Bays", "Integer", "Внутренние отсеки 2.5\"", false),
+                        new FieldMetadataDto("ext525Bays", "Integer", "Внешние отсеки 5.25\"", false),
+                        new FieldMetadataDto("expansionSlotsFullHeight", "Integer", "Полноразмерные слоты расширения", false),
+                        new FieldMetadataDto("expansionSlotsHalfHeight", "Integer", "Низкопрофильные слоты расширения", false),
+                        new FieldMetadataDto("expansionSlotsRiser", "Integer", "Слоты для вертикальной установки GPU", false),
+                        new FieldMetadataDto("radiatorSizes", "List<Integer>", "Поддерживаемые размеры радиаторов СЖО (мм)", false),
+                        new FieldMetadataDto("fanSizes", "List<Integer>", "Поддерживаемые размеры вентиляторов (мм)", false),
+                        new FieldMetadataDto("moboFormFactors", "Set", "Поддерживаемые форм-факторы мат. плат", false),
+                        new FieldMetadataDto("frontPanelUsbTypes", "Set", "Разъемы USB на передней панели", false)
+                )),
+                Map.entry("MEMORY", List.of(
+                        new FieldMetadataDto("formFactor.id", "Long", "ID форм-фактора", true),
+                        new FieldMetadataDto("memoryType.id", "Long", "ID поколения памяти (DDR)", true),
+                        new FieldMetadataDto("modulesCount", "Integer", "Количество модулей в комплекте", false),
+                        new FieldMetadataDto("modulesSizeGb", "Integer", "Объем одного модуля (ГБ)", false),
+                        new FieldMetadataDto("isEcc", "Boolean", "Поддержка ECC", false),
+                        new FieldMetadataDto("isRegistered", "Boolean", "Является ли память буферизованной (Registered)", false)
+                )),
+                Map.entry("POWER_SUPPLY", List.of(
+                        new FieldMetadataDto("powerSupplyType.id", "Long", "ID форм-фактора БП", true),
+                        new FieldMetadataDto("modular.id", "Long", "ID типа модульности", true),
+                        new FieldMetadataDto("wattageW", "Integer", "Мощность (Вт)", false),
+                        new FieldMetadataDto("lengthMm", "Integer", "Длина (мм)", true),
+                        new FieldMetadataDto("atx4PinConnectors", "Integer", "Доступно 4-pin ATX (Мат. плата)", false),
+                        new FieldMetadataDto("eps8PinConnectors", "Integer", "Доступно 8-pin EPS (Процессор)", false),
+                        new FieldMetadataDto("pcie12PinConnectors", "Integer", "Доступно 12-pin PCIe", false),
+                        new FieldMetadataDto("pcie6Plus2PinConnectors", "Integer", "Доступно 6+2-pin PCIe", false),
+                        new FieldMetadataDto("pcie6PinConnectors", "Integer", "Доступно 6-pin PCIe", false),
+                        new FieldMetadataDto("pcie8PinConnectors", "Integer", "Доступно 8-pin PCIe", false),
+                        new FieldMetadataDto("pcie12vhpwrConnectors", "Integer", "Доступно 12VHPWR", false),
+                        new FieldMetadataDto("sataConnectors", "Integer", "Доступно SATA коннекторов", false),
+                        new FieldMetadataDto("molex4PinConnectors", "Integer", "Доступно Molex разъемов (4-pin)", false)
+                )),
+                Map.entry("CPU_COOLER", List.of(
+                        new FieldMetadataDto("isWaterCooled", "Boolean", "Является ли СЖО (водяное охлаждение)", false),
+                        new FieldMetadataDto("heightMm", "Integer", "Высота башни (мм)", true),
+                        new FieldMetadataDto("waterCooledSizeMm", "Integer", "Размер радиатора СЖО (мм)", true),
+                        new FieldMetadataDto("sockets", "Set", "Поддерживаемые сокеты", false)
+                )),
+                Map.entry("OPTICAL_DRIVE", List.of(
+                        new FieldMetadataDto("formFactor.id", "Long", "ID форм-фактора", true),
+                        new FieldMetadataDto("storageInterface.id", "Long", "ID интерфейса", true)
+                )),
+                Map.entry("STORAGE", List.of(
+                        new FieldMetadataDto("storageType.id", "Long", "ID типа накопителя (HDD/SSD)", true),
+                        new FieldMetadataDto("formFactor.id", "Long", "ID форм-фактора", true),
+                        new FieldMetadataDto("isExternal", "Boolean", "Является ли внешним накопителем", false),
+                        new FieldMetadataDto("capacityGb", "Integer", "Емкость (ГБ)", false)
+                )),
+                Map.entry("CASE_FAN", List.of(
+                        new FieldMetadataDto("sizeMm", "Integer", "Размер вентилятора (мм)", false),
+                        new FieldMetadataDto("pwm", "Boolean", "Поддержка PWM", false),
+                        new FieldMetadataDto("connectors", "Set", "Коннекторы подключения", false)
+                )),
+                Map.entry("MONITOR", List.of(
+                        new FieldMetadataDto("inputHdmi", "Integer", "Порты HDMI", false),
+                        new FieldMetadataDto("inputDp", "Integer", "Порты DisplayPort", false),
+                        new FieldMetadataDto("inputDvi", "Integer", "Порты DVI", false),
+                        new FieldMetadataDto("inputVga", "Integer", "Порты VGA", false),
+                        new FieldMetadataDto("inputUsbC", "Integer", "Порты USB Type-C", false),
+                        new FieldMetadataDto("inputMiniHdmi", "Integer", "Порты Mini-HDMI", false),
+                        new FieldMetadataDto("inputMicroHdmi", "Integer", "Порты Micro-HDMI", false),
+                        new FieldMetadataDto("inputMiniDp", "Integer", "Порты Mini-DisplayPort", false),
+                        new FieldMetadataDto("inputBnc", "Integer", "Порты BNC", false),
+                        new FieldMetadataDto("inputComponent", "Integer", "Порты Component", false),
+                        new FieldMetadataDto("inputSVideo", "Integer", "Порты S-Video", false),
+                        new FieldMetadataDto("inputVirtualLink", "Integer", "Порты VirtualLink", false)
+                )),
+                Map.entry("EXPANSION_CARD", List.of(
+                        new FieldMetadataDto("cardType", "Enum", "Тип карты расширения (SOUND, WIRED_NETWORK, WIRELESS_NETWORK)", false),
+                        new FieldMetadataDto("interfaceType.id", "Long", "ID интерфейса", true)
+                ))
+        );
+    }
+}

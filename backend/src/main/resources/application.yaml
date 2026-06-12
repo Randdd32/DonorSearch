@@ -1,0 +1,71 @@
+spring:
+  application:
+    name: Donor Search backend
+  profiles:
+    default: "dev"
+  datasource:
+    primary:
+      url: ${PRIMARY_DB_URL:jdbc:postgresql://localhost:5432/hardware_db}
+      username: ${PRIMARY_DB_USERNAME:postgres}
+      password: ${PRIMARY_DB_PASSWORD:postgres}
+      driver-class-name: org.postgresql.Driver
+      hikari:
+        maximum-pool-size: 10
+        connection-timeout: 30000
+    secondary:
+      url: ${SECONDARY_DB_URL:jdbc:sqlserver://infra-server:1433;databaseName=InfraManager;trustServerCertificate=true}
+      username: ${SECONDARY_DB_USERNAME:sa}
+      password: ${SECONDARY_DB_PASSWORD:password}
+      driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+      hikari:
+        maximum-pool-size: 10
+        connection-timeout: 30000
+  jpa:
+    properties:
+      hibernate:
+        default_batch_fetch_size: 100
+
+server:
+  port: 8080
+
+jwt:
+  secret: ${JWT_SECRET}
+  access-expiration-minutes: ${JWT_ACCESS_EXPIRATION_MINUTES:30}
+  refresh-expiration-days: ${JWT_REFRESH_EXPIRATION_DAYS:60}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health, info, prometheus"
+---
+spring:
+  config:
+    activate:
+      on-profile: "dev"
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+management:
+  endpoint:
+    health:
+      show-details: always
+---
+spring:
+  config:
+    activate:
+      on-profile: "prod"
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+
+management:
+  endpoint:
+    health:
+      show-details: never
